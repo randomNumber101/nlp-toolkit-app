@@ -1,6 +1,6 @@
-import React from 'react';
+import * as React from 'react';
 import ReactDOM from 'react-dom/client';
-import App from './App'; // Import your main App component
+import App from './frontend/screens/App.tsx'; // Import your main App component
 import './index.scss'; // Import your styles if necessary
 
 // Render the App component in the root div

@@ -23,7 +23,6 @@ def get_entrypoint():
     raise Exception('No index.html found')
 
 
-
 def set_interval(interval):
     def decorator(function):
         def wrapper(*args, **kwargs):
@@ -43,12 +42,8 @@ def set_interval(interval):
 
 entry = get_entrypoint()
 
-@set_interval(1)
-def update_ticker():
-    if len(webview.windows) > 0:
-        webview.windows[0].load_url(entry)
-
 
 if __name__ == '__main__':
-    window = webview.create_window('pywebview-react boilerplate', entry, js_api=Api())
-    webview.start(update_ticker, debug=True)
+    api = Api()
+    window = webview.create_window('NLP Toolkit', entry, js_api=api)
+    webview.start(debug=True)

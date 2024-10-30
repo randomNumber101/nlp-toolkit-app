@@ -8,5 +8,16 @@
 <body>
   <div id="root"></div> <!-- Use id "root" as the target for React to mount -->
   <script src="index.jsx"></script>
+  <script>
+          window.addEventListener('pywebviewready', async () => {
+              console.log('pywebviewready event fired');
+              if (window.pywebview && window.pywebview.api) {
+                  const result = await window.pywebview.api.simple_test();
+                  console.log(result);
+              } else {
+                  console.error('window.pywebview is not available');
+              }
+          });
+  </script>
 </body>
 </html>

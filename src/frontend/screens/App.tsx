@@ -1,14 +1,16 @@
-import React, { useState } from 'react';
-import LandingPage from './components/screens/LandingPage/LandingPage';
-import PipelineConfigScreen from './components/screens/PipelineConfigScreen/PipelineConfigScreen';
-import InputScreen from './components/screens/InputScreen/InputScreen';
-import ResultsScreen from './components/screens/ResultScreen/ResultScreen';
+import * as React from 'react';
+import {useState} from "react";
+import LandingPage from './LandingPage/LandingPage';
+import PipelineConfigScreen from './PipelineConfigScreen/PipelineConfigScreen';
+import InputScreen from './InputScreen/InputScreen';
+import ResultsScreen from './ResultScreen/ResultScreen';
+import {Pipeline} from '../types'
 
 function App() {
   const [currentScreen, setCurrentScreen] = useState('landing');
-  const [selectedPipeline, setSelectedPipeline] = useState(null);
+  const [selectedPipeline, setSelectedPipeline] = useState<Pipeline | null>(null);
 
-  const goToConfigScreen = (pipeline) => {
+  const goToConfigScreen = (pipeline : Pipeline) => {
     setSelectedPipeline(pipeline);
     setCurrentScreen('pipelineConfig');
   };
@@ -22,6 +24,7 @@ function App() {
   };
 
   const renderScreen = () => {
+
     switch (currentScreen) {
       case 'landing':
 
@@ -34,7 +37,11 @@ function App() {
 
         );
       case 'pipelineConfig':
-        return <PipelineConfigScreen pipeline={selectedPipeline} onNext={goToInputScreen} />;
+        return <PipelineConfigScreen
+            pipeline={selectedPipeline}
+            onNext={goToInputScreen}
+            onSavePipeline={(updatedPipeline) => setSelectedPipeline(updatedPipeline)}
+          />;
       case 'input':
         return <InputScreen onNext={goToResultsScreen} />;
       case 'results':

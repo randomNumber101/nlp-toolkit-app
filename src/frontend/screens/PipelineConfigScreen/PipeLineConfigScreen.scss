@@ -1,0 +1,31 @@
+.pipeline-config-screen {
+  padding: 20px;
+}
+
+.pipeline-config-screen label {
+  display: block;
+  margin-bottom: 15px;
+}
+
+.steps-list {
+  margin-top: 20px;
+}
+
+.step-card {
+  border: 1px solid #ddd;
+  padding: 15px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+}
+
+.step-actions button {
+  margin-right: 5px;
+}
+
+.add-step-button,
+.save-button {
+  margin-top: 20px;
+  padding: 10px 20px;
+  cursor: pointer;
+}

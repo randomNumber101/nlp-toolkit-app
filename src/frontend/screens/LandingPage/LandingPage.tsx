@@ -1,14 +1,10 @@
 import * as React from 'react'
+import {useEffect, useState} from 'react';
 
 import "./LandingPage.scss"
+import {Pipeline} from "../../types";
+import { listPipelines } from '../../utils/pipelineApi';
 
-import { useState } from 'react';
-
-interface Pipeline {
-  id: number;
-  name: string;
-  description: string;
-}
 
 interface LandingPageProps {
   onAddPipeline: () => void;
@@ -19,9 +15,28 @@ interface LandingPageProps {
 const LandingPage = ({onAddPipeline, onSelectPipeline, onRunPipeline} : LandingPageProps) => {
   // Sample data for pipelines, in a real app you would fetch this data or manage it with global state
   const [pipelines, setPipelines] = useState<Pipeline[]>([
-    { id: 1, name: 'Sentiment Analysis', description: 'Analyze the sentiment of text data' },
-    { id: 2, name: 'Topic Modeling', description: 'Identify topics within a document' },
+    { id: 1, name: 'Sentiment Analysis', description: 'Analyze the sentiment of text data' , steps: []},
+    { id: 2, name: 'Topic Modeling', description: 'Identify topics within a document', steps: [] },
   ]);
+
+  React.useEffect(() => {
+    async function fetchPipelines() {
+      const pipelines = await listPipelines();
+      console.log(pipelines[0])
+      setPipelines(pipelines);
+    }
+    window.addEventListener('pywebviewready', async () => {
+      console.log("Listening to ready event.")
+      if (window.pywebview && window.pywebview.api) {
+        console.log("pywebview is available"); // Should print "API is connected!" if everything is working
+        fetchPipelines()
+      } else {
+        console.error("pywebview API is not available.");
+      }
+    });
+  }, []);
+
+
 
   const handleAddPipeline = () => {
     // Triggered when user clicks "Add Pipeline"
