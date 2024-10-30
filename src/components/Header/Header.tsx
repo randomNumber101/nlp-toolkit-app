@@ -8,7 +8,7 @@ export default function Header() {
   return (
     <div className='header-container'>
       <img className='logo' src={logo} alt='pywebview'/>
-      <h2>pywebview</h2>
+      <h2>pywebview test</h2>
 
       <div className='links'>
         <a href='https://pywebview.flowrl.com/' target='_blank'>Documentation</a>

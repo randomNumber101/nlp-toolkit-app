@@ -5,7 +5,7 @@ added_files = [
     ('./gui', 'gui'),
 ]
 
-a = Analysis(['./src/index.py'],
+a = Analysis(['./main.py'],
              pathex=['./dist'],
              binaries=[],
              datas=added_files,

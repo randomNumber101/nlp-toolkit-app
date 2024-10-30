@@ -1,7 +1,7 @@
 {
   "name": "pywebview-react-boilerplate",
   "version": "1.0.0",
-  "description": "A simple boilerplate to get started with pywebview and React",
+  "description": "A Toolbox for natural language processing (NLP)",
   "main": "index.js",
   "scripts": {
     "build": "npm run clean && npm run frontend:prod && run-script-os",
@@ -41,10 +41,12 @@
   },
   "homepage": "https://github.com/r0x0r/pywebview-react-boilerplate#readme",
   "dependencies": {
+    "deasync": "^0.1.30",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
+    "@types/react": "^18.3.12",
     "parcel-bundler": "^1.12.5",
     "run-script-os": "^1.1.6",
     "sass": "^1.63.6",
