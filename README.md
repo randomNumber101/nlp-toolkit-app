@@ -24,11 +24,9 @@ nlp-toolkit-app/
 ├── index.py                   # Starts pywebview (Main)
 ```
 ## Key Files
-backend/Api.py: Contains the Python API functions (e.g., save_pipeline, load_pipeline) that the frontend calls through pywebview.
-frontend/screens/: Holds main screens of the app, including LandingPage, PipelineConfigScreen, and ResultScreen.
-types/: Contains TypeScript type definitions, including Pipeline and Step, to enforce consistent data handling.
-utils/pipelineApi.ts: Functions for interacting with the backend API (loading, saving, listing pipelines).
-main.py: Initializes the pywebview window and links the Api class to the frontend.
-Running the Application
-Install dependencies:
+- backend/Api.py: Contains the Python API functions (e.g., save_pipeline, load_pipeline) that the frontend calls through pywebview.
+- frontend/screens/: Holds main screens of the app, including LandingPage, PipelineConfigScreen, and ResultScreen.
+- types/: Contains TypeScript type definitions, including Pipeline and Step, to enforce consistent data handling.
+- utils/pipelineApi.ts: Functions for interacting with the backend API (loading, saving, listing pipelines).
+- main.py: Initializes the pywebview window and links the Api class to the frontend.
 
