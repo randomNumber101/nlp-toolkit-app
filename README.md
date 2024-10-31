@@ -1,47 +1,34 @@
-# pywebview-react-boilerplate
-This is a  simple boilerplate to help you start with _pywebview_ and React. It sets up the development environment, install dependencies, as well as provides scripts for building an executable. Stack is based on pywebview, React, SASS, Parcel bundler, pyinstaller (Windows/Linux) and py2app (macOS).
+# NLP Toolkit Application
 
-## Requirements
-- Python 3
-- Node
-- virtualenv
+This project is an NLP (Natural Language Processing) toolkit built with **pywebview**, **React**, and **TypeScript**. The application allows users to create, configure, and run NLP pipelines with various processing steps.
 
-## Installation
+## Folder Structure
 
-``` bash
-npm run init
+```plaintext
+nlp-toolkit-app/
+├── src/
+│   ├── assets/                # Static assets for the application
+│   ├── backend/               # Backend 
+│   │   ├── storage/             # Static memory
+│   │   │   └── pipelines/       # JSON files for each pipeline
+│   │   └── Api.py               # Python API exposed to the frontend via pywebview
+│   ├── frontend/              # Frontend 
+│   │   ├── components/          # Reusable React components
+│   │   └── screens/             # Screen components (LandingPage, PipelineConfigScreen, etc.)
+│   ├── types/                 # TypeScript type definitions for the application
+│   ├── utils/                 # 
+│   │   └── pipelineApi.ts     # Functions to interact with the backend API
+│   └── styles/                # SCSS files for global and component styles
+├── index.html                 # The root html element
+├── index.jsx                  # Mounts App to the root element
+├── index.py                   # Starts pywebview (Main)
 ```
+## Key Files
+backend/Api.py: Contains the Python API functions (e.g., save_pipeline, load_pipeline) that the frontend calls through pywebview.
+frontend/screens/: Holds main screens of the app, including LandingPage, PipelineConfigScreen, and ResultScreen.
+types/: Contains TypeScript type definitions, including Pipeline and Step, to enforce consistent data handling.
+utils/pipelineApi.ts: Functions for interacting with the backend API (loading, saving, listing pipelines).
+main.py: Initializes the pywebview window and links the Api class to the frontend.
+Running the Application
+Install dependencies:
 
-This will create a virtual environment, install pip and Node dependencies. Alternatively you can perform these steps manually.
-
-``` bash
-npm install
-pip install -r requirements.txt
-```
-
-On Linux systems installation system makes educated guesses. If you run KDE, QT dependencies are installed, otherwise GTK is chosen. `apt` is used for installing GTK dependencies. In case you are running a non apt-based system, you will have to install GTK dependencies manually. See [installation](https://pywebview.flowrl.com/guide/installation.html) for details.
-
-## Usage
-
-To launch the application.
-
-``` bash
-npm run start
-```
-
-To build an executable. The output binary will be produced in the `dist` directory.
-
-``` bash
-npm run build
-```
-
-To start a development server (only for testing frontend code).
-
-``` bash
-npm run dev
-```
-
-
-## Bug reporting
-
-Please report _pywebview_ related bugs directly to [pywebview's repository](https://github.com/r0x0r/pywebview). This repository is only for the issues related to this boilerplate.
