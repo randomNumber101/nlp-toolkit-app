@@ -1,0 +1,47 @@
+{
+  "id" : "DummyStep",
+  "name": "Classify nouns",
+  "parameters": {
+    "threshold" : {
+      "type" : "float",
+      "default" : 0.1,
+      "description" : "Sets the classification threshold."
+    },
+    "should return": "bool",
+    "LLM config" : {
+      "type" : "complex",
+      "description": "Config for the LLM",
+      "model" : {
+        "type" : "string",
+        "input" : {
+          "type" : "picker",
+          "possibilities": ["BertForNounClassification", "ProbabilisticClassificaion", "Heuristic"]
+        },
+        "default" : "BertForNounClassification",
+        "description" : "Model used for Classification"
+      },
+      "tokenization" : "bool",
+      "num heads": {
+        "type" : "int",
+        "input" : {
+          "type" : "slider",
+          "min" : 4,
+          "max" : 12,
+          "step" : 2
+        }
+      }
+    },
+    "dimensions" : {
+      "type" : "bool",
+      "default": true
+    }
+  },
+  "inputs": {
+    "text" : "text",
+    "original text" : "text"
+  },
+  "outputs" : {
+    "detected nouns" : "list[int]",
+    "visualization" : "html"
+  }
+}

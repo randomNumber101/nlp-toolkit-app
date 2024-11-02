@@ -19,11 +19,12 @@ interface Pipeline {
 
 interface PipelineConfigScreenProps {
   pipeline: Pipeline | null;
+  onPrevious: () => void;
   onNext: () => void;
   onSavePipeline: (updatedPipeline: Pipeline) => void;
 }
 
-const PipelineConfigScreen: React.FC<PipelineConfigScreenProps> = ({ pipeline, onNext, onSavePipeline }) => {
+const PipelineConfigScreen: React.FC<PipelineConfigScreenProps> = ({ pipeline, onPrevious, onNext, onSavePipeline }) => {
   const [pipelineName, setPipelineName] = useState(pipeline?.name || '');
   const [steps, setSteps] = useState<Step[]>(pipeline?.steps || []);
 
@@ -52,13 +53,11 @@ const PipelineConfigScreen: React.FC<PipelineConfigScreenProps> = ({ pipeline, o
     setSteps(newSteps);
   };
 
-  // Save the pipeline and go to the next screen
   const handleSavePipeline = () => {
     if (pipeline) {
       const updatedPipeline = { ...pipeline, name: pipelineName, steps };
       onSavePipeline(updatedPipeline);
     }
-    onNext();
   };
 
   return (
@@ -95,7 +94,11 @@ const PipelineConfigScreen: React.FC<PipelineConfigScreenProps> = ({ pipeline, o
       <button onClick={handleAddStep} className="add-step-button">+ Add Step</button>
 
       {/* Save Button */}
-      <button onClick={handleSavePipeline} className="save-button">Save and Next</button>
+      <div className="navigation">
+        <button onClick={onPrevious} className="back-button">Go back</button>
+        <button onClick={handleSavePipeline} className="next-button">Save</button>
+        <button onClick={onNext} className="save-button">Run Pipeline</button>
+      </div>
     </div>
   );
 };

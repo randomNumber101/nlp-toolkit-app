@@ -1,14 +1,20 @@
 import json
 import os
 
+from src.backend.storage.storageApi import StorageApi
+
 
 class Api:
+
+    STORAGE = StorageApi()
+
     def __init__(self):
         # Define the storage directory for pipelines
         self.storage_path = os.path.join(os.path.dirname(__file__), 'storage', 'pipelines')
         os.makedirs(self.storage_path, exist_ok=True)  # Create directory if it doesn’t exist
 
-    def save_pipeline(self, pipeline_id, config):
+    def save_pipeline(self, config):
+        pipeline_id = config["id"]
         """Save a pipeline configuration as a JSON file in the storage/pipelines directory."""
         file_path = os.path.join(self.storage_path, f"{pipeline_id}.json")
         with open(file_path, 'w') as file:

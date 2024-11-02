@@ -5,10 +5,15 @@ import PipelineConfigScreen from './PipelineConfigScreen/PipelineConfigScreen';
 import InputScreen from './InputScreen/InputScreen';
 import ResultsScreen from './ResultScreen/ResultScreen';
 import {Pipeline} from '../types'
+import {savePipeline} from "../utils/pipelineApi";
 
 function App() {
   const [currentScreen, setCurrentScreen] = useState('landing');
   const [selectedPipeline, setSelectedPipeline] = useState<Pipeline | null>(null);
+
+  const goToLandingPage = () => {
+    setCurrentScreen('landing')
+  }
 
   const goToConfigScreen = (pipeline : Pipeline) => {
     setSelectedPipeline(pipeline);
@@ -22,6 +27,12 @@ function App() {
   const goToResultsScreen = () => {
     setCurrentScreen('results');
   };
+
+  const onSavePipeline = (pipeline: Pipeline) => {
+    savePipeline(pipeline).catch(console.log);
+    setSelectedPipeline(pipeline);
+    setCurrentScreen('landing');
+  }
 
   const renderScreen = () => {
 
@@ -39,8 +50,9 @@ function App() {
       case 'pipelineConfig':
         return <PipelineConfigScreen
             pipeline={selectedPipeline}
+            onPrevious={goToLandingPage}
             onNext={goToInputScreen}
-            onSavePipeline={(updatedPipeline) => setSelectedPipeline(updatedPipeline)}
+            onSavePipeline={onSavePipeline}
           />;
       case 'input':
         return <InputScreen onNext={goToResultsScreen} />;

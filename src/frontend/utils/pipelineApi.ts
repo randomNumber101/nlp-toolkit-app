@@ -40,10 +40,10 @@ export async function loadPipeline(pipelineId: number): Promise<Pipeline | null>
 }
 
 // Save a pipeline configuration by its ID
-export async function savePipeline(pipelineId: string, config: Pipeline): Promise<boolean> {
+export async function savePipeline(config: Pipeline): Promise<boolean> {
   await waitForPywebview();
   try {
-    const response = await window.pywebview.api.save_pipeline(pipelineId, config);
+    const response = await window.pywebview.api.save_pipeline(config);
     if (response.status === 'success') {
       console.log(response.message);
       return true;
