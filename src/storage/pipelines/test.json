@@ -1,0 +1,26 @@
+{
+    "id": 123,
+    "name": "Sentiment Analysis Pipeline",
+    "description": "Pipeline for analyzing sentiment",
+    "steps": [
+        {
+            "id": "DummyStep",
+            "values" : {
+                "threshold" : 0.2,
+                "LLMConfig" : {
+                    "model" : 1
+                }
+            }
+        },
+        {
+            "id": "DummyStep",
+            "values": {
+                "threshold" : 0.3,
+                "LLMConfig" : {
+                    "tokenization" : true
+                }
+
+            }
+        }
+    ]
+}

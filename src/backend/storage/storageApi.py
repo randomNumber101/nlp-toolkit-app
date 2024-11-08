@@ -1,16 +1,17 @@
 import os
 import json
 
-from src.backend.storage.parsing import StepBlueprintParser
+from backend.storage.parsing import StepBlueprintParser, PipelineParser
 
 from ..register import Register
+from ..transferObjects.pipelineTransferObjects import convert_pipeline_to_transfer, convert_step_blueprint_to_transfer
 
 
 class Paths:
     def __init__(self):
         self.storage = os.path.dirname(__file__)
-        self.pipelines = os.path.join(self.storage, "pipelines")
-        self.steps = os.path.join(self.storage, "steps")
+        self.pipelines = os.path.join(self.storage, "../../storage/pipelines")
+        self.steps = os.path.join(self.storage, "../../storage/steps")
 
 
 def list_jsons(path):
@@ -24,25 +25,25 @@ class PipelineApi:
         self.PATHS = paths
         self.PIPELINES = paths.pipelines
 
-    def save_pipeline(self, config):
-        pipeline_id = config["id"]
-        """Save a pipeline configuration as a JSON file in the storage/pipelines directory."""
-        file_path = os.path.join(self.PIPELINES, f"{pipeline_id}.json")
+    def save_pipeline(self, pipeline):
+        jsonObj = PipelineParser.to_json(pipeline)
+        file_path = os.path.join(self.PIPELINES, f"{pipeline.id}.json")
         with open(file_path, 'w') as file:
-            json.dump(config, file, indent=4)  # Save with indentation for readability
-        return {"message": f"Pipeline {pipeline_id} saved."}
+            json.dump(jsonObj, file, indent=4)
+
 
     def load_pipeline(self, pipeline_id):
         """Load a pipeline configuration from a JSON file in the storage/pipelines directory."""
         file_path = os.path.join(self.PIPELINES, f"{pipeline_id}.json")
         if not os.path.exists(file_path):
-            return {"status": "error", "message": f"Pipeline {pipeline_id} not found."}
+            raise FileNotFoundError(f"No pipeline with if {pipeline_id} found")
 
         with open(file_path, 'r') as file:
             config = json.load(file)
-        return config
+            pipeline = PipelineParser.from_json(config)
+        return pipeline
 
-    def list_pipelines(self):
+    def load_all(self):
         """List all saved pipeline configurations by reading filenames in storage/pipelines."""
         pipeline_ids = list_jsons(self.PIPELINES)
         pipelines = [self.load_pipeline(pid) for pid in pipeline_ids]
@@ -90,5 +91,26 @@ class StorageApi:
         self.PIPELINES = PipelineApi(self.PATHS)
         self.STEPS = StepsApi(self.PATHS)
 
-    def load_pipeline(self, *args, **kwargs):
-        return self.PIPELINES.load_pipeline(*args, **kwargs)
+    def load_pipeline(self, pipeline_id):
+        pipeline = self.PIPELINES.load_pipeline(pipeline_id)
+        return convert_pipeline_to_transfer(pipeline).to_dict()
+
+    def load_all_pipelines(self):
+        pipelines = self.PIPELINES.load_all()
+        return [convert_pipeline_to_transfer(p).to_dict() for p in pipelines]
+
+    def save_pipeline(self, pipelineObj):
+        # Deserialize and serialize to ensure type compatibility
+        pipeline = PipelineParser.from_json(pipelineObj)
+        self.PIPELINES.save_pipeline(pipeline)
+        return True
+
+    def load_step(self, step_id):
+        stepBP = self.STEPS.load_step(step_id)
+        return convert_step_blueprint_to_transfer(stepBP).to_dict()
+
+    def load_all_steps(self):
+        stepBPs = self.STEPS.load_all()
+        return [convert_step_blueprint_to_transfer(stepBP).to_dict() for stepBP in stepBPs]
+
+

@@ -2,7 +2,7 @@ import os
 import threading
 import webview
 
-from src.backend import Api
+from backend.Api import Api
 
 
 def get_entrypoint():

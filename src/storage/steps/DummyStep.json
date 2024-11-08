@@ -14,7 +14,7 @@
       "model" : {
         "type" : "string",
         "input" : {
-          "type" : "picker",
+          "type" : "list",
           "possibilities": ["BertForNounClassification", "ProbabilisticClassificaion", "Heuristic"]
         },
         "default" : "BertForNounClassification",

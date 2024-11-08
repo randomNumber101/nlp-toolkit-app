@@ -1,9 +1,8 @@
-from src.backend.generaltypes import StepOperation, Payload
+from backend.generaltypes import StepOperation, Payload
 
-# Operation will be automatically
 class DummyOperation(StepOperation):
     def __init__(self):
-        super().__init__("dummy")
+        super().__init__("DummyStep")
 
     def run(self, payload: Payload):
         print("Dummy Operation was run!")

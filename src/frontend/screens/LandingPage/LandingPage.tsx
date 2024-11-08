@@ -3,7 +3,7 @@ import {useEffect, useState} from 'react';
 
 import "./LandingPage.scss"
 import {Pipeline} from "../../types";
-import { listPipelines } from '../../utils/pipelineApi';
+import {listPipelines, listStepBlueprints} from '../../utils/pipelineApi';
 
 
 interface LandingPageProps {
@@ -15,9 +15,9 @@ interface LandingPageProps {
 const LandingPage = ({onAddPipeline, onSelectPipeline, onRunPipeline} : LandingPageProps) => {
   // Sample data for pipelines, in a real app you would fetch this data or manage it with global state
   const [pipelines, setPipelines] = useState<Pipeline[]>([
-    { id: 1, name: 'Sentiment Analysis', description: 'Analyze the sentiment of text data' , steps: []},
-    { id: 2, name: 'Topic Modeling', description: 'Identify topics within a document', steps: [] },
-  ]);
+    { id: "sentiment", name: 'Sentiment Analysis', description: 'Analyze the sentiment of text data' , steps: []},
+    { id: "topic_moddeling", name: 'Topic Modeling', description: 'Identify topics within a document', steps: [] },
+  ] );
 
   React.useEffect(() => {
     async function fetchPipelines() {

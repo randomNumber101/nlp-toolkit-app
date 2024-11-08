@@ -1,8 +1,8 @@
 from typing import Callable, Dict, Any, List
-from src.backend.parameterTypes import ParameterPicker, Parameter, ParamType, InputOutputDefinition, \
+from backend.parameterTypes import ParameterPicker, Parameter, ParamType, InputOutputDefinition, \
     StaticParameter, ComplexType, ComplexPicker
-from src.backend.generaltypes import StepBlueprint, StepOperationMapper
-
+from backend.generaltypes import StepBlueprint, StepOperationMapper, Pipeline, StepValues
+import uuid
 
 # Utility functions to extract fields with optional default values
 def get(obj: Dict[str, Any], field: str) -> Any:
@@ -22,9 +22,11 @@ class ParameterTypeParser:
 
     def registerType(self, pt: ParamType):
         if pt.name not in self.typeMap:
-            self.typeMap[pt.name] = pt.type
+            self.typeMap[pt.name] = pt
 
     def parse(self, name, strict=True):
+        if strict is None:
+            strict = True
         if name in self.typeMap:
             return self.typeMap[name]
         elif not strict:
@@ -71,15 +73,18 @@ class ParameterPickerParser:
     def useDefault(self, paramType: ParamType) -> ParameterPicker:
         if paramType in self.defaultPickers:
             return self.defaultPickers[paramType]
+        else:
+            raise NotImplementedError(f"No default picker installed for type {paramType}")
 
 
 # Class to parse parameters, including complex types
 class ParameterParser:
     def __init__(self, parameterTypeParser: ParameterTypeParser, pickerParser: ParameterPickerParser,
-                 enforceStatic=False):
+                 enforceStatic=False, strictTyping=None):
         self.typeParser = parameterTypeParser
         self.pickerParser = pickerParser
         self.enforceStatic = enforceStatic
+        self.strictTyping = strictTyping
 
     def parseParameterObject(self, name: str, param_obj: Dict[str, Any]) -> Parameter | StaticParameter:
         param_type_str = get(param_obj, "type")
@@ -87,7 +92,7 @@ class ParameterParser:
         default_value = getOptional(param_obj, "default")
 
         if not param_type_str == "complex":
-            param_type = self.typeParser(param_type_str)
+            param_type = self.typeParser(param_type_str, strict=self.strictTyping)
             picker_obj = getOptional(param_obj, "input")
 
             if self.enforceStatic:
@@ -101,20 +106,22 @@ class ParameterParser:
                 return StaticParameter(name, picker, description, default_value)
             else:
                 return Parameter(name, param_type, description, default_value)
-
-        del param_obj["type"]
-        if "description" in param_obj:
-            del param_obj["description"]
-        if "default" in param_obj:
-            del param_obj["default"]
-
-        parameters = self.parseParameters(param_obj)
-        if self.pickerParser is not None:
-            picker = ComplexPicker(parameters)
-            return StaticParameter(name, picker, description, default_value)
         else:
-            paramType = ComplexType({p.name: p.type for p in parameters})
-            return Parameter(name, paramType, description, default_value)
+            # For Complex (composite) types, parse residual key-values as parameters.
+
+            del param_obj["type"]
+            if "description" in param_obj:
+                del param_obj["description"]
+            if "default" in param_obj:
+                del param_obj["default"]
+
+            parameters = self.parseParameters(param_obj)
+            if self.pickerParser is not None:
+                picker = ComplexPicker(parameters)
+                return StaticParameter(name, picker, description, default_value)
+            else:
+                paramType = ComplexType({p.name: p.type for p in parameters})
+                return Parameter(name, paramType, description, default_value)
 
     def parseParameters(self, param_obj: Dict[str, Any]) -> List[Parameter | StaticParameter]:
         parameters = []
@@ -125,8 +132,15 @@ class ParameterParser:
                 parameters.append(self.parseParameterObject(name, param_def))
             elif isinstance(param_def, str):
                 # Simple parameters without detailed definitions (e.g., "bool")
-                param_type = self.typeParser(param_def)
-                parameters.append(Parameter(name, param_type))
+                param_type = self.typeParser(param_def, strict=self.strictTyping)
+                try:
+                    picker = self.pickerParser.useDefault(param_type)
+                    parameter = StaticParameter(name, picker)
+                except NotImplementedError as e:
+                    if self.enforceStatic:
+                        raise e
+                    parameter = Parameter(name, param_type)
+                parameters.append(parameter)
         return parameters
 
 
@@ -135,7 +149,7 @@ class StepBlueprintParser:
     def __init__(self, pTypesParser: ParameterTypeParser, pPickerParser: ParameterPickerParser,
                  operationMapper: StepOperationMapper):
         self.staticParser = ParameterParser(pTypesParser, pPickerParser, enforceStatic=True)
-        self.dynamicParser = ParameterParser(pTypesParser, pPickerParser, enforceStatic=False)
+        self.dynamicParser = ParameterParser(pTypesParser, pPickerParser, enforceStatic=False, strictTyping=False)
         self.operationMapper = operationMapper
 
     def parse(self, stepObject: Dict[str, Any]) -> StepBlueprint:
@@ -158,10 +172,57 @@ class StepBlueprintParser:
         in_out_def = InputOutputDefinition(staticInputs=parameters, dynamicInputs=input_params, outputs=output_params)
 
         # Instantiate the StepBlueprint
-        operation = self.operationMapper.getOperation(step_id)  # Placeholder; actual implementation will vary
+        operation = self.operationMapper.getOperation(step_id)
         step_blueprint = StepBlueprint(step_id, name, operation, description, inOutDef=in_out_def)
 
         return step_blueprint
 
     def __call__(self, stepObject: Dict[str, Any]) -> StepBlueprint:
         return self.parse(stepObject)
+
+
+
+
+
+class PipelineParser:
+    @staticmethod
+    def from_json(json_data: Dict[str, Any]) -> Pipeline:
+        """
+        Parses a JSON object into a Pipeline instance.
+        """
+        # Extract basic pipeline details
+        pipeline_id = json_data.get("id", str(uuid.uuid4()))
+        name = json_data.get("name", f"Pipeline {pipeline_id}")
+        description = json_data.get("description", "")
+
+        # Parse steps
+        steps = []
+        for step_data in json_data.get("steps", []):
+            step_id = step_data["id"]
+            values = step_data.get("values", {})
+            step = StepValues(step_id, values)
+            steps.append(step)
+
+        # Create and return Pipeline instance
+        return Pipeline(id=pipeline_id, name=name, description=description, steps=steps)
+
+    @staticmethod
+    def to_json(pipeline: Pipeline) -> Dict[str, Any]:
+        """
+        Converts a Pipeline instance into a JSON-serializable dictionary.
+        """
+        # Create JSON-compatible dictionary from Pipeline
+        pipeline_dict = {
+            "id": pipeline.id,
+            "name": pipeline.name,
+            "description": pipeline.description,
+            "steps": [
+                {
+                    "id": step.stepId,
+                    "values": step.values
+                }
+                for step in pipeline.steps
+            ]
+        }
+        return pipeline_dict
+

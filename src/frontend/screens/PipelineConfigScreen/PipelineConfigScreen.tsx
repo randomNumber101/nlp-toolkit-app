@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useState } from 'react';
 
 import "./PipelineConfigScreen.scss";
+import StepConfigClass from "../../components/StepConfig";
 
 interface Step {
   id: number;

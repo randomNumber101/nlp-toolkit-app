@@ -1,14 +1,22 @@
 // src/utils/pipelineApi.ts
 
-import {Pipeline} from "../types";
+import { Pipeline, StepBlueprint, StepValues } from "../types";
+
+function unpackResponse(response: any) {
+  if (response instanceof Error) {
+    console.error(response.message);
+    throw response;
+  }
+  return response;
+}
 
 async function waitForPywebview(): Promise<void> {
   return new Promise((resolve, reject) => {
     const interval = setInterval(() => {
-      if (typeof window.pywebview !== 'undefined' && window.pywebview.api) {
+      if (typeof window.pywebview !== "undefined" && window.pywebview.api) {
         clearInterval(interval);
         clearTimeout(timeout);
-        console.log("Webview is available. Exiting poll loop.")
+        console.log("Webview is available. Exiting poll loop.");
         resolve();
       }
       console.log("Webview not available, yet");
@@ -23,16 +31,12 @@ async function waitForPywebview(): Promise<void> {
 }
 
 // Load a single pipeline by its ID
-export async function loadPipeline(pipelineId: number): Promise<Pipeline | null> {
+export async function loadPipeline(pipelineId: string): Promise<Pipeline | null> {
   await waitForPywebview();
   try {
     const response = await window.pywebview.api.load_pipeline(pipelineId);
-    if (response.status === 'success') {
-      return response.data as Pipeline;
-    } else {
-      console.error(response.message);
-      return null;
-    }
+    const result = unpackResponse(response);
+    return result as Pipeline; // Cast to Pipeline interface
   } catch (error) {
     console.error("Failed to load pipeline:", error);
     return null;
@@ -44,32 +48,48 @@ export async function savePipeline(config: Pipeline): Promise<boolean> {
   await waitForPywebview();
   try {
     const response = await window.pywebview.api.save_pipeline(config);
-    if (response.status === 'success') {
-      console.log(response.message);
-      return true;
-    } else {
-      console.error(response.message);
-      return false;
-    }
+    const result = unpackResponse(response);
+    return result as boolean; // Cast result to boolean
   } catch (error) {
     console.error("Failed to save pipeline:", error);
     return false;
   }
 }
 
-// List all pipeline IDs
+// List all pipelines
 export async function listPipelines(): Promise<Pipeline[]> {
   await waitForPywebview();
   try {
-    const response = await window.pywebview.api.list_pipelines();
-    if (response.status === 'success') {
-      return response.data.map(res => res.data);
-    } else {
-      console.error(response.message);
-      return [];
-    }
+    const response = await window.pywebview.api.STORAGE.load_all_pipelines();
+    console.log(response)
+    const result = unpackResponse(response);
+    return result as Pipeline[]; // Cast response to Pipeline array
   } catch (error) {
     console.error("Failed to list pipelines:", error);
     return [];
+  }
+}
+
+// List all step blueprints
+export async function listStepBlueprints(): Promise<StepBlueprint[]> {
+  await waitForPywebview();
+
+  const response = await window.pywebview.api.STORAGE.load_all_steps();
+  console.log(response)
+  const result = unpackResponse(response);
+  return result as StepBlueprint[]; // Cast response to StepBlueprint array
+
+}
+
+// Load a specific step blueprint by its ID
+export async function loadStepBlueprint(stepId: string): Promise<StepBlueprint | null> {
+  await waitForPywebview();
+  try {
+    const response = await window.pywebview.api.load_step(stepId);
+    const result = unpackResponse(response);
+    return result as StepBlueprint; // Cast to StepBlueprint interface
+  } catch (error) {
+    console.error("Failed to load step blueprint:", error);
+    return null;
   }
 }
