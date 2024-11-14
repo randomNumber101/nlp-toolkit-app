@@ -33,7 +33,7 @@ class PickerObjectTransfer:
             return {
                 "name": self.name,
                 "outputType": "complex",
-                "inner": [param.to_dict() for param in self.parameters]
+                "parameters": [param.to_dict() for param in self.parameters]
             }
         else:
             return {

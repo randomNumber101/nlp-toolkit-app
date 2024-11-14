@@ -15,8 +15,8 @@ interface LandingPageProps {
 const LandingPage = ({onAddPipeline, onSelectPipeline, onRunPipeline} : LandingPageProps) => {
   // Sample data for pipelines, in a real app you would fetch this data or manage it with global state
   const [pipelines, setPipelines] = useState<Pipeline[]>([
-    { id: "sentiment", name: 'Sentiment Analysis', description: 'Analyze the sentiment of text data' , steps: []},
-    { id: "topic_moddeling", name: 'Topic Modeling', description: 'Identify topics within a document', steps: [] },
+    { id: "sentiment", name: 'Test', description: 'Analyze the sentiment of text data' , steps: []},
+    //{ id: "topic_moddeling", name: 'Topic Modeling ><', description: 'Identify topics within a document', steps: [] },
   ] );
 
   React.useEffect(() => {
@@ -34,7 +34,7 @@ const LandingPage = ({onAddPipeline, onSelectPipeline, onRunPipeline} : LandingP
         console.error("pywebview API is not available.");
       }
     });
-  }, []);
+  }, [pipelines]);
 
 
 
@@ -45,6 +45,8 @@ const LandingPage = ({onAddPipeline, onSelectPipeline, onRunPipeline} : LandingP
 
   const handleSelectPipeline = (pipeline: Pipeline) => {
     // Triggered when user clicks "Configure" on a pipeline
+    console.log("User clicked on pipeline:")
+    console.log(pipeline)
     onSelectPipeline(pipeline);
   };
 

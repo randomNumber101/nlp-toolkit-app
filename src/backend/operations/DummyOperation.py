@@ -1,5 +1,6 @@
 from backend.generaltypes import StepOperation, Payload
 
+
 class DummyOperation(StepOperation):
     def __init__(self):
         super().__init__("DummyStep")
@@ -11,4 +12,3 @@ class DummyOperation(StepOperation):
             "type": "plaintext",
             "content": "This is the visualized result of Dummy Operation."
         }
-

@@ -23,7 +23,7 @@ class ParamType(Generic[T]):
         return self.parse(value)
 
     def __repr__(self):
-        return f"Type {self.name}"
+        return self.name.lower()
 
 
 class ListType(ParamType):

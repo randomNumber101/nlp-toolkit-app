@@ -2,7 +2,7 @@
 import * as React from 'react';
 
 interface OptionsPickerProps {
-  options: Array<{ label: string; value: any }>;
+  options: Array<string>;
   value: any;
   onChange: (value: any) => void;
 }
@@ -10,8 +10,8 @@ interface OptionsPickerProps {
 const OptionsPicker: React.FC<OptionsPickerProps> = ({ options, value, onChange }) => (
   <select value={value} onChange={(e) => onChange(e.target.value)}>
     {options.map((option) => (
-      <option key={option.value} value={option.value}>
-        {option.label}
+      <option key={option} value={option}>
+        {option}
       </option>
     ))}
   </select>

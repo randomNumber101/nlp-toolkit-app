@@ -1,0 +1,74 @@
+// src/components/valuePicker/Pickers.scss
+
+// General picker container styling
+.picker-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  margin: 10px 0;
+  position: relative;
+  width: 100%; // Make it take full width of the parent for better alignment
+
+  label {
+    font-weight: bold;
+    margin-right: 10px; // Space between label and picker
+    text-align: left;
+    min-width: 150px; // Ensures labels align by giving them a fixed width
+  }
+
+  .tooltip {
+    visibility: hidden;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    border-radius: 5px;
+    padding: 5px;
+    position: absolute;
+    bottom: -30px; // Position the tooltip further down to avoid covering the picker
+    z-index: 1;
+    font-size: 12px;
+  }
+
+  &:hover .tooltip {
+    visibility: visible;
+  }
+}
+
+// Complex picker styling
+.complex-picker {
+  border: 2px solid #007acc;
+  padding: 15px;
+  border-radius: 5px;
+  margin: 10px auto; // Centers complex picker within parent
+  width: 80%; // Make complex picker width smaller to be distinct
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box; // Ensure padding doesn’t increase box size
+
+  .complex-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    h4 {
+      font-size: 1.2em;
+      margin: 0;
+    }
+
+    .description {
+      font-size: 0.9em;
+      color: #666;
+      text-align: center;
+      margin-top: 5px;
+    }
+  }
+
+  .complex-body {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding: 10px 0;
+  }
+}

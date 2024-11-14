@@ -78,15 +78,16 @@ export async function listStepBlueprints(): Promise<StepBlueprint[]> {
   console.log(response)
   const result = unpackResponse(response);
   return result as StepBlueprint[]; // Cast response to StepBlueprint array
-
 }
 
 // Load a specific step blueprint by its ID
 export async function loadStepBlueprint(stepId: string): Promise<StepBlueprint | null> {
   await waitForPywebview();
   try {
-    const response = await window.pywebview.api.load_step(stepId);
+    const response = await window.pywebview.api.STORAGE.load_step(stepId);
     const result = unpackResponse(response);
+    console.log("Retrieved blueprint for " + stepId)
+    console.log(result)
     return result as StepBlueprint; // Cast to StepBlueprint interface
   } catch (error) {
     console.error("Failed to load step blueprint:", error);
