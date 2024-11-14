@@ -12,13 +12,11 @@ interface StepConfigProps {
 }
 
 const StepConfigClass: React.FC<StepConfigProps> = ({ blueprint, values, onUpdate }) => {
-  const [paraValues, setParaValues] = useState(values.values || {});
   const [updatedValues, setUpdatedValues] = useState(values.values || {});
 
   useEffect(() => console.log("Values changed: ", updatedValues), [updatedValues]);
 
   useEffect(() => {
-    setParaValues(values.values || {});
     setUpdatedValues(values.values || {});
   }, [values, blueprint]);
 
@@ -30,7 +28,6 @@ const StepConfigClass: React.FC<StepConfigProps> = ({ blueprint, values, onUpdat
   };
 
   const saveChanges = () => {
-    setParaValues(updatedValues);
     onUpdate({ ...values, values: updatedValues });
   };
 

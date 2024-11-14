@@ -1,74 +1,85 @@
-// src/components/valuePicker/Pickers.scss
-
-// General picker container styling
 .picker-container {
   display: flex;
-  flex-direction: row;
   align-items: center;
-  justify-content: center;
-  margin: 10px 0;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 20px;
   position: relative;
-  width: 100%; // Make it take full width of the parent for better alignment
-
-  label {
-    font-weight: bold;
-    margin-right: 10px; // Space between label and picker
-    text-align: left;
-    min-width: 150px; // Ensures labels align by giving them a fixed width
-  }
-
-  .tooltip {
-    visibility: hidden;
-    background-color: #555;
-    color: #fff;
-    text-align: center;
-    border-radius: 5px;
-    padding: 5px;
-    position: absolute;
-    bottom: -30px; // Position the tooltip further down to avoid covering the picker
-    z-index: 1;
-    font-size: 12px;
-  }
-
-  &:hover .tooltip {
-    visibility: visible;
-  }
 }
 
-// Complex picker styling
-.complex-picker {
-  border: 2px solid #007acc;
+.picker-label {
+  flex: 0 0 30%;
+  text-align: left;
+  font-weight: bold;
+  padding-right: 10px;
+}
+
+// Tooltip for Parameter description
+
+.tooltip {
+  visibility: hidden;
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  border-radius: 4px;
+  padding: 5px;
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 150px;
+  z-index: 1;
+}
+.picker-container:hover .tooltip {
+  visibility: visible;
+}
+
+
+// SliderPicker
+
+.slider-wrapper {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+.slider-value-box {
+  position: absolute;
+  top: -25px;
+  font-size: 0.9rem;
+  color: #333;
+  background-color: #f0f0f0;
+  padding: 3px 8px;
+  border-radius: 4px;
+  box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.2);
+  display: inline-block; /* Ensure it is always displayed */
+}
+
+.slider {
+  width: 80%; /* Make the slider narrower */
+  margin-top: 20px;
+}
+
+
+// Complex picker
+
+.complex-picker-box {
+  border: 1px solid #3498db;
   padding: 15px;
   border-radius: 5px;
-  margin: 10px auto; // Centers complex picker within parent
-  width: 80%; // Make complex picker width smaller to be distinct
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  box-sizing: border-box; // Ensure padding doesn’t increase box size
+  margin-bottom: 20px;
+  background-color: #f9f9f9;
+}
 
-  .complex-header {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+.complex-header h4 {
+  margin: 0;
+  padding: 0;
+  font-size: 1.1rem;
+  color: #333;
+}
 
-    h4 {
-      font-size: 1.2em;
-      margin: 0;
-    }
-
-    .description {
-      font-size: 0.9em;
-      color: #666;
-      text-align: center;
-      margin-top: 5px;
-    }
-  }
-
-  .complex-body {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    padding: 10px 0;
-  }
+.complex-body {
+  margin-top: 10px;
 }

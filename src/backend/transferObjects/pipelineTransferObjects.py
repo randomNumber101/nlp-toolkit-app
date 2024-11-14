@@ -6,17 +6,19 @@ from backend.parameterTypes import ComplexPicker, Parameter, ParameterPicker, St
 
 
 class ParameterTransferObject:
-    def __init__(self, name: str, type: str, description: str, picker: Optional['PickerObjectTransfer'] = None):
+    def __init__(self, name: str, type: str, description: str, defaultValue=None, picker: Optional['PickerObjectTransfer'] = None):
         self.name = name
         self.type = type
         self.description = description
         self.picker = picker
+        self.defaultValue = defaultValue
 
     def to_dict(self):
         return {
             "name": self.name,
             "type": self.type,
             "description": self.description,
+            "defaultValue": self.defaultValue,
             "picker": self.picker.to_dict() if self.picker else None
         }
 
@@ -108,7 +110,8 @@ def convert_parameter_to_transfer(param: 'Parameter') -> ParameterTransferObject
     picker = None
     if hasattr(param, "picker") and param.picker is not None:
         picker = convert_picker_to_transfer(param.picker)
-    return ParameterTransferObject(name=param.name, type=str(param.type), description=param.description, picker=picker)
+
+    return ParameterTransferObject(name=param.name, type=str(param.type), defaultValue=param.defaultValue, description=param.description, picker=picker)
 
 
 def convert_picker_to_transfer(picker: 'ParameterPicker') -> PickerObjectTransfer:

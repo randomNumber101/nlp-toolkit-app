@@ -5,17 +5,23 @@ import PipelineConfigScreen from './PipelineConfigScreen/PipelineConfigScreen';
 import InputScreen from './InputScreen/InputScreen';
 import ResultsScreen from './ResultScreen/ResultScreen';
 import { Pipeline, StepBlueprint } from '../types';
-import { loadStepBlueprint, savePipeline } from "../utils/pipelineApi";
+import {listPipelines, loadStepBlueprint, savePipeline} from "../utils/pipelineApi";
+import LoadingAnimation from "../components/LoadingScreen/Loading";
+
 
 function App() {
-  const [currentScreen, setCurrentScreen] = useState('landing');
+  const [currentScreen, setCurrentScreen] = useState('loading');
   const [selectedPipeline, setSelectedPipeline] = useState<Pipeline | null>(null);
+
+  const [pipelines, setPipelines] = useState<Pipeline[]>([
+    { id: "sentiment", name: 'Dummy Pipe (should not show)', description: 'Analyze the sentiment of text data' , steps: []},] );
   const [blueprintMap, setBlueprintMap] = useState<{ [key: string]: StepBlueprint }>({});
-  const [loadingConfig, setLoading] = useState(false)
+
 
   async function loadBlueprints(pipeline: Pipeline) {
+    const _current_screen = currentScreen
+    setCurrentScreen('loading')
     if (pipeline != null) {
-      setLoading(true)
       // Only update blueprint map if selectedPipeline is not null
       const loadedBlueprints = await Promise.all(pipeline.steps.map(s => loadStepBlueprint(s.stepId)));
       const bpMap = {} as { [key: string]: StepBlueprint };
@@ -24,15 +30,28 @@ function App() {
       })
       setBlueprintMap(bpMap);
       console.log("Set blueprint map to something.");
-      setLoading(false)
     } else {
       setBlueprintMap({});
       console.log("Pipeline is null.");
     }
+    setCurrentScreen(_current_screen)
   }
 
+  async function loadPipelines() {
+    const _current_screen = currentScreen
+    setCurrentScreen('loading')
+    const pipelines = await listPipelines();
+    console.log(pipelines[0])
+    setPipelines(pipelines);
+    setCurrentScreen(_current_screen)
+  }
+
+  useEffect(() => {
+    goToLandingPage()
+  }, [])
+
   const goToLandingPage = () => {
-    setCurrentScreen('landing');
+    loadPipelines().then(() => setCurrentScreen('landing'));
   };
 
   const goToConfigScreen = (pipeline: Pipeline) => {
@@ -58,9 +77,13 @@ function App() {
 
   const renderScreen = () => {
     switch (currentScreen) {
+      case 'loading': {
+        return <LoadingAnimation message={"Loading configurations..."}/>
+      }
       case 'landing':
         return (
           <LandingPage
+            pipelines={pipelines}
             onAddPipeline={() => setCurrentScreen('pipelineConfig')}
             onSelectPipeline={goToConfigScreen}
             onRunPipeline={goToInputScreen}
@@ -68,9 +91,6 @@ function App() {
         );
       case 'pipelineConfig':
         console.log("Going to Config Screen. Blueprints are: ", blueprintMap)
-        if (loadingConfig) {
-          return <div>Loading pipeline...</div>
-        }
         return <PipelineConfigScreen
           pipeline={selectedPipeline}
           blueprintMap={blueprintMap}
@@ -85,6 +105,7 @@ function App() {
       default:
         return (
           <LandingPage
+            pipelines={pipelines}
             onAddPipeline={() => setCurrentScreen('pipelineConfig')}
             onSelectPipeline={goToConfigScreen}
             onRunPipeline={goToInputScreen}
