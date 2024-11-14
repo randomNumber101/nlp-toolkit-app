@@ -1,10 +1,22 @@
+// General Picker Container
 .picker-container {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 10px;
   width: 100%;
-  margin-bottom: 20px;
+  padding: 8px 0;
   position: relative;
+  margin-bottom: 20px;
+  border-radius: 4px;
+  transition: box-shadow 0.3s, border 0.3s, background-color 0.3s;
+
+  // Hover effect for non-complex pickers
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid #ccc; // Light border around the picker on hover
+  }
 }
 
 .picker-label {
@@ -14,11 +26,10 @@
   padding-right: 10px;
 }
 
-// Tooltip for Parameter description
-
+// Tooltip for Parameter Description
 .tooltip {
   visibility: hidden;
-  background-color: #333;
+  background-color: rgba(115, 104, 92, 0.69);
   color: #fff;
   text-align: center;
   border-radius: 4px;
@@ -26,17 +37,19 @@
   position: absolute;
   bottom: 100%;
   left: 50%;
-  transform: translateX(-50%);
-  width: 150px;
+  transform: translate(-50%, -10%);
+  width: 180px;
   z-index: 1;
+  opacity: 0;
+  transition: opacity 0.5s;
 }
+
 .picker-container:hover .tooltip {
   visibility: visible;
+  opacity: 1;
 }
 
-
-// SliderPicker
-
+// Slider Picker Styles
 .slider-wrapper {
   position: relative;
   flex: 1;
@@ -54,17 +67,28 @@
   padding: 3px 8px;
   border-radius: 4px;
   box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.2);
-  display: inline-block; /* Ensure it is always displayed */
 }
 
 .slider {
-  width: 80%; /* Make the slider narrower */
+  width: 85%; // Increased slider width slightly for better visual alignment
   margin-top: 20px;
 }
 
+// Boolean Picker Styles
+.boolean-picker {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
 
-// Complex picker
+.boolean-checkbox {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
 
+// Complex Picker Styles
 .complex-picker-box {
   border: 1px solid #3498db;
   padding: 15px;
@@ -82,4 +106,19 @@
 
 .complex-body {
   margin-top: 10px;
+}
+
+// Text field and other input styles
+.text-field,
+.options-picker {
+  width: 85%; // Larger width for text fields and option selectors
+  padding: 8px; // Increased padding for larger input boxes
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  transition: box-shadow 0.3s, border 0.3s;
+
+  &:hover {
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid #3498db;
+  }
 }

@@ -52,13 +52,23 @@ Register.OperationMapper.registerOperation(DummyOperation())  # Dummy Operation 
     Register parameter value picker types for frontend.
 '''
 
+
 class TextField(ParameterPicker):
     def __init__(self, outputType):
-        super(TextField, self).__init__("text_field", outputType=t, parameters=[])
+        super(TextField, self).__init__("text_field", outputType=outputType, parameters=[])
+
+
+class CheckBox(ParameterPicker):
+    def __init__(self):
+        super(CheckBox, self).__init__("checkbox", outputType=BaseTypes.BOOL, parameters=[])
+
 
 # Text field picker as default
 for t in BaseTypes.ALL:
     Register.ParamPickerParser.registerDefault(t, TextField(outputType=t))
+
+Register.ParamPickerParser.registerDefault(BaseTypes.BOOL, CheckBox())
+
 
 class List(ParameterPicker):
     def __init__(self, defaultValue=0):
