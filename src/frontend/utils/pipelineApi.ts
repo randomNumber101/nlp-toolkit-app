@@ -19,7 +19,9 @@ async function waitForPywebview(): Promise<void> {
         console.log("Webview is available. Exiting poll loop.");
         resolve();
       }
-      console.log("Webview not available, yet");
+      else{
+        console.log("Webview not available, yet");
+      }
     }, 250);
 
     // Timeout after 3 seconds if pywebview is still unavailable
@@ -47,7 +49,7 @@ export async function loadPipeline(pipelineId: string): Promise<Pipeline | null>
 export async function savePipeline(config: Pipeline): Promise<boolean> {
   await waitForPywebview();
   try {
-    const response = await window.pywebview.api.save_pipeline(config);
+    const response = await window.pywebview.api.STORAGE.save_pipeline(config);
     const result = unpackResponse(response);
     return result as boolean; // Cast result to boolean
   } catch (error) {

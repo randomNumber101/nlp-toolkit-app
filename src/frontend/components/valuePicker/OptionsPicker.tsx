@@ -1,5 +1,6 @@
 // src/components/OptionsPicker.tsx
 import * as React from 'react';
+import './OptionsPicker.scss'
 
 interface OptionsPickerProps {
   options: Array<string>;

@@ -4,7 +4,7 @@ import SliderPicker from './SliderPicker';
 import OptionsPicker from './OptionsPicker';
 import CheckboxPicker from './CheckboxPicker'; // Import CheckboxPicker
 import { Parameter } from '../../types';
-import './Pickers.scss';
+import './DynamicPicker.scss';
 
 interface DynamicPickerProps {
   parameter: Parameter;

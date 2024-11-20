@@ -1,0 +1,24 @@
+// Slider Picker Styles
+.slider-wrapper {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+.slider-value-box {
+  position: absolute;
+  top: -25px;
+  font-size: 0.9rem;
+  color: #333;
+  background-color: #f0f0f0;
+  padding: 3px 8px;
+  border-radius: 4px;
+  box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.slider {
+  width: 85%; // Increased slider width slightly for better visual alignment
+  margin-top: 20px;
+}

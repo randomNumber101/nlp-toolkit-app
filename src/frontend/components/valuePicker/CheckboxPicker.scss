@@ -1,0 +1,13 @@
+// Boolean Picker Styles
+.boolean-picker {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.boolean-checkbox {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}

@@ -198,7 +198,7 @@ class PipelineParser:
         # Parse steps
         steps = []
         for step_data in json_data.get("steps", []):
-            step_id = step_data["id"]
+            step_id = step_data["stepId"]
             values = step_data.get("values", {})
             step = StepValues(step_id, values)
             steps.append(step)
@@ -218,7 +218,7 @@ class PipelineParser:
             "description": pipeline.description,
             "steps": [
                 {
-                    "id": step.stepId,
+                    "stepId": step.stepId,
                     "values": step.values
                 }
                 for step in pipeline.steps

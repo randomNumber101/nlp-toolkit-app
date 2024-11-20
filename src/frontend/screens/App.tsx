@@ -47,7 +47,7 @@ function App() {
   }
 
   useEffect(() => {
-    goToLandingPage()
+    goToInputScreen()
   }, [])
 
   const goToLandingPage = () => {
@@ -71,8 +71,11 @@ function App() {
 
   const onSavePipeline = (pipeline: Pipeline) => {
     savePipeline(pipeline).catch(console.log);
-    setSelectedPipeline(pipeline);
-    setCurrentScreen('landing');
+    const index = pipelines.findIndex(p => p.id == pipeline.id)
+    const newPipelines = {...pipelines}
+    newPipelines[index] = {...pipeline}
+    setSelectedPipeline(pipeline)
+    setPipelines(newPipelines)
   };
 
   const renderScreen = () => {
@@ -90,16 +93,16 @@ function App() {
           />
         );
       case 'pipelineConfig':
-        console.log("Going to Config Screen. Blueprints are: ", blueprintMap)
+        console.log("Going to Config Screen. Pipeline is: ", selectedPipeline)
         return <PipelineConfigScreen
-          pipeline={selectedPipeline}
+          initialPipe={selectedPipeline}
           blueprintMap={blueprintMap}
           onPrevious={goToLandingPage}
           onNext={goToInputScreen}
           onSavePipeline={onSavePipeline}
         />;
       case 'input':
-        return <InputScreen onNext={goToResultsScreen} />;
+        return <InputScreen onGoToPipelineScreen={input => goToLandingPage()} />;
       case 'results':
         return <ResultsScreen pipeline={selectedPipeline} />;
       default:

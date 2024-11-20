@@ -1,5 +1,5 @@
 import * as React from 'react';
-import './Pickers.scss';
+import './CheckboxPicker.scss';
 
 interface CheckboxPickerProps {
   value: boolean;

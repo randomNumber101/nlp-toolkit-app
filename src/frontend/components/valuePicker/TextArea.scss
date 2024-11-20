@@ -1,0 +1,22 @@
+// src/components/valuePicker/TextArea.scss
+
+.custom-textarea {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  box-sizing: border-box;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  background-color: #fff;
+
+  &:focus {
+    border-color: #4a90e2;
+    outline: none;
+    box-shadow: 0 0 5px rgba(74, 144, 226, 0.3);
+  }
+
+  &::placeholder {
+    color: #bbb;
+  }
+}

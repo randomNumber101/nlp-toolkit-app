@@ -4,7 +4,7 @@
     "description": "Pipeline for analyzing sentiment",
     "steps": [
         {
-            "id": "DummyStep",
+            "stepId": "DummyStep",
             "values" : {
                 "threshold" : 0.2,
                 "LLMConfig" : {
@@ -13,7 +13,7 @@
             }
         },
         {
-            "id": "DummyStep",
+            "stepId": "DummyStep",
             "values": {
                 "threshold" : 0.3,
                 "LLMConfig" : {

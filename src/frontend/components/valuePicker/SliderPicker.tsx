@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
-import './Pickers.scss';
+import './SliderPicker.scss';
 
 interface SliderPickerProps {
   value: number | null;

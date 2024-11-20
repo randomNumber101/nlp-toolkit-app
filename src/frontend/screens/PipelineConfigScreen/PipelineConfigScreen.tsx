@@ -2,26 +2,34 @@ import * as React from 'react'
 import {useEffect, useState} from 'react';
 
 import "./PipelineConfigScreen.scss";
-import StepConfigClass from "../../components/StepConfig";
 import {loadStepBlueprint} from "../../utils/pipelineApi";
 import {Pipeline, StepBlueprint, StepValues} from "../../types";
-import {types} from "sass";
-import List = types.List;
 import StepConfig from "../../components/StepConfig";
+import TextFieldPicker from "../../components/valuePicker/TextFieldPicker";
 
 
 interface PipelineConfigScreenProps {
-  pipeline: Pipeline | null;
+  initialPipe: Pipeline | null;
   blueprintMap: {[key: string] : StepBlueprint}
   onPrevious: () => void;
   onNext: () => void;
   onSavePipeline: (updatedPipeline: Pipeline) => void;
 }
 
-const PipelineConfigScreen: React.FC<PipelineConfigScreenProps> = ({ pipeline, blueprintMap, onPrevious, onNext, onSavePipeline }) => {
-  const [pipelineName, setPipelineName] = useState(pipeline?.name || '');
-  const [steps, setSteps] = useState<StepValues[]>(pipeline?.steps || []);
+const PipelineConfigScreen: React.FC<PipelineConfigScreenProps> = ({ initialPipe, blueprintMap, onPrevious, onNext, onSavePipeline }) => {
+  const [pipeline, setPipeline] = useState<Pipeline>(initialPipe)
+  const [pipelineName, setPipelineName] = useState(pipeline?.name ?? '');
+  const [pipelineDescription, setDescription] = useState(pipeline?.description ?? 'No description')
+  const [steps, setSteps] = useState<StepValues[]>(pipeline?.steps ?? []);
   const [blueprints, setBlueprintMap] = useState<{[key : string]: StepBlueprint}>(blueprintMap)
+
+  console.log(initialPipe)
+
+  useEffect(() => {
+    setPipelineName(pipeline?.name)
+    setDescription(pipeline?.description ?? 'No description')
+    setSteps(pipeline?.steps ?? [])
+  }, [pipeline])
 
   // Add a new step to the pipeline
   const handleAddStep = () => {
@@ -48,22 +56,16 @@ const PipelineConfigScreen: React.FC<PipelineConfigScreenProps> = ({ pipeline, b
 
   const handleSavePipeline = () => {
     if (pipeline) {
-      const updatedPipeline = { ...pipeline, name: pipelineName, steps };
+      const updatedPipeline = { ...pipeline, name: pipelineName, description: pipelineDescription, steps: steps};
       onSavePipeline(updatedPipeline);
     }
   };
 
   const handleUpdatedValues = (stepIndex : number, values : StepValues) => {
     const updatedSteps = [... steps]
-    updatedSteps[stepIndex] = { ...updatedSteps[stepIndex], values}
-    // TODO: Save to file....
+    updatedSteps[stepIndex] = { ...updatedSteps[stepIndex], ...values}
     setSteps(updatedSteps)
   }
-
-  console.log("Config Blueprint:")
-  console.log(blueprintMap)
-
-
 
   return (
     <div className="pipeline-config-screen">
@@ -78,6 +80,7 @@ const PipelineConfigScreen: React.FC<PipelineConfigScreenProps> = ({ pipeline, b
           onChange={(e) => setPipelineName(e.target.value)}
         />
       </label>
+      <TextFieldPicker value={pipelineDescription} onChange={newDesc => setDescription(newDesc)}></TextFieldPicker>
 
       {/* Steps List */}
       <div className="steps-list">
@@ -88,7 +91,7 @@ const PipelineConfigScreen: React.FC<PipelineConfigScreenProps> = ({ pipeline, b
                 key={index}
                 blueprint={blueprints[step.stepId]}
                 values={step}
-                onUpdate={vs => handleUpdatedValues}
+                onUpdate={vals => handleUpdatedValues(index, vals)}
             />
             <div className="step-actions">
               <button onClick={() => handleMoveStep(index, 'up')}>Move Up</button>
