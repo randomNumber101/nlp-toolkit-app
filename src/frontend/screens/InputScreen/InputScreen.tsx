@@ -1,145 +1,152 @@
 // src/components/InputScreen/InputScreen.tsx
 import * as React from 'react';
-import { useState, useRef, DragEvent } from 'react';
-import TextArea from '../../components/valuePicker/TextArea';
+import { useState } from 'react';
+import TextArea from '../../components/ValuePickers/TextArea';
+import DragAndDrop from '../../components/DragAndDrop/DragAndDrop';
 import './InputScreen.scss';
 
 interface InputScreenProps {
   loadingText?: string;
-  onGoToPipelineScreen: (input: string) => void;
+  onGoToPipelineScreen: (input: InputHandle) => void;
 }
+
+interface InputHandle {
+  id: string;
+  type: 'text' | 'file';
+  preview: string;
+  loadFull: () => Promise<ReadableStream<Uint8Array>>;
+  name?: string; // Optional, used for file inputs
+}
+
+const stringToStreamHandle = (input: string): InputHandle => {
+  return {
+    id: crypto.randomUUID(),
+    type: 'text',
+    preview: input.substring(0, 300),
+    loadFull: () => {
+      const encoder = new TextEncoder();
+      const uint8array = encoder.encode(input);
+      return Promise.resolve(
+        new ReadableStream({
+          start(controller) {
+            controller.enqueue(uint8array);
+            controller.close();
+          },
+        })
+      );
+    },
+  };
+};
+
+const fileToStreamHandle = (file: File): InputHandle => {
+  return {
+    id: crypto.randomUUID(),
+    type: 'file',
+    name: file.name,
+    preview: 'Large file, streaming...',
+    loadFull: () => {
+      return Promise.resolve(file.stream());
+    },
+  };
+};
 
 const InputScreen: React.FC<InputScreenProps> = ({
   loadingText = '',
   onGoToPipelineScreen,
 }) => {
-  const [input, setInput] = useState(loadingText);
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [dragActive, setDragActive] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
-  const dropRef = useRef<HTMLDivElement>(null);
+  const [input, setInput] = useState<string>(loadingText);
+  const [isExpanded, setIsExpanded] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>('');
+  const [inputHandle, setInputHandle] = useState<InputHandle | null>(null);
+  const [inputType, setInputType] = useState<'text' | 'file'>('text'); // To track current input type
 
   const handleButtonClick = () => {
-    onGoToPipelineScreen(input);
+    if (inputHandle) {
+      onGoToPipelineScreen(inputHandle);
+    }
   };
 
   const toggleExpand = () => {
     setIsExpanded(!isExpanded);
-    // Reset drag and error states when toggling
-    if (!isExpanded) {
-      setDragActive(false);
+    // Optionally reset other states if needed
+  };
+
+  const handleTextChange = (text: string) => {
+    setInput(text);
+    setInputHandle(text ? stringToStreamHandle(text) : null);
+    setErrorMessage('');
+  };
+
+  const handleFileUpload = (file: File) => {
+    if (file.type === 'text/plain' || file.name.endsWith('.txt')) {
+      setInput('Large file, streaming...');
+      setInputHandle(fileToStreamHandle(file));
       setErrorMessage('');
+    } else {
+      setErrorMessage('Only .txt files are accepted.');
     }
   };
 
-  const handleDrag = (e: DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.type === 'dragenter' || e.type === 'dragover') {
-      setDragActive(true);
-    } else if (e.type === 'dragleave') {
-      setDragActive(false);
-    }
-  };
-
-  const handleDrop = (e: DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragActive(false);
-    const files = e.dataTransfer.files;
-    if (files && files.length > 0) {
-      const file = files[0];
-      if (file.type === 'text/plain' || file.name.endsWith('.txt')) {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          const text = event.target?.result;
-          if (typeof text === 'string') {
-            setInput(text);
-            setErrorMessage('');
-          }
-        };
-        reader.readAsText(file);
-      } else {
-        setErrorMessage('Only .txt files are accepted.');
-      }
-    }
-  };
-
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (files && files.length > 0) {
-      const file = files[0];
-      if (file.type === 'text/plain' || file.name.endsWith('.txt')) {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          const text = event.target?.result;
-          if (typeof text === 'string') {
-            setInput(text);
-            setErrorMessage('');
-          }
-        };
-        reader.readAsText(file);
-      } else {
-        setErrorMessage('Only .txt files are accepted.');
-      }
-    }
-  };
-
-  const handleBrowseFiles = () => {
-    if (dropRef.current) {
-      const input = dropRef.current.querySelector('input');
-      input?.click();
-    }
+  const removeFile = () => {
+    setInput('');
+    setInputHandle(null);
+    setErrorMessage('');
   };
 
   return (
     <div className="input-screen-container">
-      {!isExpanded && (
-        <>
-          <div
-            className={`drop-zone ${dragActive ? 'active' : ''}`}
-            onDragEnter={handleDrag}
-            onDragOver={handleDrag}
-            onDragLeave={handleDrag}
-            onDrop={handleDrop}
-            ref={dropRef}
+      <div className="input-methods">
+        {/* Toggle between Text and File Input */}
+        <div className="input-toggle">
+          <button
+            className={`toggle-button ${inputType === 'text' ? 'active' : ''}`}
+            onClick={() => setInputType('text')}
           >
-            <input
-              type="file"
-              accept=".txt"
-              onChange={handleFileSelect}
-              hidden
+            Text Input
+          </button>
+          <button
+            className={`toggle-button ${inputType === 'file' ? 'active' : ''}`}
+            onClick={() => setInputType('file')}
+          >
+            File Input
+          </button>
+        </div>
+
+        {inputType === 'file' ? (
+          <DragAndDrop onFileUpload={handleFileUpload} />
+        ) : (
+          <div className={`textarea-container ${isExpanded ? 'expanded' : ''} ${inputHandle && inputHandle.type === 'text' ? 'active' : ''}`}>
+            <TextArea
+              value={input}
+              onChange={handleTextChange}
+              rows={isExpanded ? 15 : 4} // Adjust rows based on expansion
+              className="input-textarea"
+              placeholder="Enter your input here..."
             />
-            <p>
-              Drag & Drop your .txt file here or{' '}
-              <span className="browse-text" onClick={handleBrowseFiles}>
-                browse
-              </span>
-            </p>
+            <button className="expand-button" onClick={toggleExpand}>
+              {isExpanded ? 'Collapse' : 'Expand'}
+            </button>
           </div>
+        )}
 
-          {/* "OR" Separator */}
-          <div className="separator">
-            <span>OR</span>
+        {inputHandle && inputHandle.type === 'file' && (
+          <div className="file-info">
+            <span className="file-icon">📄</span>
+            <span className="file-name">{inputHandle.name}</span>
+            <button className="remove-file-button" onClick={removeFile}>
+              ❌
+            </button>
           </div>
-        </>
-      )}
+        )}
 
-      {errorMessage && <p className="error-message">{errorMessage}</p>}
-
-      <div className={`textarea-container ${isExpanded ? 'expanded' : ''}`}>
-        <TextArea
-          value={input}
-          onChange={setInput}
-          rows={isExpanded ? 15 : 4} // Adjust rows based on expansion
-          className="input-textarea"
-          placeholder="Enter your input here..."
-        />
-        <button className="expand-button" onClick={toggleExpand}>
-          {isExpanded ? 'Collapse' : 'Expand'}
-        </button>
+        {errorMessage && <p className="error-message">{errorMessage}</p>}
       </div>
-      <button className="submit-button" onClick={handleButtonClick}>
+
+      <button
+        className={`submit-button ${inputHandle ? '' : 'disabled'}`}
+        onClick={handleButtonClick}
+        disabled={!inputHandle}
+      >
         Choose Pipeline
       </button>
     </div>

@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 import { StepBlueprint, StepValues } from '../types';
-import DynamicPicker from './valuePicker/DynamicPicker';
+import DynamicPicker from './ValuePickers/DynamicPicker';
 
 interface StepConfigProps {
   blueprint: StepBlueprint;

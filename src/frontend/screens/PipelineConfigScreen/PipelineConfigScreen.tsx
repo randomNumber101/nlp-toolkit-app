@@ -5,7 +5,7 @@ import "./PipelineConfigScreen.scss";
 import {loadStepBlueprint} from "../../utils/pipelineApi";
 import {Pipeline, StepBlueprint, StepValues} from "../../types";
 import StepConfig from "../../components/StepConfig";
-import TextFieldPicker from "../../components/valuePicker/TextFieldPicker";
+import TextFieldPicker from "../../components/ValuePickers/TextFieldPicker";
 
 
 interface PipelineConfigScreenProps {
