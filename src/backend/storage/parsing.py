@@ -181,9 +181,6 @@ class StepBlueprintParser:
         return self.parse(stepObject)
 
 
-
-
-
 class PipelineParser:
     @staticmethod
     def from_json(json_data: Dict[str, Any]) -> Pipeline:
@@ -225,4 +222,3 @@ class PipelineParser:
             ]
         }
         return pipeline_dict
-

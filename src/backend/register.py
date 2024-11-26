@@ -1,6 +1,7 @@
 from backend.generaltypes import StepOperation, Payload, StepOperationMapper
 from backend.operations.DummyOperation import DummyOperation
 from backend.parameterTypes import ParamType, ParameterPicker, Parameter, ListType
+from backend.run.LogManager import LogManager
 from backend.storage.parsing import ParameterTypeParser, ParameterPickerParser
 
 
@@ -43,16 +44,6 @@ class BaseTypes:
         return string in BaseTypes.MAP
 
 
-'''
-    Register StepOperations
-'''
-Register.OperationMapper.registerOperation(DummyOperation())  # Dummy Operation for Dummy Step
-
-'''
-    Register parameter value picker types for frontend.
-'''
-
-
 class TextField(ParameterPicker):
     def __init__(self, outputType):
         super(TextField, self).__init__("text_field", outputType=outputType, parameters=[])
@@ -61,13 +52,6 @@ class TextField(ParameterPicker):
 class CheckBox(ParameterPicker):
     def __init__(self):
         super(CheckBox, self).__init__("checkbox", outputType=BaseTypes.BOOL, parameters=[])
-
-
-# Text field picker as default
-for t in BaseTypes.ALL:
-    Register.ParamPickerParser.registerDefault(t, TextField(outputType=t))
-
-Register.ParamPickerParser.registerDefault(BaseTypes.BOOL, CheckBox())
 
 
 class List(ParameterPicker):
@@ -80,9 +64,6 @@ class List(ParameterPicker):
         super().__init__(name="list", outputType=BaseTypes.STRING, parameters=listParams)
 
 
-Register.ParamPickerParser.registerParser("list", lambda kws: List().create_from_json(kws))
-
-
 class Slider(ParameterPicker):
     def __init__(self):
         sliderParams = [
@@ -93,4 +74,23 @@ class Slider(ParameterPicker):
         super().__init__("slider", BaseTypes.FLOAT, sliderParams)
 
 
-Register.ParamPickerParser.registerParser("slider", lambda kws: Slider().create_from_json(kws))
+def registerClasses():
+
+    logger = LogManager()
+
+    '''
+        Register StepOperations
+    '''
+    Register.OperationMapper.registerOperation(DummyOperation(logger=logger))  # Dummy Operation for Dummy Step
+
+    '''
+        Register parameter value picker types for frontend.
+    '''
+    for t in BaseTypes.ALL:
+        Register.ParamPickerParser.registerDefault(t, TextField(outputType=t))  # Text field picker as default
+    Register.ParamPickerParser.registerDefault(BaseTypes.BOOL, CheckBox())  # Checkbox for bool values
+    Register.ParamPickerParser.registerParser("list", lambda kws: List().create_from_json(kws))  # Register list picker
+    Register.ParamPickerParser.registerParser("slider", lambda kws: Slider().create_from_json(kws))  # Register value slider
+
+
+registerClasses()

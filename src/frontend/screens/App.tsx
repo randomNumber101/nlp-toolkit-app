@@ -3,20 +3,25 @@ import { useEffect, useState } from "react";
 import LandingPage from './LandingPage/LandingPage';
 import PipelineConfigScreen from './PipelineConfigScreen/PipelineConfigScreen';
 import InputScreen from './InputScreen/InputScreen';
-import ResultsScreen from './ResultScreen/ResultScreen';
-import { Pipeline, StepBlueprint } from '../types';
-import {listPipelines, loadStepBlueprint, savePipeline} from "../utils/pipelineApi";
+import RunScreen from './RunScreen/RunScreen';
+
 import LoadingAnimation from "../components/LoadingScreen/Loading";
+import {listPipelines, loadStepBlueprint, savePipeline} from "../utils/pipelineApi";
+import {streamToString} from "../utils/functional";
+import { Pipeline, StepBlueprint } from '../types';
+import {InputHandle} from './InputScreen/InputScreen'
 
 
 function App() {
   const [currentScreen, setCurrentScreen] = useState('loading');
   const [selectedPipeline, setSelectedPipeline] = useState<Pipeline | null>(null);
+  const [inputHandle, setInput] = useState<InputHandle | null>(null)
 
   const [pipelines, setPipelines] = useState<Pipeline[]>([
     { id: "sentiment", name: 'Dummy Pipe (should not show)', description: 'Analyze the sentiment of text data' , steps: []},] );
   const [blueprintMap, setBlueprintMap] = useState<{ [key: string]: StepBlueprint }>({});
 
+  console.log("App started.")
 
   async function loadBlueprints(pipeline: Pipeline) {
     const _current_screen = currentScreen
@@ -47,8 +52,9 @@ function App() {
   }
 
   useEffect(() => {
-    goToInputScreen()
-  }, [])
+    if (!inputHandle)
+      goToInputScreen()
+  }, [inputHandle])
 
   const goToLandingPage = () => {
     loadPipelines().then(() => setCurrentScreen('landing'));
@@ -65,8 +71,9 @@ function App() {
     setCurrentScreen('input');
   };
 
-  const goToResultsScreen = () => {
-    setCurrentScreen('results');
+  const goToResultsScreen = (pipeline: Pipeline) => {
+    setSelectedPipeline(pipeline)
+    loadBlueprints(pipeline).then(_ => setCurrentScreen('results'))
   };
 
   const onSavePipeline = (pipeline: Pipeline) => {
@@ -77,6 +84,13 @@ function App() {
     setSelectedPipeline(pipeline)
     setPipelines(newPipelines)
   };
+
+  const handleInput = (input: InputHandle) => {
+    setInput(input)
+    console.log(input.name)
+    input.loadFull().then(streamToString).then(console.log)
+    goToLandingPage()
+  }
 
   const renderScreen = () => {
     switch (currentScreen) {
@@ -89,7 +103,7 @@ function App() {
             pipelines={pipelines}
             onAddPipeline={() => setCurrentScreen('pipelineConfig')}
             onSelectPipeline={goToConfigScreen}
-            onRunPipeline={goToInputScreen}
+            onRunPipeline={goToResultsScreen}
           />
         );
       case 'pipelineConfig':
@@ -102,9 +116,13 @@ function App() {
           onSavePipeline={onSavePipeline}
         />;
       case 'input':
-        return <InputScreen onGoToPipelineScreen={input => goToLandingPage()} />;
+        return <InputScreen onGoToPipelineScreen={handleInput} />;
       case 'results':
-        return <ResultsScreen pipeline={selectedPipeline} />;
+        return <RunScreen
+            pipeline={selectedPipeline}
+            inputHandle={inputHandle}
+            blueprints={blueprintMap}
+        />;
       default:
         return (
           <LandingPage

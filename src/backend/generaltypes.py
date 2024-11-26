@@ -1,24 +1,47 @@
 import uuid
 from abc import ABC, abstractmethod
 from typing import Dict, List
+
+from backend.events.eventTransferObjects import StepState
 from backend.parameterTypes import Parameter, InputOutputDefinition
+
+from pandas import DataFrame
+import pandas as pd
+
+from backend.run.LogManager import LogLevels
+
+
+# Might be specified later
+class Input(DataFrame):
+    pass
+
+    @staticmethod
+    def from_csv(file_or_buffer) -> 'Input':
+        return Input(pd.read_csv(file_or_buffer))
 
 
 class Payload(Dict[str, object]):
 
     def __init__(self, values: Dict = None, link_to_parent: Dict = None):
+        self.protected_names = {"original_data", "data", "visualizations"}
         if values is not None:
             for k, v in values.items():
-                self.k = v
+                if k not in self.protected_names:
+                    self.k = v
         super().__init__()
-
-    def __setattr__(self, key, value):
-        self[key] = value
 
     def __setitem__(self, key, value):
         if self.link_to_parent is not None:
             self.link_to_parent[key] = value
-        super().__setitem__(key, value)
+        return super().__setitem__(key, value)
+
+    def __getitem__(self, key):
+        if self.link_to_parent is not None:
+            return self.link_to_parent[key]
+        return super().__getitem__(key)
+
+    def __setattr__(self, key, value):
+        self[key] = value
 
     def __getattr__(self, key):
         if self.link_to_parent is not None and key not in self and key in self.link_to_parent:
@@ -35,16 +58,27 @@ class Payload(Dict[str, object]):
         )
 
 
+class FrontendNotifier(ABC):
+    @abstractmethod
+    def log(self, message: str | List[str], level: LogLevels = LogLevels.DEBUG):
+        pass
+
+    @abstractmethod
+    def sendStatus(self, stepState: StepState, progress: float):
+        pass
+
+
 class StepOperation(ABC):
-    def __init__(self, stepId):
+    def __init__(self, stepId, logger):
+        self.logger = logger
         self.stepId = stepId
 
     @abstractmethod
-    def run(self, payload):
+    def run(self, payload, notifier: FrontendNotifier):
         pass
 
-    def __call__(self, payload):
-        self.run(payload)
+    def __call__(self, payload, notifier: FrontendNotifier):
+        self.run(payload, notifier)
 
 
 class StepOperationMapper:
@@ -87,10 +121,9 @@ class StepValues:
 
 class Pipeline:
     def __init__(self, id, name, description="", steps: List[StepValues] = None):
-
         self.id = id
         self.name = name
+        self.description = description
         if steps is None:
             steps = []
         self.steps = steps
-        self.description = description

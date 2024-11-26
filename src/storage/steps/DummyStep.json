@@ -37,8 +37,8 @@
     }
   },
   "inputs": {
-    "text" : "text",
-    "original text" : "text"
+    "text" : "string",
+    "original text" : "string"
   },
   "outputs" : {
     "detected nouns" : "list[int]",

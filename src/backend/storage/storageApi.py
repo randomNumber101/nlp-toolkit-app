@@ -1,7 +1,10 @@
 import os
 import json
 
+from typing import List
+
 from backend.storage.parsing import StepBlueprintParser, PipelineParser
+from ..generaltypes import Pipeline, StepBlueprint
 
 from ..register import Register
 from ..transferObjects.pipelineTransferObjects import convert_pipeline_to_transfer, convert_step_blueprint_to_transfer
@@ -12,6 +15,7 @@ class Paths:
         self.storage = os.path.dirname(__file__)
         self.pipelines = os.path.join(self.storage, "../../storage/pipelines")
         self.steps = os.path.join(self.storage, "../../storage/steps")
+        self.runs = os.path.join(self.storage, "../../storage/runs")
 
 
 def list_jsons(path):
@@ -32,7 +36,7 @@ class PipelineApi:
             json.dump(jsonObj, file, indent=4)
 
 
-    def load_pipeline(self, pipeline_id):
+    def load_pipeline(self, pipeline_id) -> Pipeline:
         """Load a pipeline configuration from a JSON file in the storage/pipelines directory."""
         file_path = os.path.join(self.PIPELINES, f"{pipeline_id}.json")
         if not os.path.exists(file_path):
@@ -43,7 +47,7 @@ class PipelineApi:
             pipeline = PipelineParser.from_json(config)
         return pipeline
 
-    def load_all(self):
+    def load_all(self) -> list[Pipeline]:
         """List all saved pipeline configurations by reading filenames in storage/pipelines."""
         pipeline_ids = list_jsons(self.PIPELINES)
         pipelines = [self.load_pipeline(pid) for pid in pipeline_ids]
@@ -63,11 +67,11 @@ class StepsApi:
     def reload_from_storage(self):
         self.load_all(use_cache=False)
 
-    def list_ids(self):
+    def list_ids(self) -> list[str]:
         step_ids = list_jsons(self.STEPS)
         return step_ids
 
-    def load_step(self, step_id: str, use_cache=True):
+    def load_step(self, step_id: str, use_cache=True) -> StepBlueprint:
         if use_cache and step_id in self._cache:
             return self._cache[step_id]
 
@@ -80,7 +84,7 @@ class StepsApi:
         self._cache[step_id] = step
         return step
 
-    def load_all(self, use_cache=True):
+    def load_all(self, use_cache=True) -> list[StepBlueprint]:
         return [self.load_step(sId, use_cache) for sId in self.list_ids()]
 
 
@@ -112,5 +116,8 @@ class StorageApi:
     def load_all_steps(self):
         stepBPs = self.STEPS.load_all()
         return [convert_step_blueprint_to_transfer(stepBP).to_dict() for stepBP in stepBPs]
+
+
+
 
 

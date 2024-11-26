@@ -6,11 +6,11 @@ import DragAndDrop from '../../components/DragAndDrop/DragAndDrop';
 import './InputScreen.scss';
 
 interface InputScreenProps {
-  loadingText?: string;
+  preloaded?: InputHandle;
   onGoToPipelineScreen: (input: InputHandle) => void;
 }
 
-interface InputHandle {
+export interface InputHandle {
   id: string;
   type: 'text' | 'file';
   preview: string;
@@ -51,14 +51,14 @@ const fileToStreamHandle = (file: File): InputHandle => {
 };
 
 const InputScreen: React.FC<InputScreenProps> = ({
-  loadingText = '',
+  preloaded = null,
   onGoToPipelineScreen,
 }) => {
-  const [input, setInput] = useState<string>(loadingText);
+  const [input, setInput] = useState<string>(null);
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>('');
-  const [inputHandle, setInputHandle] = useState<InputHandle | null>(null);
-  const [inputType, setInputType] = useState<'text' | 'file'>('text'); // To track current input type
+  const [inputHandle, setInputHandle] = useState<InputHandle | null>(preloaded);
+  const [inputType, setInputType] = useState<'text' | 'file'>(preloaded?.type ?? 'file'); // To track current input type
 
   const handleButtonClick = () => {
     if (inputHandle) {

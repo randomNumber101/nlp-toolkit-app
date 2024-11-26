@@ -11,6 +11,7 @@ function unpackResponse(response: any) {
 }
 
 async function waitForPywebview(): Promise<void> {
+  console.log("Waiting for webview...")
   return new Promise((resolve, reject) => {
     const interval = setInterval(() => {
       if (typeof window.pywebview !== "undefined" && window.pywebview.api) {
