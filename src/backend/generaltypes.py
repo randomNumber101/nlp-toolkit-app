@@ -23,6 +23,8 @@ class Input(DataFrame):
 class Payload(Dict[str, object]):
 
     def __init__(self, values: Dict = None, link_to_parent: Dict = None):
+        self.data = None
+        self.visualizations = []
         self.protected_names = {"original_data", "data", "visualizations"}
         if values is not None:
             for k, v in values.items():
@@ -31,6 +33,8 @@ class Payload(Dict[str, object]):
         super().__init__()
 
     def __setitem__(self, key, value):
+        if key == "visualizations" and self.visualizations:
+            raise ValueError(f"Cannot set visualization object, only update it.")
         if self.link_to_parent is not None:
             self.link_to_parent[key] = value
         return super().__setitem__(key, value)
@@ -49,6 +53,9 @@ class Payload(Dict[str, object]):
                 f"{key} is not in this partial view, but in parent. You might have forgotten to declare it as input.")
 
         return self[key]
+
+    def addVisualization(self, viz):
+        self.visualizations.append(viz)
 
     def partialView(self, params: List[Parameter]):
         return Payload(

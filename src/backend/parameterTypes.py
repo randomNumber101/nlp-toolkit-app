@@ -16,21 +16,23 @@ class ParamType(Generic[T]):
             raise RuntimeError(f"Cannot generate Type {self.name}. Specify type of parse function.")
         self.parse = (lambda x: cast(realType, x)) if parse is None else parse
 
-        # Register this type
-        Register.ParamTypeParser.registerType(self)
-
     def parse(self, value: object) -> T:
         return self.parse(value)
 
     def __repr__(self):
         return self.name.lower()
 
+    def __eq__(self, other):
+        self.name = other.name
+
+    def transformableInto(self, other):
+        return self.__eq__(other)
+
 
 class ListType(ParamType):
-    def __init__(self, innerType: ParamType):
+    def __init__(self, innerType: ParamType = None):
         self.innerType = innerType
         self._parse_list = lambda list_val: list([innerType.parse(x) for x in list_val])
-
         super().__init__(f"list[{innerType.name}]", List[innerType.type], parse=self._parse_list)
 
 

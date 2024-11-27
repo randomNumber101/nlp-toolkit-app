@@ -1,8 +1,14 @@
+import typing
+from typing import Dict, List, Tuple
+
+from backend import utils
 from backend.generaltypes import StepOperation, Payload, StepOperationMapper
 from backend.operations.DummyOperation import DummyOperation
 from backend.parameterTypes import ParamType, ParameterPicker, Parameter, ListType
 from backend.run.LogManager import LogManager
 from backend.storage.parsing import ParameterTypeParser, ParameterPickerParser
+
+import pandas as pd
 
 
 class Register:
@@ -44,6 +50,41 @@ class BaseTypes:
         return string in BaseTypes.MAP
 
 
+class DataType(ParamType):
+
+    Instances: Dict[Tuple[str], "DataType"] = {}
+
+    def __init__(self, column_names: List[str]):
+        self.column_names = column_names
+        self._parse_to_df = utils.parseWildcardToDataframe
+        column_names_str = ",".join(column_names)
+        super().__init__(f"csv[{column_names_str}]", pd.DataFrame, parse=self._parse_to_df)
+
+    def transformableInto(self, other):
+        if not isinstance(other, DataType):
+            return False
+
+        my_cols = self.column_names
+        other_cols = set(other.column_names)
+
+        return len(other_cols.difference(my_cols)) == 0
+
+
+
+
+
+
+
+    @staticmethod
+    def getInstance(column_names: List[str]):
+        key = tuple(column_names)
+        if key not in DataType.Instances:
+            DataType.Instances[key] = DataType(column_names)
+        return DataType.Instances[key]
+
+
+
+
 class TextField(ParameterPicker):
     def __init__(self, outputType):
         super(TextField, self).__init__("text_field", outputType=outputType, parameters=[])
@@ -54,7 +95,7 @@ class CheckBox(ParameterPicker):
         super(CheckBox, self).__init__("checkbox", outputType=BaseTypes.BOOL, parameters=[])
 
 
-class List(ParameterPicker):
+class PossibilitiesPicker(ParameterPicker):
     def __init__(self, defaultValue=0):
         listParams = [
             Parameter("possibilities", BaseTypes.STRING_LIST)
@@ -74,8 +115,9 @@ class Slider(ParameterPicker):
         super().__init__("slider", BaseTypes.FLOAT, sliderParams)
 
 
-def registerClasses():
 
+
+def registerClasses():
     logger = LogManager()
 
     '''
@@ -84,13 +126,22 @@ def registerClasses():
     Register.OperationMapper.registerOperation(DummyOperation(logger=logger))  # Dummy Operation for Dummy Step
 
     '''
+        Register types
+    '''
+    for t in BaseTypes.ALL:
+        Register.ParamTypeParser.registerType(t)
+
+    Register.ParamTypeParser.registerGenericType("csv", DataType.getInstance)
+
+    '''
         Register parameter value picker types for frontend.
     '''
     for t in BaseTypes.ALL:
         Register.ParamPickerParser.registerDefault(t, TextField(outputType=t))  # Text field picker as default
     Register.ParamPickerParser.registerDefault(BaseTypes.BOOL, CheckBox())  # Checkbox for bool values
-    Register.ParamPickerParser.registerParser("list", lambda kws: List().create_from_json(kws))  # Register list picker
-    Register.ParamPickerParser.registerParser("slider", lambda kws: Slider().create_from_json(kws))  # Register value slider
+    Register.ParamPickerParser.registerParser("list", lambda kws: PossibilitiesPicker().create_from_json(kws))  # Register list picker
+    Register.ParamPickerParser.registerParser("slider",
+                                              lambda kws: Slider().create_from_json(kws))  # Register value slider
 
 
 registerClasses()

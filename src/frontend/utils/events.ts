@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 
 type EventHandler = (event: CustomEvent) => void;
 
-const useBackendEvent = (eventName: string, handler: EventHandler) => {
+export const useBackendEvent = (eventName: string, handler: EventHandler) => {
     useEffect(() => {
         const listener = (e: Event) => {
             handler(e as CustomEvent);

@@ -6,10 +6,11 @@ import InputScreen from './InputScreen/InputScreen';
 import RunScreen from './RunScreen/RunScreen';
 
 import LoadingAnimation from "../components/LoadingScreen/Loading";
-import {listPipelines, loadStepBlueprint, savePipeline} from "../utils/pipelineApi";
+import {invokeEvent, listPipelines, loadStepBlueprint, savePipeline} from "../utils/pipelineApi";
 import {streamToString} from "../utils/functional";
 import { Pipeline, StepBlueprint } from '../types';
 import {InputHandle} from './InputScreen/InputScreen'
+import {registerStepLogHandler, useBackendEvent} from "../utils/events";
 
 
 function App() {
@@ -22,6 +23,17 @@ function App() {
   const [blueprintMap, setBlueprintMap] = useState<{ [key: string]: StepBlueprint }>({});
 
   console.log("App started.")
+
+  useBackendEvent("test", (event) => {
+      console.log(event)
+    });
+
+  useEffect(() => {
+    invokeEvent("test", {
+      "status" : "succeeded",
+      "data" : {"number" : 420}
+    }).then(_ => console.log("Sent event."))
+  }, [])
 
   async function loadBlueprints(pipeline: Pipeline) {
     const _current_screen = currentScreen

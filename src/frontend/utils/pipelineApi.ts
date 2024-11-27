@@ -97,3 +97,14 @@ export async function loadStepBlueprint(stepId: string): Promise<StepBlueprint |
     return null;
   }
 }
+
+export async function invokeEvent(name, data): Promise<null> {
+    await waitForPywebview();
+  try {
+    const response = await window.pywebview.api.RUNS.invokeEvent(name, data);
+    return null// Cast to StepBlueprint interface
+  } catch (error) {
+    console.error("Failed to invoke event:", error);
+    return null;
+  }
+}

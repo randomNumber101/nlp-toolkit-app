@@ -1,3 +1,4 @@
+import re
 from typing import Callable, Dict, Any, List
 from backend.parameterTypes import ParameterPicker, Parameter, ParamType, InputOutputDefinition, \
     StaticParameter, ComplexType, ComplexPicker
@@ -16,6 +17,7 @@ def getOptional(obj: Dict[str, Any], field: str, default=None) -> Any:
 class ParameterTypeParser:
     def __init__(self, parameterTypeList: List[ParamType] = None):
         self.typeMap = {}
+        self.genTypeMap = {}
         if parameterTypeList is not None:
             for pt in parameterTypeList:
                 self.registerType(pt)
@@ -24,18 +26,32 @@ class ParameterTypeParser:
         if pt.name not in self.typeMap:
             self.typeMap[pt.name] = pt
 
-    def parse(self, name, strict=True):
+    def registerGenericType(self, name, initializer: Callable[[List[str]], ParamType]):
+        self.genTypeMap[name] = initializer
+
+    def parse(self, typeString, strict=True):
         if strict is None:
             strict = True
-        if name in self.typeMap:
-            return self.typeMap[name]
+
+        match = re.search(r"(\w*)(\[\w+(,\w+)*\])?", typeString)
+        typeName = match.group(1)
+        typeArgs = match.group(2).split(sep=",") if match.lastindex > 1 else None
+
+        if typeArgs and typeName in self.genTypeMap:
+            typObj = self.genTypeMap[typeName](typeArgs)
+            return typObj
+
+        if typeName in self.typeMap:
+            typeObj = self.typeMap[typeName]
+            return typeObj
+
         elif not strict:
             # Create CustomType
-            print("Created custom type: " + name)
-            customType = ParamType(name, None, parse=lambda x: x)
+            print("Created custom type: " + typeName)
+            customType = ParamType(typeName, None, parse=lambda x: x)
             self.registerType(customType)
             return customType
-        raise LookupError(f"Type {name} is not registered. Disable strict mode to create new custom type.")
+        raise LookupError(f"Type {typeName} is not registered. Disable strict mode to create new custom type.")
 
     def __call__(self, name, strict=True):
         return self.parse(name, strict)

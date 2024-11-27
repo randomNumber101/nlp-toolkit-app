@@ -1,6 +1,7 @@
 import os.path
 import uuid
 
+from backend.events.backendEventApi import BackendEventApi
 from backend.run.LogManager import LogManager, LogLevels
 from backend.run.PipelineRunner import PipelineRunner
 from backend.storage.storageApi import PipelineApi, StorageApi
@@ -41,28 +42,24 @@ class RunStorageApi:
 
 class RunApi:
 
-    def __init__(self, storage: StorageApi):
+    def __init__(self, storage: StorageApi, events: BackendEventApi):
         self.runs_dir = storage.PATHS.runs
         self.pipelineApi = storage.PIPELINES
         self.stepApi = storage.STEPS
+        self.eventApi = events
         self.logger = LogManager()
+
+
+    def invokeEvent(self, name, data_object):
+        self.eventApi.sendEvent(name, data_object)
 
     # Returns a new run id
     def startRun(self, pipelineId, input: str) -> str:
         runId = str(uuid.uuid4())
         pipeline = self.pipelineApi.load_pipeline(pipelineId)
         blueprints = {bp.stepId: bp for bp in self.stepApi.load_all()}
-        runner = PipelineRunner()
+
+        runner = PipelineRunner(blueprints, pipeline, )
+
         return runId
 
-    def getPipelineStatus(self, pipelineId, runId):
-        pass
-
-    def getCurrentStepId(self, pipelineId, runId):
-        pass
-
-    def getStepLogs(self, pipelineId, runId, stepId):
-        pass
-
-    def getStepOutput(self, pipelineId, runId, stepId):
-        pass

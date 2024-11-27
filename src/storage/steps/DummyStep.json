@@ -37,8 +37,8 @@
     }
   },
   "inputs": {
-    "text" : "string",
-    "original text" : "string"
+    "data" : "CSV[text,label,number]",
+    "original data" : "string"
   },
   "outputs" : {
     "detected nouns" : "list[int]",

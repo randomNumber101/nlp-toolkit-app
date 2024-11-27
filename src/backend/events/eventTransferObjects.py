@@ -9,36 +9,38 @@ class StepState(Enum):
     FAILED = 3
 
 
-class StepStatus:
-    def __init__(self, runId: str, pipelineId: str, stepIndex: int, state: StepState, progress: float = 0.0):
+class NotificationDomain:
+    def __init__(self, runId, pipelineId, stepIndex):
         self.runId = runId
         self.pipelineId = pipelineId
         self.stepIndex = stepIndex
+
+
+class StepStatus:
+    def __init__(self, domain: NotificationDomain, state: StepState, progress: float = 0.0):
+        self.domain = domain
         self.state = state
         self.progress = progress
 
     def to_json(self):
         return {
-            "runId": self.runId,
-            "pipelineId": self.pipelineId,
-            "stepIndex": self.stepIndex,
+            "runId": self.domain.runId,
+            "pipelineId": self.domain.pipelineId,
+            "stepIndex": self.domain.stepIndex,
             "state": self.state.value,
             "progress": self.progress
         }
 
 
 class StepLogUpdate:
-
-    def __init__(self, runId: str, pipelineId: str, stepIndex: int, logs: List[str]):
-        self.runId = runId
-        self.pipelineId = pipelineId
-        self.stepIndex = stepIndex
+    def __init__(self, domain: NotificationDomain, logs: List[str]):
+        self.domain = domain
         self.logs = logs
 
     def to_json(self):
         return {
-            "runId": self.runId,
-            "pipelineId": self.pipelineId,
-            "stepIndex": self.stepIndex,
+            "runId": self.domain.runId,
+            "pipelineId": self.domain.pipelineId,
+            "stepIndex": self.domain.stepIndex,
             "logs": self.logs
         }
