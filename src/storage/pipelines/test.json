@@ -7,7 +7,7 @@
             "stepId": "DummyStep",
             "values" : {
                 "threshold" : 0.2,
-                "LLMConfig" : {
+                "LLM Config" : {
                     "model" : 1
                 }
             }
@@ -16,7 +16,7 @@
             "stepId": "DummyStep",
             "values": {
                 "threshold" : 0.3,
-                "LLMConfig" : {
+                "LLM Config" : {
                     "tokenization" : true
                 }
 

@@ -1,4 +1,5 @@
 import re
+import typing
 from typing import Callable, Dict, Any, List
 from backend.parameterTypes import ParameterPicker, Parameter, ParamType, InputOutputDefinition, \
     StaticParameter, ComplexType, ComplexPicker
@@ -26,24 +27,32 @@ class ParameterTypeParser:
         if pt.name not in self.typeMap:
             self.typeMap[pt.name] = pt
 
-    def registerGenericType(self, name, initializer: Callable[[List[str]], ParamType]):
-        self.genTypeMap[name] = initializer
+    def registerGenericType(self, name: str, initializer: Callable[[List[str]], ParamType]):
+        self.genTypeMap[name.lower()] = initializer
 
-    def parse(self, typeString, strict=True):
+    def parse(self, typeString : str, strict=True):
         if strict is None:
             strict = True
 
-        match = re.search(r"(\w*)(\[\w+(,\w+)*\])?", typeString)
-        typeName = match.group(1)
-        typeArgs = match.group(2).split(sep=",") if match.lastindex > 1 else None
+        typeString = typeString.lower()
 
-        if typeArgs and typeName in self.genTypeMap:
+        match = re.search(r"(\w*)(\[(\w+(,\w+)*)\])?", typeString)
+        typeName = match.group(1)
+        typeArgs = match.group(3).split(sep=",") if match.lastindex > 2 else None
+
+        if typeArgs or typeName in self.genTypeMap:
+            if not typeArgs:
+                typeArgs = []
             typObj = self.genTypeMap[typeName](typeArgs)
             return typObj
+
+        if typeString in self.typeMap: # Edge case when generic type is not registered. TODO: Rewrite List type to generate types dynamically
+            typeName = typeString
 
         if typeName in self.typeMap:
             typeObj = self.typeMap[typeName]
             return typeObj
+
 
         elif not strict:
             # Create CustomType
@@ -96,7 +105,7 @@ class ParameterPickerParser:
 # Class to parse parameters, including complex types
 class ParameterParser:
     def __init__(self, parameterTypeParser: ParameterTypeParser, pickerParser: ParameterPickerParser,
-                 enforceStatic=False, strictTyping=None):
+                 enforceStatic=False, strictTyping=True):
         self.typeParser = parameterTypeParser
         self.pickerParser = pickerParser
         self.enforceStatic = enforceStatic
@@ -134,10 +143,12 @@ class ParameterParser:
             parameters = self.parseParameters(param_obj)
             if self.pickerParser is not None:
                 picker = ComplexPicker(parameters)
-                return StaticParameter(name, picker, description, default_value)
+                complexType = typing.cast(ComplexType, picker.outputType)
+                default_values = complexType.getDefaults()
+                return StaticParameter(name, picker, description, default_values)
             else:
-                paramType = ComplexType({p.name: p.type for p in parameters})
-                return Parameter(name, paramType, description, default_value)
+                complexType = ComplexType(parameters)
+                return Parameter(name, complexType, description, complexType.getDefaults())
 
     def parseParameters(self, param_obj: Dict[str, Any]) -> List[Parameter | StaticParameter]:
         parameters = []

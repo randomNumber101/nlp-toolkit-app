@@ -1,15 +1,21 @@
+import random
 import time
 
-from backend.events.eventTransferObjects import StepState
-from backend.generaltypes import StepOperation, Payload, FrontendNotifier
+from backend.transferObjects.eventTransferObjects import StepState
+from backend.generaltypes import StepOperation, Payload, FrontendNotifier, Config
+from backend.transferObjects.visualization import SimpleTextViz
 
 
 ## Needs to be registered in register.py
 class DummyOperation(StepOperation):
-    def __init__(self, logger):
-        super().__init__("DummyStep", logger)
 
-    def run(self, payload: Payload, notifier: FrontendNotifier):
+    def initialize(self, config: Config):
+        print("Loading config for DummyStep...")
+        print(config)
+        print(config["LLM config"])
+        time.sleep(0.1)
+
+    def run(self, payload: Payload, notifier: FrontendNotifier) -> StepState:
         notifier.log("Dummy Operation starting!")
         notifier.sendStatus(StepState.RUNNING, progress=0)
         time.sleep(1)
@@ -20,11 +26,15 @@ class DummyOperation(StepOperation):
         notifier.sendStatus(StepState.RUNNING, progress=75)
         time.sleep(1)
         notifier.log("Executed last calculcation.")
+        if random.random() > 0.9:
+            if random.random() > 0.5:
+                notifier.log("Error occurred during computation.")
+                return StepState.FAILED
+            else:
+                raise RuntimeError("Exception thrown during computation.")
         notifier.sendStatus(StepState.RUNNING, progress=100)
         payload.result = "Dummy operation"
-        payload.visualization = {
-            "type": "plaintext",
-            "content": "This is the visualized result of Dummy Operation."
-        }
+        payload.addVisualization(SimpleTextViz("Lorem ipsum dorem solomit. Dedum berit kolifat dere. Nemim dol krato sorem."))
         time.sleep(0.05)
         notifier.sendStatus(StepState.SUCCESS, progress=100)
+        return StepState.SUCCESS

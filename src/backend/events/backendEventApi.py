@@ -1,11 +1,9 @@
 import webview
 
-from backend.events.eventTransferObjects import StepStatus, StepLogUpdate
+from backend.transferObjects.eventTransferObjects import StepStatus, StepLogUpdate
 
 
 class BackendEventApi:
-
-
     def sendStepLogs(self, stepLogs: StepLogUpdate):
         self.sendEvent("stepLogUpdate", stepLogs.to_json())
 
@@ -13,7 +11,7 @@ class BackendEventApi:
         self.sendEvent("stepStatusUpdate", status.to_json())
 
     def sendEvent(self, event_name, data_json):
-        if not webview.windows[0]:
+        if not webview.windows:
             raise RuntimeError("No window set.")
 
         webview.windows[0].evaluate_js(f"""
@@ -22,6 +20,10 @@ class BackendEventApi:
                         window.dispatchEvent(event);
                     }})();
                 """)
+
+
+
+
 
 
 

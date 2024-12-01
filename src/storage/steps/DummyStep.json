@@ -25,10 +25,11 @@
         "type" : "int",
         "input" : {
           "type" : "slider",
-          "min" : 4,
+          "min" : 2,
           "max" : 12,
           "step" : 2
-        }
+        },
+        "default" : 8
       }
     },
     "dimensions" : {
@@ -38,7 +39,7 @@
   },
   "inputs": {
     "data" : "CSV[text,label,number]",
-    "original data" : "string"
+    "original_data" : "CSV[text,label,number]"
   },
   "outputs" : {
     "detected nouns" : "list[int]",

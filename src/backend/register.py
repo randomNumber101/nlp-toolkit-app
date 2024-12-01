@@ -118,12 +118,11 @@ class Slider(ParameterPicker):
 
 
 def registerClasses():
-    logger = LogManager()
 
     '''
         Register StepOperations
     '''
-    Register.OperationMapper.registerOperation(DummyOperation(logger=logger))  # Dummy Operation for Dummy Step
+    Register.OperationMapper.registerOperation("DummyStep", DummyOperation)  # Dummy Operation for Dummy Step
 
     '''
         Register types

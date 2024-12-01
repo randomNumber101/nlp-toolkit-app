@@ -1,66 +1,82 @@
-from typing import Dict, List
+from typing import Dict, List, Union
 
 from backend.events.backendEventApi import BackendEventApi
-from backend.events.eventTransferObjects import StepState, StepLogUpdate, NotificationDomain, StepStatus
+from backend.transferObjects.eventTransferObjects import StepState, StepLogUpdate, NotificationDomain, StepStatus
 from backend.generaltypes import Pipeline, StepBlueprint, FrontendNotifier, Payload
 from backend.register import Register
-from backend.run.LogManager import LogManager, LogLevels, LoggerChannel
+from backend.run.LogManager import LogManager, LogLevels, LoggerChannel, StatusManager, StatusChannel
 
 
-class FrontendChannel(LoggerChannel):
+class FrontendLogChannel(LoggerChannel):
 
     def __init__(self, events: BackendEventApi, domain: NotificationDomain):
         self.events = events
         self.domain = domain
+        super(FrontendLogChannel, self).__init__()
 
-    def write(self, messages: List[str], level: LogLevels):
-        logObject = StepLogUpdate(domain=self.domain, logs=messages)
-        self.events.sendStepLogs(logObject)
+    def handle(self, obj: Dict[str, Union[str, LogLevels]]):
+        messages: List[str] = obj.get("messages", [])
+        level: LogLevels = obj.get("level", LogLevels.INFO)
+        prefixedMessages = [(LogLevels.prefix(level) + message) for message in messages]
+        self.events.sendStepLogs(StepLogUpdate(self.domain, prefixedMessages))
+
+
+class FrontendStatusChannel(StatusChannel):
+    def __init__(self, events: BackendEventApi, domain: NotificationDomain):
+        self.events = events
+        self.domain = domain
+        super(FrontendStatusChannel, self).__init__()
+
+    def handle(self, status: StepStatus):
+        self.events.sendStepStatus(status)
 
 
 class RunNotifier(FrontendNotifier):
 
-    def __init__(self, logger: LogManager, events: BackendEventApi):
+    def __init__(self, events: BackendEventApi):
         super(RunNotifier, self).__init__()
-        self.logger = logger
         self.events = events
+        self.logger = LogManager()
+        self.status_manager = StatusManager()
         self.domain = None
 
     def log(self, message: str | List[str], level: LogLevels = LogLevels.DEBUG):
         self.logger.log(message, level)
 
-    def sendStatus(self, stepState: StepState, progress: float):
+    def sendStatus(self, stepState: StepState, progress: float = 0):
         status = StepStatus(domain=self.domain, state=stepState, progress=progress)
-        self.events.sendStepStatus(status)
+        self.status_manager.send_status(status)
 
     def withDomain(self, domain: NotificationDomain):
         self.domain = domain
-        self.logger.setChannel("frontend", FrontendChannel(self.events, domain))
+        self.logger.set_channel("frontend", FrontendLogChannel(self.events, domain))
+        self.status_manager.set_channel("frontend", FrontendStatusChannel(self.events, domain))
         return self
 
 
 class PipelineRunner:
 
-    def __init__(self, blueprints: Dict[str, StepBlueprint], pipeline: Pipeline, events: BackendEventApi,
-                 logger: LogManager):
-        self.blueprints = blueprints
-        self.pipeline = pipeline
+    def __init__(self, events: BackendEventApi, runStorage: "RunStorageApi"):
         self.events = events
-        self.logger = logger
+        self.storage = runStorage
 
-    def start(self, runId : str, input: str):
+    def start(self, blueprints: Dict[str, StepBlueprint], pipeline: Pipeline, run_id: str, input: str):
+
+        # 0. Create folder structure
+        self.storage.initializeRun(run_id, pipeline)
+
         # 1. Build frontend notifier
-        notifier = RunNotifier(self.logger, self.events)
+        notifier = RunNotifier(self.events)
 
         # TODO: Add domain in frontend for general logs
-        notifier.withDomain(NotificationDomain(runId, self.pipeline.id, 0))
+        notifier.withDomain(NotificationDomain(run_id, pipeline.id, 0))
 
         # 2. Create payload and initialize input data
 
         payload = Payload()
 
         # Find first csv parameter in first step
-        blueprint_steps = [self.blueprints[stepVal.stepId] for stepVal in self.pipeline.steps]
+        blueprint_steps = [blueprints[stepVal.stepId] for stepVal in pipeline.steps]
         base_csv_type = Register.ParamTypeParser.parse("csv[]")
 
         first_csv_parameter = None
@@ -72,20 +88,41 @@ class PipelineRunner:
                     first_csv_parameter = inputParameter
 
         if not first_csv_parameter:
-            notifier.log(f"Pipeline has no step that utilizes the input data. Input will thus be ignored", LogLevels.WARN)
+            notifier.log(f"Pipeline has no step that utilizes the input data. Input will thus be ignored",
+                         LogLevels.WARN)
         else:
-            input_data_object = first_csv_parameter.type.parse(input) # Creates a pandas Dataframe object based on the headers
-            payload.setData(input_data_object)
+            input_data_object = first_csv_parameter.type.parse(
+                input)  # Creates a pandas Dataframe object based on the headers
+            payload.original_data = input_data_object
+            payload.data = input_data_object
 
         # 3. Run step by step
 
-        for step, stepVals in zip(blueprint_steps, self.pipeline.steps):
-            # TODO: 1 - Initialize Step operation with static parameters and dynamic parameters
-            # TODO: 2 - Call step operation
-            # TODO: 3 - Set / Save Visualization, Save output
-            # TODO: 4 - On Save : Trigger Success Event
-            # TODO: 5 - Try/Errors : Trigger Failed event
-            pass
+        stepIndex = 0
+        for step, stepVals in zip(blueprint_steps, pipeline.steps):
+            notifier.withDomain(NotificationDomain(run_id, pipeline.id, stepIndex))
+            try:
+                result = step.run(stepVals, payload, notifier)
+            except Exception as e:
+                notifier.log(f"Exception during run: {repr(e)}")
+                notifier.sendStatus(StepState.FAILED)
+                return
 
+            if not result or result == StepState.FAILED:
+                notifier.sendStatus(StepState.FAILED)
+                return
 
-        pass
+            visualization = payload.getVisualization(stepIndex)
+            self.storage.saveVisualization(run_id, stepIndex, visualization)
+
+            if stepIndex == len(blueprint_steps) - 1:
+                # Last step finished, save the latest data object to filesystem
+                result = payload.data
+                if result is not None:
+                    self.storage.saveResult(run_id, result)
+                notifier.log(f"Finished processing last step. Saved result to file.", LogLevels.INFO)
+            else:
+                notifier.log(f"Finished processing step {stepIndex}.", LogLevels.INFO)
+
+            notifier.sendStatus(StepState.SUCCESS, 100)
+            stepIndex += 1

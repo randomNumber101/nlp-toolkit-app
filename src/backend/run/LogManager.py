@@ -1,8 +1,12 @@
 import enum
-from abc import abstractmethod
-from typing import List, Dict
+from abc import ABC, abstractmethod
+from typing import List, Dict, TypeVar, Generic, Optional, Union
+
+from backend.events.backendEventApi import BackendEventApi
+from backend.transferObjects.eventTransferObjects import StepStatus
 
 
+# Define the LogLevels Enum as before
 class LogLevels(enum.Enum):
     DEBUG = 0
     INFO = 1
@@ -18,9 +22,7 @@ class LogLevels(enum.Enum):
             LogLevels.ERROR: 3
         }
 
-        if level in _HIERARCHY:
-            return _HIERARCHY[level]
-        return -1
+        return _HIERARCHY.get(level, -1)
 
     @staticmethod
     def geq(level_0, level_1):
@@ -34,45 +36,86 @@ class LogLevels(enum.Enum):
             LogLevels.WARN: "WARN | ",
             LogLevels.ERROR: "ERROR | "
         }
-        return _PREFIXES.get(level, default="")
+        return _PREFIXES.get(level, "")
 
 
-class LoggerChannel:
+# Define a generic type variable
+T = TypeVar("T")
 
+
+# Define the generic Channel interface
+class Channel(ABC, Generic[T]):
     @abstractmethod
-    def write(self, messages: List[str], level: LogLevels):
+    def handle(self, obj: T):
         pass
 
 
-class ConsoleLoggerChannel(LoggerChannel):
+# Define the generic Multiplexer base class
+class Multiplexer(Generic[T], ABC):
+    def __init__(self, channels: Optional[Dict[str, Channel[T]]] = None):
+        self.channels: Dict[str, Channel[T]] = channels if channels is not None else {}
 
-    def write(self, messages: List[str], level):
+    def get_channel(self, name: str) -> Optional[Channel[T]]:
+        return self.channels.get(name)
+
+    def set_channel(self, name: str, channel: Channel[T]):
+        self.channels[name] = channel
+
+    def multiplex(self, obj: T):
+        for channel in self.channels.values():
+            channel.handle(obj)
+
+    # Allow the multiplexer to be called directly
+    def __call__(self, obj: T):
+        self.multiplex(obj)
+
+
+# Refactor LoggerChannel to implement Channel for logging
+class LoggerChannel(Channel[Dict[str, Union[str, LogLevels]]]):
+    def handle(self, obj: Dict[str, Union[str, LogLevels]]):
+        messages: List[str] = obj.get("messages", [])
+        level: LogLevels = obj.get("level", LogLevels.INFO)
         for message in messages:
             print(LogLevels.prefix(level) + message)
 
 
-class LogManager:
-
-    def __init__(self, channels: Dict[str, LoggerChannel] = None, log_level=LogLevels.DEBUG):
+# Refactor LogManager to inherit from Multiplexer
+class LogManager(Multiplexer[Dict[str, Union[str, LogLevels]]]):
+    def __init__(self, channels: Optional[Dict[str, Channel[Dict[str, Union[str, LogLevels]]]]] = None, log_level: LogLevels = LogLevels.DEBUG):
+        super().__init__(channels if channels is not None else {"console": LoggerChannel()})
         self.log_level = log_level
-        self.channels = channels if channels is not None else {"console": ConsoleLoggerChannel()}
 
-    def getChannel(self, name):
-        return self.channels.get(name, None)
-
-    def setChannel(self, name, channel: LoggerChannel):
-        self.channels[name] = channel
-
-    def log(self, message: str | List[str], level=LogLevels.INFO):
+    def log(self, message: Union[str, List[str]], level: LogLevels = LogLevels.INFO):
         if not LogLevels.geq(level, self.log_level):
             return
 
         if isinstance(message, str):
             message = [message]
 
-        for _, channel in self.channels.items():
-            channel.write(message, level)
+        log_entry = {"messages": message, "level": level}
+        self.multiplex(log_entry)
+
+    # Allow LogManager to be called directly
+    def __call__(self, message: Union[str, List[str]], level: LogLevels = LogLevels.INFO):
+        self.log(message, level)
 
 
-    def __call__(self, *args, **kwargs):
-        return self.log(*args, **kwargs)
+# Example implementation of a StatusChannel
+class StatusChannel(Channel[StepStatus]):
+    def handle(self, status: StepStatus):
+        # Print to console
+        print(f"Status received: {status.to_json()}")
+
+
+# Implement the StatusManager by inheriting from Multiplexer
+class StatusManager(Multiplexer[StepStatus]):
+    def __init__(self, channels: Optional[Dict[str, Channel[StepStatus]]] = None):
+        super().__init__(channels if channels is not None else {"default": StatusChannel()})
+
+
+    def send_status(self, status: StepStatus):
+        self.multiplex(status)
+
+    # Allow StatusManager to be called directly
+    def __call__(self, status: StepStatus):
+        self.send_status(status)

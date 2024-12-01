@@ -1,6 +1,9 @@
 import copy
+import typing
 from abc import ABC, abstractmethod
 from typing import Callable, Type, List, Dict, TypeVar, Generic, cast
+
+
 
 T = TypeVar('T')
 
@@ -12,18 +15,19 @@ class ParamType(Generic[T]):
 
         self.name = name
         self.type = realType
-        if realType is None and parse is None:
-            raise RuntimeError(f"Cannot generate Type {self.name}. Specify type of parse function.")
-        self.parse = (lambda x: cast(realType, x)) if parse is None else parse
+
+        if parse is not None:
+            self.parse = parse
+        elif realType is not None:
+            self.parse = lambda value: cast(realType, value)
+        else:
+            self.parse = lambda x: x  # Leave value as is
 
     def parse(self, value: object) -> T:
         return self.parse(value)
 
     def __repr__(self):
         return self.name.lower()
-
-    def __eq__(self, other):
-        self.name = other.name
 
     def transformableInto(self, other):
         return self.__eq__(other)
@@ -37,13 +41,24 @@ class ListType(ParamType):
 
 
 class ComplexType(ParamType):
-    def __init__(self, innerTypes: Dict[str, ParamType]):
-        self.innerTypes = innerTypes
+    def __init__(self, innerParams: List["Parameter"]):
+        self.innerParams = innerParams
 
         def parse(obj: Dict[str, object]):
-            return {key: paraType.parse(obj[key]) for key, paraType in innerTypes.items()}
+            return {p.name: p.type.parse(obj[p.name]) for p in innerParams}
 
-        super().__init__("Complex", Dict[str, object], parse=parse)
+        super().__init__("complex", Dict[str, object], parse=parse)
+
+    def getDefaults(self):
+        defaults = {}
+        for p in self.innerParams:
+            if p.type.name != "complex":
+                if p.defaultValue:
+                    defaults[p.name] = p.defaultValue
+            else:
+                complexType = typing.cast(ComplexType, p.type)
+                defaults[p.name] = complexType.getDefaults()
+        return defaults
 
 
 # Contains information on how to configure the parameter for the frontend
@@ -70,7 +85,7 @@ class ParameterPicker(ABC):
         kwargs = {}
         for p in self.initializationParams:
             if p.name not in values:
-                raise ValueError(f"Cannot create picker form obj {obj}. Field {p.name} is missing.")
+                raise ValueError(f"Cannot create picker from obj {obj}. Field {p.name} is missing.")
             kwargs[p.name] = p.type.parse(values[p.name])
 
         self.initialize(**kwargs)
@@ -80,7 +95,7 @@ class ParameterPicker(ABC):
 class ComplexPicker(ParameterPicker):
     def __init__(self, innerParams: List["Parameter"], name="complex"):
         self.inner = innerParams
-        outputType = ComplexType({param.name: param.type for param in innerParams})
+        outputType = ComplexType(innerParams)
         super().__init__(name=name, outputType=outputType, parameters=[])
 
 
