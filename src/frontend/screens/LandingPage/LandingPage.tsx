@@ -1,38 +1,34 @@
-import * as React from 'react'
-import {useEffect, useState} from 'react';
+// src/components/LandingPage/LandingPage.tsx
 
-import "./LandingPage.scss"
-import {Pipeline} from "../../types";
-import {listPipelines, listStepBlueprints} from '../../utils/pipelineApi';
-import {types} from "sass";
-import List = types.List;
-
+import * as React from 'react';
+import { useEffect, useState } from 'react';
+import './LandingPage.scss';
+import { Pipeline } from '../../types';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCog } from '@fortawesome/free-solid-svg-icons';
 
 interface LandingPageProps {
-  pipelines : List[Pipeline]
+  pipelines: Pipeline[];
   onAddPipeline: () => void;
   onSelectPipeline: (pipeline: Pipeline) => void;
   onRunPipeline: (pipeline: Pipeline) => void;
 }
 
-const LandingPage = ({pipelines, onAddPipeline, onSelectPipeline, onRunPipeline} : LandingPageProps) => {
-
-  // Sample data for pipelines, in a real app you would fetch this data or manage it with global state
-
+const LandingPage: React.FC<LandingPageProps> = ({
+  pipelines,
+  onAddPipeline,
+  onSelectPipeline,
+  onRunPipeline,
+}) => {
   const handleAddPipeline = () => {
-    // Triggered when user clicks "Add Pipeline"
     onAddPipeline();
   };
 
   const handleSelectPipeline = (pipeline: Pipeline) => {
-    // Triggered when user clicks "Configure" on a pipeline
-    console.log("User clicked on pipeline:")
-    console.log(pipeline)
     onSelectPipeline(pipeline);
   };
 
   const handleRunPipeline = (pipeline: Pipeline) => {
-    // Triggered when user clicks "Run" on a pipeline
     onRunPipeline(pipeline);
   };
 
@@ -41,25 +37,39 @@ const LandingPage = ({pipelines, onAddPipeline, onSelectPipeline, onRunPipeline}
       <h1>Configured Pipelines</h1>
       <div className="pipeline-list">
         {pipelines.map((pipeline) => (
-          <div key={pipeline.id} className="pipeline-card">
-            <h3>{pipeline.name}</h3>
-            <p>{pipeline.description}</p>
-            <div className="pipeline-actions">
-              <button onClick={() => handleSelectPipeline(pipeline)} className="configure-button">
-                Configure
-              </button>
-              <button onClick={() => handleRunPipeline(pipeline)} className="run-button">
-                Run
-              </button>
+          <div
+            key={pipeline.id}
+            className="pipeline-card"
+            onClick={() => handleRunPipeline(pipeline)}
+          >
+            <button
+              className="configure-button"
+              onClick={(e) => {
+                e.stopPropagation(); // Prevent click from triggering parent onClick
+                handleSelectPipeline(pipeline);
+              }}
+              aria-label="Configure Pipeline"
+            >
+              <FontAwesomeIcon icon={faCog} />
+            </button>
+            <div className="card-content">
+              <h3>{pipeline.name}</h3>
+            </div>
+            <div className="description">
+              <p>{pipeline.description}</p>
             </div>
           </div>
         ))}
       </div>
-      <button onClick={handleAddPipeline} className="add-pipeline-button">
-        + Add New Pipeline
+      <button
+        onClick={handleAddPipeline}
+        className="add-pipeline-button"
+        aria-label="Add New Pipeline"
+      >
+        +
       </button>
     </div>
   );
-}
+};
 
 export default LandingPage;
