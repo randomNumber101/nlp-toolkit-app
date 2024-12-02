@@ -12,7 +12,7 @@ interface LogConsoleProps {
 
 const LogConsole: React.FC<LogConsoleProps> = ({ logs }) => {
     const logEndRef = useRef<HTMLDivElement>(null);
-    const [isExpanded, setIsExpanded] = useState<boolean>(false);
+    const [isExpanded, setIsExpanded] = useState<boolean>(true);
 
     useEffect(() => {
         if (isExpanded) {

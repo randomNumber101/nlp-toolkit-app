@@ -1,70 +1,159 @@
 /* src/components/RunStep/RunStep.scss */
 
 .run-step {
-    background-color: #fff;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    margin-bottom: 15px;
-    padding: 15px;
-    transition: background-color 0.3s ease;
+    flex: 0 0 100%;
+    width: 100%;
+    display: flex;
+    align-items: center;       /* Vertically center the content */
+    justify-content: center;    /* Horizontally center the content */
+    box-sizing: border-box;
+    height: 100vh;             /* Full viewport height */
+    overflow-y: auto;          /* Enable vertical scrolling if content overflows */
+    padding: 20px;             /* Optional padding */
 
     &.active {
-        background-color: #e6f7ff;
-        border-color: #91d5ff;
+        opacity: 1;
+        transform: scale(1);
     }
 
     &.inactive {
-        background-color: #fafafa;
-        opacity: 0.7;
+        opacity: 0.5;
+        transform: scale(0.8);
     }
 
-    .step-header {
-        h3 {
-            margin: 0;
-            font-size: 1.2em;
-            color: #333;
+    .run-step-content {
+        width: 80%;            /* 80% of the viewport width */
+        margin: 0 auto;
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 20px;         /* Increased padding for better spacing */
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        box-sizing: border-box;
+        max-height: 90vh;      /* Prevent content from exceeding viewport height */
+        overflow: hidden;
+
+        .step-indicator {
+            font-size: 0.9em;
+            color: #999;
+            margin-bottom: 10px;
+            text-align: center; /* Center the step indicator */
         }
 
-        p {
-            margin: 5px 0 10px 0;
-            color: #666;
-        }
-    }
+        .step-header {
+            text-align: center; /* Center the header text */
 
-    .step-status {
-        margin-bottom: 10px;
+            h3 {
+                margin: 0;
+                font-size: 1.8em;
+                color: #333;
+            }
 
-        .progress-bar {
-            width: 100%;
-            background-color: #f0f0f0;
-            border-radius: 3px;
-            overflow: hidden;
-            height: 10px;
-
-            .progress {
-                height: 100%;
-                background-color: #1890ff;
-                transition: width 0.3s ease;
+            p {
+                margin: 10px 0 20px 0;
+                color: #666;
             }
         }
 
-        .status {
-            font-weight: bold;
-            &.success {
-                color: #52c41a;
+        .step-status {
+            margin-bottom: 20px;
+
+            .status-message {
+                display: flex;
+                align-items: center;
+                justify-content: center; /* Center text horizontally */
+                padding: 10px;
+                border-radius: 5px;
+                color: #fff;
+                font-weight: bold;
+                text-align: center;
+                margin-bottom: 10px;
+
+                .text {
+                    display: block;
+                    width: 100%;
+                }
+
+                &.success {
+                    background-color: #52c41a; /* Green */
+                }
+
+                &.failed {
+                    background-color: #ff4d4f; /* Red */
+                }
+
+                &.running {
+                    background-color: #1890ff; /* Blue */
+                }
+
+                &.not-started {
+                    background-color: #faad14; /* Yellow */
+                }
             }
-            &.failed {
-                color: #ff4d4f;
-            }
-            &.not-started {
-                color: #faad14;
+
+            .progress-bar {
+                width: 100%;
+                background-color: #f0f0f0;
+                border-radius: 3px;
+                overflow: hidden;
+                height: 10px;
+
+                .progress {
+                    height: 100%;
+                    background-color: #1890ff;
+                    transition: width 0.3s ease;
+                }
             }
         }
-    }
 
-    .step-visualization {
-        margin-top: 10px;
-        padding: 10px;
-        border-top: 1px solid #eee;
+        .result-group {
+            margin-bottom: 20px;
+            background-color: #52c41a; /* Green background for success */
+            border-radius: 5px;
+            padding: 10px;
+
+            h4 {
+                margin-bottom: 10px;
+                color: #fff; /* White text */
+                text-align: center; /* Center the "Result" text */
+                font-size: 1.4em; /* Slightly larger font */
+            }
+
+            .result-area {
+                padding: 10px;
+                border-radius: 5px;
+                background-color: rgba(255, 255, 255, 0.2); /* Slightly transparent white */
+                color: #fff;
+                text-align: center; /* Center content if needed */
+            }
+        }
+
+        .log-console {
+            max-height: none;
+            overflow-y: auto;
+            overflow-x: hidden; /* Prevent horizontal scrolling */
+
+            /* Custom scrollbar styles */
+            &::-webkit-scrollbar {
+                width: 8px;
+            }
+
+            &::-webkit-scrollbar-track {
+                background: #f1f1f1;
+                border-radius: 4px;
+            }
+
+            &::-webkit-scrollbar-thumb {
+                background: #000; /* Black scrollbar */
+                border-radius: 4px;
+            }
+
+            /* For Firefox */
+            scrollbar-width: thin;
+            scrollbar-color: #000 #f1f1f1;
+        }
     }
 }

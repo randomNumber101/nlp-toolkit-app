@@ -1,8 +1,6 @@
 // src/components/RunScreen/RunScreen.tsx
 
 import * as React from 'react';
-// src/components/RunScreen/RunScreen.tsx
-
 import { useState, useEffect } from 'react';
 import './RunScreen.scss';
 import RunStep from '../RunStep/RunStep';
@@ -10,11 +8,11 @@ import { StepStatus, StepState } from '../../types/events';
 import { Pipeline, StepBlueprint } from '../../types';
 import { startRun } from '../../utils/pipelineApi';
 import { useBackendEvent } from '../../utils/useBackendEvents';
-import {InputHandle} from "../InputScreen/InputScreen";
+import { InputHandle } from "../InputScreen/InputScreen";
 
 interface RunScreenProps {
     pipeline: Pipeline;
-    blueprints: {[key: string] : StepBlueprint}
+    blueprints: { [key: string]: StepBlueprint }
     inputHandle: InputHandle;
 }
 
@@ -22,19 +20,18 @@ const RunScreen: React.FC<RunScreenProps> = ({ pipeline, blueprints, inputHandle
     const [runId, setRunId] = useState<string | null>(null);
     const [stepsStatus, setStepsStatus] = useState<StepStatus[]>(
         pipeline.steps.map((step, index) => ({
-                    domain: { runId: runId, pipelineId: pipeline.id, stepIndex: index },
-                    state: StepState.NOT_STARTED,
-                    progress: 0,
-                }))
+            domain: { runId: runId, pipelineId: pipeline.id, stepIndex: index },
+            state: StepState.NOT_STARTED,
+            progress: 0,
+        }))
     );
     const [activeStepIndex, setActiveStepIndex] = useState<number>(0);
 
     function getHandleData(handle: InputHandle) {
-        if(handle.type === "text") {
-            return handle.data
-        }
-        else {
-            return handle.path
+        if (handle.type === "text") {
+            return handle.data;
+        } else {
+            return handle.path;
         }
     }
 
@@ -61,16 +58,13 @@ const RunScreen: React.FC<RunScreenProps> = ({ pipeline, blueprints, inputHandle
 
     // Handler for status updates
     const handleStatusUpdate = (event: CustomEvent) => {
-        const statusUpdate = event.detail as StepStatus; // Adjust the type accordingly
-        if (runId == statusUpdate.domain.runId && pipeline.id == statusUpdate.domain.pipelineId) {
-            console.log("Updating stati:")
+        const statusUpdate = event.detail as StepStatus;
+        if (runId === statusUpdate.domain.runId && pipeline.id === statusUpdate.domain.pipelineId) {
             setStepsStatus(prevStatuses =>
                 prevStatuses.map(status => {
-                    if (!status.domain)
-                        console.log("No domain:", status)
                     if (status.domain.stepIndex === statusUpdate.domain.stepIndex)
-                        return statusUpdate
-                    return status
+                        return statusUpdate;
+                    return status;
                 })
             );
             // Update active step index
@@ -83,17 +77,50 @@ const RunScreen: React.FC<RunScreenProps> = ({ pipeline, blueprints, inputHandle
     // Subscribe to status events
     useBackendEvent('stepStatusUpdate', handleStatusUpdate);
 
+    const handlePrev = () => {
+        setActiveStepIndex(prev => Math.max(prev - 1, 0));
+    };
+
+    const handleNext = () => {
+        setActiveStepIndex(prev => Math.min(prev + 1, pipeline.steps.length - 1));
+    };
+
     return (
-        <div className="run-screen">
-            {pipeline.steps.map((step, index) => (
-                <RunStep
-                    key={index}
-                    step={blueprints[step.stepId]}
-                    status={stepsStatus[index]}
-                    isActive={index === activeStepIndex}
-                    runId={runId || ''}
-                />
-            ))}
+        <div className="run-screen-container">
+            <button
+                className="nav-button left"
+                onClick={handlePrev}
+                disabled={activeStepIndex === 0}
+                aria-label="Previous Step"
+            >
+                ‹
+            </button>
+            <div className="run-screen-wrapper">
+                <div
+                    className="run-screen"
+                    style={{ transform: `translateX(-${activeStepIndex * 100}%)` }}
+                >
+                    {pipeline.steps.map((step, index) => (
+                        <RunStep
+                            key={index}
+                            step={blueprints[step.stepId]}
+                            status={stepsStatus[index]}
+                            isActive={index === activeStepIndex}
+                            runId={runId || ''}
+                            stepNumber={index + 1}
+                            totalSteps={pipeline.steps.length}
+                        />
+                    ))}
+                </div>
+            </div>
+            <button
+                className="nav-button right"
+                onClick={handleNext}
+                disabled={activeStepIndex === pipeline.steps.length - 1}
+                aria-label="Next Step"
+            >
+                ›
+            </button>
         </div>
     );
 };
