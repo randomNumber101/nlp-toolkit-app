@@ -1,42 +1,7 @@
-import enum
 from abc import ABC, abstractmethod
 from typing import List, Dict, TypeVar, Generic, Optional, Union
+from backend.transferObjects.eventTransferObjects import StepStatus, LogLevels
 
-from backend.events.backendEventApi import BackendEventApi
-from backend.transferObjects.eventTransferObjects import StepStatus
-
-
-# Define the LogLevels Enum as before
-class LogLevels(enum.Enum):
-    DEBUG = 0
-    INFO = 1
-    WARN = 2
-    ERROR = 3
-
-    @staticmethod
-    def level_of(level):
-        _HIERARCHY = {
-            LogLevels.DEBUG: 0,
-            LogLevels.INFO: 1,
-            LogLevels.WARN: 2,
-            LogLevels.ERROR: 3
-        }
-
-        return _HIERARCHY.get(level, -1)
-
-    @staticmethod
-    def geq(level_0, level_1):
-        return LogLevels.level_of(level_0) >= LogLevels.level_of(level_1)
-
-    @staticmethod
-    def prefix(level):
-        _PREFIXES = {
-            LogLevels.DEBUG: "DEBUG | ",
-            LogLevels.INFO: "INFO | ",
-            LogLevels.WARN: "WARN | ",
-            LogLevels.ERROR: "ERROR | "
-        }
-        return _PREFIXES.get(level, "")
 
 
 # Define a generic type variable

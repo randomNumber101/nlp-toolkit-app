@@ -2,13 +2,11 @@ import typing
 from abc import ABC, abstractmethod
 from typing import Dict, List, Type, Any, Optional
 
-from backend.transferObjects.eventTransferObjects import StepState
+from backend.transferObjects.eventTransferObjects import StepState, LogLevels
 from backend.parameterTypes import Parameter, InputOutputDefinition, ComplexType, ParamType
 
 from pandas import DataFrame
 import pandas as pd
-
-from backend.run.LogManager import LogLevels
 
 
 # Might be specified later

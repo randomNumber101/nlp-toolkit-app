@@ -1,6 +1,7 @@
 // src/utils/pipelineApi.ts
 
 import { Pipeline, StepBlueprint, StepValues } from "../types";
+import {VisualizationData} from "../types/events";
 
 function unpackResponse(response: any) {
   if (response instanceof Error) {
@@ -103,6 +104,43 @@ export async function invokeEvent(name, data): Promise<null> {
   try {
     const response = await window.pywebview.api.RUNS.invokeEvent(name, data);
     return null// Cast to StepBlueprint interface
+  } catch (error) {
+    console.error("Failed to invoke event:", error);
+    return null;
+  }
+}
+
+// Starts a run in a seperate Thread and returns its callback (run_id : string)
+export async function startRun(pipelineId, input): Promise<string> {
+  await waitForPywebview()
+  try {
+    const response = await window.pywebview.api.RUNS.startRun(pipelineId, input);
+    const result = unpackResponse(response)
+    return result as string;
+  } catch (error) {
+    console.error("Failed to invoke event:", error);
+    return null;
+  }
+}
+
+export async function getRunVisualization(run_id : string, step_index: number): Promise<VisualizationData> {
+  await waitForPywebview()
+  try {
+    const response = await window.pywebview.api.RUNS.getVisualization(run_id, step_index);
+    const result = unpackResponse(response)
+    return result as VisualizationData;
+  } catch (error) {
+    console.error("Failed to invoke event:", error);
+    return null;
+  }
+}
+
+export async function getRunResult(run_id : string, step_index: number): Promise<any> {
+  await waitForPywebview()
+  try {
+    const response = await window.pywebview.api.RUNS.getResult(run_id);
+    const result = unpackResponse(response)
+    return result
   } catch (error) {
     console.error("Failed to invoke event:", error);
     return null;

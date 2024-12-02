@@ -10,7 +10,7 @@ import {invokeEvent, listPipelines, loadStepBlueprint, savePipeline} from "../ut
 import {streamToString} from "../utils/functional";
 import { Pipeline, StepBlueprint } from '../types';
 import {InputHandle} from './InputScreen/InputScreen'
-import {registerStepLogHandler, useBackendEvent} from "../utils/events";
+import {useBackendEvent} from "../utils/useBackendEvents";
 
 
 function App() {
@@ -100,7 +100,6 @@ function App() {
   const handleInput = (input: InputHandle) => {
     setInput(input)
     console.log(input.name)
-    input.loadFull().then(streamToString).then(console.log)
     goToLandingPage()
   }
 

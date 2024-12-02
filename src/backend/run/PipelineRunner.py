@@ -1,10 +1,11 @@
 from typing import Dict, List, Union
 
 from backend.events.backendEventApi import BackendEventApi
-from backend.transferObjects.eventTransferObjects import StepState, StepLogUpdate, NotificationDomain, StepStatus
+from backend.transferObjects.eventTransferObjects import StepState, StepLogUpdate, NotificationDomain, StepStatus, Log, \
+    LogLevels
 from backend.generaltypes import Pipeline, StepBlueprint, FrontendNotifier, Payload
 from backend.register import Register
-from backend.run.LogManager import LogManager, LogLevels, LoggerChannel, StatusManager, StatusChannel
+from backend.run.LogManager import LogManager, LoggerChannel, StatusManager, StatusChannel
 
 
 class FrontendLogChannel(LoggerChannel):
@@ -17,8 +18,8 @@ class FrontendLogChannel(LoggerChannel):
     def handle(self, obj: Dict[str, Union[str, LogLevels]]):
         messages: List[str] = obj.get("messages", [])
         level: LogLevels = obj.get("level", LogLevels.INFO)
-        prefixedMessages = [(LogLevels.prefix(level) + message) for message in messages]
-        self.events.sendStepLogs(StepLogUpdate(self.domain, prefixedMessages))
+        logMessages = [Log(level, message) for message in messages]
+        self.events.sendStepLogs(StepLogUpdate(self.domain, logMessages))
 
 
 class FrontendStatusChannel(StatusChannel):
@@ -104,7 +105,7 @@ class PipelineRunner:
             try:
                 result = step.run(stepVals, payload, notifier)
             except Exception as e:
-                notifier.log(f"Exception during run: {repr(e)}")
+                notifier.log(f"Exception during run: {repr(e)}", LogLevels.ERROR)
                 notifier.sendStatus(StepState.FAILED)
                 return
 

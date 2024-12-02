@@ -7,7 +7,8 @@ import pandas
 
 from backend.events.backendEventApi import BackendEventApi
 from backend.generaltypes import Pipeline
-from backend.run.LogManager import LogManager, LogLevels
+from backend.run.LogManager import LogManager
+from backend.transferObjects.eventTransferObjects import LogLevels
 from backend.run.PipelineRunner import PipelineRunner
 from backend.storage.storageApi import PipelineApi, StorageApi
 from backend.transferObjects.pipelineTransferObjects import convert_pipeline_to_transfer
@@ -49,9 +50,9 @@ class RunStorageApi:
         return True
 
     def getVisualization(self, run_id, stepIndex: int) -> dict:
-        base_path = os.path.join(self.directory, run_id)
+        base_path = os.path.join(self.directory, run_id, "visualizations")
         viz_path = os.path.join(base_path, f"{stepIndex}.json")
-        with open(viz_path, 'w') as f:
+        with open(viz_path, 'r') as f:
             viz_json = json.load(f)
         return viz_json
 
@@ -60,7 +61,7 @@ class RunStorageApi:
         save_path = os.path.join(base_path, "result.pkl")
         return data.to_pickle(save_path)
 
-    def getResult(self, run_id):
+    def getResult(self, run_id) -> pandas.DataFrame:
         base_path = os.path.join(self.directory, run_id)
         save_path = os.path.join(base_path, "result.pkl")
         if os.path.isfile(save_path):
@@ -72,14 +73,14 @@ class RunApi:
 
     def __init__(self, storage: StorageApi, events: BackendEventApi):
         self.runs_dir = storage.PATHS.runs
-        self.pipelineApi = storage.PIPELINES
-        self.stepApi = storage.STEPS
-        self.runStorageApi = RunStorageApi(run_directory=self.runs_dir)
-        self.eventApi = events
+        self._pipelineApi = storage.PIPELINES
+        self._stepApi = storage.STEPS
+        self._runStorageApi = RunStorageApi(run_directory=self.runs_dir)
+        self._eventApi = events
 
 
     def invokeEvent(self, name, data_object):
-        self.eventApi.sendEvent(name, data_object)
+        self._eventApi.sendEvent(name, data_object)
 
     '''
     Starts the new run in a separate Thread and returns its identifier (run_id)
@@ -88,9 +89,9 @@ class RunApi:
         run_id = f"{pipelineId}-{str(uuid.uuid4())[:18]}"
 
         def runStep():
-            pipeline = self.pipelineApi.load_pipeline(pipelineId)
-            blueprints = {bp.stepId: bp for bp in self.stepApi.load_all()}
-            runner = PipelineRunner(self.eventApi, self.runStorageApi)
+            pipeline = self._pipelineApi.load_pipeline(pipelineId)
+            blueprints = {bp.stepId: bp for bp in self._stepApi.load_all()}
+            runner = PipelineRunner(self._eventApi, self._runStorageApi)
             runner.start(blueprints, pipeline, run_id, input_data)
 
         runThread = threading.Thread(target=runStep, name=f"StepRunner for {run_id}", daemon=False)
@@ -98,3 +99,9 @@ class RunApi:
 
         return run_id
 
+
+    def getVisualization(self, run_id, stepIndex: int):
+        return self._runStorageApi.getVisualization(run_id, stepIndex)
+
+    def getResult(self, run_id):
+        return self._runStorageApi.getResult(run_id).to_json()
