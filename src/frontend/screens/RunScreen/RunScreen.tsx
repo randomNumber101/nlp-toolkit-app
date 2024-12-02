@@ -18,13 +18,7 @@ interface RunScreenProps {
 
 const RunScreen: React.FC<RunScreenProps> = ({ pipeline, blueprints, inputHandle }) => {
     const [runId, setRunId] = useState<string | null>(null);
-    const [stepsStatus, setStepsStatus] = useState<StepStatus[]>(
-        pipeline.steps.map((step, index) => ({
-            domain: { runId: runId, pipelineId: pipeline.id, stepIndex: index },
-            state: StepState.NOT_STARTED,
-            progress: 0,
-        }))
-    );
+    const [stepsStatus, setStepsStatus] = useState<StepStatus[]>([]);
     const [activeStepIndex, setActiveStepIndex] = useState<number>(0);
 
     function getHandleData(handle: InputHandle) {
@@ -54,7 +48,7 @@ const RunScreen: React.FC<RunScreenProps> = ({ pipeline, blueprints, inputHandle
         };
 
         initiateRun();
-    }, [pipeline, inputHandle, pipeline.steps]);
+    }, [pipeline, inputHandle]);
 
     // Handler for status updates
     const handleStatusUpdate = (event: CustomEvent) => {
@@ -96,22 +90,24 @@ const RunScreen: React.FC<RunScreenProps> = ({ pipeline, blueprints, inputHandle
                 ‹
             </button>
             <div className="run-screen-wrapper">
-                <div
-                    className="run-screen"
-                    style={{ transform: `translateX(-${activeStepIndex * 100}%)` }}
-                >
-                    {pipeline.steps.map((step, index) => (
-                        <RunStep
-                            key={index}
-                            step={blueprints[step.stepId]}
-                            status={stepsStatus[index]}
-                            isActive={index === activeStepIndex}
-                            runId={runId || ''}
-                            stepNumber={index + 1}
-                            totalSteps={pipeline.steps.length}
-                        />
-                    ))}
-                </div>
+                {runId && stepsStatus.length > 0 && (
+                    <div
+                        className="run-screen"
+                        style={{ transform: `translateX(-${activeStepIndex * 100}%)` }}
+                    >
+                        {pipeline.steps.map((step, index) => (
+                            <RunStep
+                                key={index}
+                                step={blueprints[step.stepId]}
+                                status={stepsStatus[index]}
+                                isActive={index === activeStepIndex}
+                                runId={runId}
+                                stepNumber={index + 1}
+                                totalSteps={pipeline.steps.length}
+                            />
+                        ))}
+                    </div>
+                )}
             </div>
             <button
                 className="nav-button right"

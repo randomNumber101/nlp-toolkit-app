@@ -18,6 +18,7 @@
 
     &.expanded {
         max-height: 250px; /* Height when expanded */
+        min-height: 80px;  /* Minimum height to display at least 3 log lines */
     }
 
     .log-header {
@@ -27,7 +28,7 @@
         padding: 10px;
         background-color: #111;
         cursor: pointer;
-        flex-shrink: 0; /* Prevent header from shrinking */
+        flex-shrink: 0;
 
         h4 {
             margin: 0;
@@ -41,9 +42,28 @@
 
     .log-content {
         padding: 10px;
-        background-color: #000; /* Maintain black background */
+        background-color: #000;
         overflow-y: auto;
-        flex: 1; /* Take up remaining space when expanded */
+        overflow-x: hidden; /* Prevent horizontal scrolling */
+        flex: 1;
+
+        /* Custom scrollbar styles */
+        &::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        &::-webkit-scrollbar-track {
+            background: #000;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background: #555;
+            border-radius: 4px;
+        }
+
+        /* For Firefox */
+        scrollbar-width: thin;
+        scrollbar-color: #555 #000;
 
         .log-entry {
             display: flex;
@@ -55,11 +75,10 @@
                 align-items: center;
                 font-weight: bold;
                 margin-right: 10px;
-                font-size: 0.8em; /* Smaller text for prefix */
+                font-size: 0.8em;
                 width: 100px; /* Fixed width for alignment */
                 text-transform: uppercase;
                 flex-shrink: 0;
-                /* Additional styling for thickness */
                 border-radius: 3px;
                 padding: 2px 4px;
 
@@ -70,48 +89,28 @@
 
             .log-message {
                 flex: 1;
-                /* Color is inherited based on parent .log-entry's class */
+                word-break: break-word; /* Prevent long words from overflowing */
             }
 
             /* Log level specific styles */
-            &.DEBUG {
-                .log-level {
-                    color: #9e9e9e; /* Gray */
-                }
-
-                .log-message {
-                    color: #9e9e9e; /* Gray */
-                }
+            &.DEBUG .log-level,
+            &.DEBUG .log-message {
+                color: #9e9e9e;
             }
 
-            &.INFO {
-                .log-level {
-                    color: #1890ff; /* Blue */
-                }
-
-                .log-message {
-                    color: #1890ff; /* Blue */
-                }
+            &.INFO .log-level,
+            &.INFO .log-message {
+                color: #1890ff;
             }
 
-            &.WARN {
-                .log-level {
-                    color: #faad14; /* Orange */
-                }
-
-                .log-message {
-                    color: #faad14; /* Orange */
-                }
+            &.WARN .log-level,
+            &.WARN .log-message {
+                color: #faad14;
             }
 
-            &.ERROR {
-                .log-level {
-                    color: #ff4d4f; /* Red */
-                }
-
-                .log-message {
-                    color: #ff4d4f; /* Red */
-                }
+            &.ERROR .log-level,
+            &.ERROR .log-message {
+                color: #ff4d4f;
             }
         }
     }
