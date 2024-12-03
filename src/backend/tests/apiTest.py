@@ -2,7 +2,7 @@ import time
 from collections import Counter
 
 from backend.Api import Api
-from backend.events.backendEventApi import BackendEventApi
+from backend.run.backendEventApi import BackendEventApi
 from backend.transferObjects.eventTransferObjects import StepStatus, StepState, StepLogUpdate
 
 

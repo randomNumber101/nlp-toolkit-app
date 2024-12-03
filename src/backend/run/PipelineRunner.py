@@ -1,6 +1,6 @@
 from typing import Dict, List, Union
 
-from backend.events.backendEventApi import BackendEventApi
+from backend.run.backendEventApi import BackendEventApi
 from backend.transferObjects.eventTransferObjects import StepState, StepLogUpdate, NotificationDomain, StepStatus, Log, \
     LogLevels
 from backend.generaltypes import Pipeline, StepBlueprint, FrontendNotifier, Payload

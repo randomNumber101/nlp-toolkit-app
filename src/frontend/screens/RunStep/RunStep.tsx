@@ -9,6 +9,7 @@ import { StepStatus, StepState, VisualizationData, StepLogUpdate, Log } from '..
 import { StepBlueprint } from '../../types';
 import { getRunVisualization } from '../../utils/pipelineApi';
 import { useBackendEvent } from '../../utils/useBackendEvents';
+import DynamicVisualization from "../../components/OutputVisualization/DynamicVisualization";
 
 interface RunStepProps {
     step: StepBlueprint;
@@ -59,14 +60,7 @@ const RunStep: React.FC<RunStepProps> = ({ step, status, isActive, runId, stepNu
     useBackendEvent('stepLogUpdate', handleLogUpdate);
 
     const renderVisualization = () => {
-        if (!visualization) return null;
-        switch (visualization.type) {
-            case 'simple_text':
-                return <TextVisualization content={visualization.content.text} />;
-            // Future visualization types can be handled here
-            default:
-                return <div>Unsupported visualization type: {visualization.type}</div>;
-        }
+        return <DynamicVisualization visualization={visualization}/>
     };
 
     const renderStatus = () => {

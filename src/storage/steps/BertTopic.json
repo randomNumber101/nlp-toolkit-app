@@ -1,0 +1,13 @@
+{
+  "id" : "BertTopic",
+  "name": "Classify nouns",
+  "parameters": {},
+  "inputs": {
+    "data" : "CSV[text,label,number]",
+    "original_data" : "CSV[text,label,number]"
+  },
+  "outputs" : {
+    "detected nouns" : "list[int]",
+    "visualization" : "html"
+  }
+}
