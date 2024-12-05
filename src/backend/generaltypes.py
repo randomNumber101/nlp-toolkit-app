@@ -26,12 +26,11 @@ class Payload(Dict[str, Any]):
 
         # Initialize protected attributes
         if not link_to_parent:
-            super().__setitem__('data', None)
             super().__setitem__('visualizations', [])
 
         if values is not None:
             for k, v in values.items():
-                setattr(self, k, v)  # Correctly set attribute based on key
+                super().__setitem__(k, v)  # Correctly set attribute based on key
 
     def __setitem__(self, key: str, value: Any):
         if key == "visualizations" and self['visualizations']:
@@ -92,7 +91,7 @@ class Config:
 
         self.values = {}
         for p in parameters:
-            if p.name not in self.complexFields and p.defaultValue:
+            if p.name not in self.complexFields and p.defaultValue is not None:
                 self.values[p.name] = self.fields[p.name].type.parse(p.defaultValue)
 
 
@@ -117,9 +116,16 @@ class Config:
         return not any(self.getMissingValues())
 
     def __getitem__(self, item):
+        return self.get(item, None)
+
+    def get(self, item, default=None):
         if item in self.complexFields:
-            return self.fields[item]
-        return self.values[item]
+            if item in self.fields:
+                return self.fields[item]
+            return default
+        if item in self.values:
+            return self.values[item]
+        return default
 
     def __setitem__(self, key, value):
         self.setValues({key: value})
@@ -185,7 +191,9 @@ class StepBlueprint:
         config.setValues(configValues.values)
         if not config.isReady():
             missingValues = list(config.getMissingValues())
-            notifier.log(f"Cannot run {self.name} due to missing config parameters: {missingValues}")
+            notifier.log(f"Config object seems to miss some values: {config.values}")
+            notifier.log(f"Cannot run {self.name} due to missing config parameters: {missingValues}",
+                         LogLevels.ERROR)
             return StepState.FAILED
 
         # Create the actual operation instance

@@ -20,6 +20,7 @@ const RunScreen: React.FC<RunScreenProps> = ({ pipeline, blueprints, inputHandle
     const [runId, setRunId] = useState<string | null>(null);
     const [stepsStatus, setStepsStatus] = useState<StepStatus[]>([]);
     const [activeStepIndex, setActiveStepIndex] = useState<number>(0);
+    const [userHasChangedStep, setUserHasChangedStep] = useState<boolean>(false);
 
     function getHandleData(handle: InputHandle) {
         if (handle.type === "text") {
@@ -42,6 +43,8 @@ const RunScreen: React.FC<RunScreenProps> = ({ pipeline, blueprints, inputHandle
                     progress: 0,
                 }));
                 setStepsStatus(initialStatuses);
+                // Focus on the first step
+                setActiveStepIndex(0);
             } else {
                 console.error('Run initiation failed.');
             }
@@ -61,9 +64,15 @@ const RunScreen: React.FC<RunScreenProps> = ({ pipeline, blueprints, inputHandle
                     return status;
                 })
             );
-            // Update active step index
+
+            // If a step starts running and the user hasn't manually changed steps, update activeStepIndex
+            if (statusUpdate.state === StepState.RUNNING && !userHasChangedStep) {
+                setActiveStepIndex(statusUpdate.domain.stepIndex);
+            }
+
+            // When a step finishes successfully, reset userHasChangedStep to false
             if (statusUpdate.state === StepState.SUCCESS) {
-                setActiveStepIndex(prev => Math.min(prev + 1, pipeline.steps.length - 1));
+                setUserHasChangedStep(false);
             }
         }
     };
@@ -72,10 +81,12 @@ const RunScreen: React.FC<RunScreenProps> = ({ pipeline, blueprints, inputHandle
     useBackendEvent('stepStatusUpdate', handleStatusUpdate);
 
     const handlePrev = () => {
+        setUserHasChangedStep(true);
         setActiveStepIndex(prev => Math.max(prev - 1, 0));
     };
 
     const handleNext = () => {
+        setUserHasChangedStep(true);
         setActiveStepIndex(prev => Math.min(prev + 1, pipeline.steps.length - 1));
     };
 

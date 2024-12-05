@@ -59,10 +59,6 @@ const RunStep: React.FC<RunStepProps> = ({ step, status, isActive, runId, stepNu
     // Subscribe to log events
     useBackendEvent('stepLogUpdate', handleLogUpdate);
 
-    const renderVisualization = () => {
-        return <DynamicVisualization visualization={visualization}/>
-    };
-
     const renderStatus = () => {
         let statusClass = '';
         let statusText = '';
@@ -112,7 +108,7 @@ const RunStep: React.FC<RunStepProps> = ({ step, status, isActive, runId, stepNu
                     <div className="result-group">
                         <h4>Result</h4>
                         <div className="result-area">
-                            {renderVisualization()}
+                            <DynamicVisualization visualization={visualization}/>
                         </div>
                     </div>
                 )}

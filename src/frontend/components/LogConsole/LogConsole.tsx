@@ -1,6 +1,7 @@
 // src/components/LogConsole/LogConsole.tsx
+
 import * as React from "react";
-import  { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import './LogConsole.scss';
 import { Log, LogLevel } from "../../types/events";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -11,13 +12,12 @@ interface LogConsoleProps {
 }
 
 const LogConsole: React.FC<LogConsoleProps> = ({ logs }) => {
-    const logEndRef = useRef<HTMLDivElement>(null);
+    const logContentRef = useRef<HTMLDivElement>(null);
     const [isExpanded, setIsExpanded] = useState<boolean>(true);
 
     useEffect(() => {
-        if (isExpanded) {
-            // Scroll to the bottom when new logs are added only if expanded
-            logEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        if (isExpanded && logContentRef.current) {
+            logContentRef.current.scrollTop = logContentRef.current.scrollHeight;
         }
     }, [logs, isExpanded]);
 
@@ -26,7 +26,7 @@ const LogConsole: React.FC<LogConsoleProps> = ({ logs }) => {
     };
 
     const getLogIcon = (level: LogLevel) => {
-        switch(level) {
+        switch (level) {
             case LogLevel.DEBUG:
                 return faBug;
             case LogLevel.INFO:
@@ -51,7 +51,7 @@ const LogConsole: React.FC<LogConsoleProps> = ({ logs }) => {
                 <FontAwesomeIcon icon={isExpanded ? faChevronUp : faChevronDown} className="toggle-icon" />
             </div>
             {isExpanded && (
-                <div className="log-content">
+                <div className="log-content" ref={logContentRef}>
                     {logs.map((log, index) => (
                         <div className={`log-entry ${LogLevel[log.level]}`} key={index}>
                             <span className="log-level">
@@ -60,7 +60,6 @@ const LogConsole: React.FC<LogConsoleProps> = ({ logs }) => {
                             <span className="log-message">{log.message}</span>
                         </div>
                     ))}
-                    <div ref={logEndRef} />
                 </div>
             )}
         </div>

@@ -1,0 +1,48 @@
+{
+  "id": "DataPreparation",
+  "name": "Data Preparation",
+  "parameters": {
+    "column": {
+      "type": "string",
+      "default": ["text"],
+      "description": "When using CSV, defines the column to use this operation on. Defaults to 'text'",
+      "input": {
+        "type": "text_field"
+      }
+    },
+    "remove stopwords": {
+      "type": "complex",
+      "description": "Remove insignificant words that are of little use for traditional NLP.",
+      "activate": {
+        "type": "bool",
+        "default": true,
+        "description": "Activate this function."
+      },
+      "language": {
+        "type": "string",
+        "input": {
+          "type": "list",
+          "possibilities": ["en_core_web_md", "de_core_news_md"]
+        },
+        "default": ["en_core_web_md"]
+      }
+    },
+    "lowercase": {
+      "type": "bool",
+      "default": false,
+      "description": "Toggle to convert text to lowercase."
+    },
+    "remove non-ascii": {
+      "type": "bool",
+      "default": true,
+      "description": "Toggle to remove non-ASCII characters."
+    }
+  },
+  "inputs": {
+    "data": "CSV[]"
+  },
+  "outputs": {
+    "data": "CSV[]",
+    "visualization": "html"
+  }
+}

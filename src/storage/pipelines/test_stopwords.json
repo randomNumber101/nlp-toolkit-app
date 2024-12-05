@@ -1,0 +1,26 @@
+{
+    "id": "test_stopwords",
+    "name": "Data Preparation",
+    "description": "Apply various data preparation techniques for your pipeline",
+    "steps": [
+        {
+            "stepId": "DataPreparation",
+            "values": {
+                "remove stopwords": {
+                    "language": "en_core_web_md"
+                },
+                "lowercase": true
+            }
+        },
+        {
+            "stepId": "DummyStep",
+            "values": {
+                "threshold": 0.3,
+                "LLM config": {
+                    "tokenization": false
+                },
+                "should return": true
+            }
+        }
+    ]
+}
