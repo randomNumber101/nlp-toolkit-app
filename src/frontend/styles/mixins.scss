@@ -1,0 +1,19 @@
+/* src/styles/mixins.scss */
+
+@mixin button-style($bg-color, $text-color, $hover-bg-color, $hover-text-color) {
+  background-color: $bg-color;
+  color: $text-color;
+  border: none;
+  border-radius: $border-radius;
+  cursor: pointer;
+  transition: background-color $transition-duration ease, color $transition-duration ease;
+
+  &:hover {
+    background-color: $hover-bg-color;
+    color: $hover-text-color;
+  }
+
+  &:focus {
+    outline: none;
+  }
+}
