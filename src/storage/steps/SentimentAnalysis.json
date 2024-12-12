@@ -1,0 +1,47 @@
+{
+  "id": "SentimentAnalysis",
+  "name": "Sentiment Analysis",
+  "parameters": {
+    "input column": {
+      "type": "string",
+      "default": "text",
+      "description": "When using CSV, defines the column to use this operation on. Defaults to 'text'",
+      "input": {
+        "type": "text_field"
+      }
+    },
+    "output column": {
+      "type": "string",
+      "default": "sentiment",
+      "description": "When using CSV, defines the column to write the output to. Leave empty to overwrite input.",
+      "input": {
+        "type": "text_field"
+      }
+    },
+    "sentiment analysis": {
+      "type": "complex",
+      "description": "Perform sentiment analysis on the text.",
+      "activate": {
+        "type": "bool",
+        "default": true,
+        "description": "Activate sentiment analysis."
+      },
+      "language": {
+        "type": "string",
+        "input": {
+          "type": "list",
+          "possibilities": ["en", "de"]
+        },
+        "default": "en",
+        "description": "Language of the text for sentiment analysis."
+      }
+    }
+  },
+  "inputs": {
+    "data": "CSV[]"
+  },
+  "outputs": {
+    "data": "CSV[]",
+    "visualization": "html"
+  }
+}

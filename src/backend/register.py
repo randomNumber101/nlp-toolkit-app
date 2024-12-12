@@ -7,6 +7,7 @@ from backend.operations import BertTopic
 from backend.operations.BertTopic import BertTopicModelingOperation
 from backend.operations.DataPreparationOperation import DataPreparationOperation
 from backend.operations.DummyOperation import DummyOperation
+from backend.operations.SentimentAnalysisOperation import SentimentAnalysisOperation
 from backend.parameterTypes import ParamType, ParameterPicker, Parameter, ListType
 from backend.run.LogManager import LogManager
 from backend.storage.parsing import ParameterTypeParser, ParameterPickerParser
@@ -72,12 +73,6 @@ class DataType(ParamType):
 
         return len(other_cols.difference(my_cols)) == 0
 
-
-
-
-
-
-
     @staticmethod
     def getInstance(column_names: List[str]):
         key = tuple(column_names)
@@ -128,6 +123,7 @@ def registerClasses():
     Register.OperationMapper.registerOperation("DummyStep", DummyOperation)  # Dummy Operation for Dummy Step
     Register.OperationMapper.registerOperation("BertTopic", BertTopicModelingOperation)
     Register.OperationMapper.registerOperation("DataPreparation", DataPreparationOperation)
+    Register.OperationMapper.registerOperation("SentimentAnalysis", SentimentAnalysisOperation)
 
     '''
         Register types

@@ -13,6 +13,15 @@
             }
         },
         {
+            "stepId": "SentimentAnalysis",
+            "values": {
+                "sentiment analysis": {
+                    "activate": "true",
+                    "language": "en"
+                }
+            }
+        },
+        {
             "stepId": "DummyStep",
             "values": {
                 "threshold": 0.3,

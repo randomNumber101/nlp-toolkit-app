@@ -208,9 +208,6 @@ class ParallelizableTextOperation(StepOperation, ABC):
         start_time = time.time()
 
         data: pd.DataFrame = payload.data
-
-        print(data)
-
         counter = Counter({"success": 0, "failed": 0})
         cell_index = 0
         num_cells = len(data[self.input_column])
@@ -219,7 +216,6 @@ class ParallelizableTextOperation(StepOperation, ABC):
             nonlocal cell_index
             cellNotifier = CellNotifierWrapper(notifier, counter, cell_index, num_cells)
             cell_index += 1
-            self.initialize(self.config)
             return self.single_cell_operation(cellNotifier, payload, text)
 
         data[self.output_column] = data[self.input_column].apply(transform)
