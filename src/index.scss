@@ -21,6 +21,10 @@ html, body, #root, .app-container {
   padding: 0;
 }
 
+* {
+    box-sizing: border-box;
+}
+
 
 
 textarea {

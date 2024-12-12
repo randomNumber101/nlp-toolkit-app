@@ -1,0 +1,37 @@
+/* Update MultiVisualization.scss */
+
+
+.multi-visualization {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 20px 0;
+    position: relative;
+    width: 100%; /* Set to 100% to fit parent */
+    max-width: 800px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #fff;
+    padding: 20px;
+    box-sizing: border-box; /* Include padding and border in width */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+    .visualization-content {
+        width: 100%;
+        min-height: 200px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .navigation-arrows {
+        /* Adjust positioning if necessary */
+    }
+
+    .tabs {
+        /* Ensure tabs don't overflow */
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+}

@@ -126,6 +126,8 @@
             }
 
             .result-area {
+                 width: 100%;
+                overflow: hidden;
                 padding: 10px;
                 border-radius: 5px;
                 background-color: rgba(255, 255, 255, 0.2);

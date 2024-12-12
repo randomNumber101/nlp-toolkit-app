@@ -6,6 +6,7 @@ from backend.transferObjects.eventTransferObjects import StepState, StepLogUpdat
 from backend.generaltypes import Pipeline, StepBlueprint, FrontendNotifier, Payload
 from backend.register import Register
 from backend.run.LogManager import LogManager, LoggerChannel, StatusManager, StatusChannel
+from backend.transferObjects.visualization import MultiVisualization
 
 
 class FrontendLogChannel(LoggerChannel):
@@ -113,8 +114,13 @@ class PipelineRunner:
                 notifier.sendStatus(StepState.FAILED)
                 return
 
-            visualization = payload.getVisualization(stepIndex)
-            self.storage.saveVisualization(run_id, stepIndex, visualization)
+            visualizations = payload.popVisualizations()
+            print(f"Got visualizations: {len(visualizations)}")
+            if len(visualizations) == 1:
+                self.storage.saveVisualization(run_id, stepIndex, visualizations[0])
+            elif len(visualizations) > 1:
+                allVisualizations = MultiVisualization(visualizations)
+                self.storage.saveVisualization(run_id, stepIndex, allVisualizations)
 
             if stepIndex == len(blueprint_steps) - 1:
                 # Last step finished, save the latest data object to filesystem

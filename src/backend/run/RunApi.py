@@ -3,6 +3,7 @@ import os.path
 import threading
 import uuid
 
+
 import pandas
 
 from backend.run.backendEventApi import BackendEventApi
@@ -83,7 +84,13 @@ class RunApi:
     '''
     Starts the new run in a separate Thread and returns its identifier (run_id)
     '''
-    def startRun(self, pipelineId, input_data: str) -> str:
+    def startRun(self, pipelineId, input_handle) -> str:
+
+        # Convert to csv as default
+        input_data = input_handle["data"]
+        if input_handle["type"] == "text":
+            input_data = "text \n" + input_data
+
         run_id = f"{pipelineId}-{str(uuid.uuid4())[:18]}"
 
         def runStep():

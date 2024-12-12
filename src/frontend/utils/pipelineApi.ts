@@ -2,6 +2,7 @@
 
 import { Pipeline, StepBlueprint, StepValues } from "../types";
 import {VisualizationData} from "../types/events";
+import {InputHandle} from "../screens/InputScreen/InputScreen";
 
 function unpackResponse(response: any) {
   if (response instanceof Error) {
@@ -111,7 +112,7 @@ export async function invokeEvent(name, data): Promise<null> {
 }
 
 // Starts a run in a seperate Thread and returns its callback (run_id : string)
-export async function startRun(pipelineId, input): Promise<string> {
+export async function startRun(pipelineId, input : InputHandle): Promise<string> {
   await waitForPywebview()
   try {
     const response = await window.pywebview.api.RUNS.startRun(pipelineId, input);

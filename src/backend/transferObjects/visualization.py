@@ -1,4 +1,5 @@
 from abc import abstractmethod
+from typing import List
 
 
 class Visualization:
@@ -13,8 +14,23 @@ class Visualization:
         }
 
     @abstractmethod
-    def serializeContent(self) -> dict:
+    def serializeContent(self) -> dict | list:
         pass
+
+
+class MultiVisualization(Visualization):
+
+    def __init__(self, vizList: List[Visualization]):
+        super(MultiVisualization, self).__init__("multi")
+        self.vizList = vizList
+
+
+    def serializeContent(self) -> list:
+        return [
+            viz.toJson() for viz in self.vizList
+        ]
+
+
 
 
 class SimpleTextViz(Visualization):

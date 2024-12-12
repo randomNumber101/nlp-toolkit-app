@@ -1,7 +1,8 @@
 import pandas as pd
 import os
 from typing import Union, Any
-import io
+
+from io import StringIO
 
 
 def parseWildcardToDataframe(X: Any) -> pd.DataFrame:
@@ -28,45 +29,11 @@ def parseWildcardToDataframe(X: Any) -> pd.DataFrame:
     if isinstance(X, pd.DataFrame):
         return X
 
-    # Case 2: X is a string (could be a file path or plain text)
+    # Case 2: X is a csv file
     elif isinstance(X, str):
-        if os.path.isfile(X):
-            # It's a file path
-            _, ext = os.path.splitext(X)
-            ext = ext.lower()
-            if ext == '.txt':
-                try:
-                    with open(X, 'r', encoding='utf-8') as file:
-                        content = file.read()
-                    df = pd.DataFrame({'text': [content]})
-                    return df
-                except Exception as e:
-                    raise TypeError(f"Error reading text file '{X}': {e}")
-            elif ext == '.csv':
-                try:
-                    df = pd.read_csv(X)
-                    return df
-                except Exception as e:
-                    raise TypeError(f"Error reading CSV file '{X}': {e}")
-            else:
-                raise TypeError(f"Unsupported file extension '{ext}'. Only .txt and .csv are supported.")
-        else:
-            # It's a plain string
-            df = pd.DataFrame({'text': [X]})
-            return df
+        csv_data = StringIO(X)
+        return pd.read_csv(csv_data)
 
-    # Case 3: X is a stream (has a read() method)
-    elif hasattr(X, 'read') and callable(X.read):
-        try:
-            # Attempt to read as text
-            content = X.read()
-            if isinstance(content, bytes):
-                # If bytes, decode using utf-8
-                content = content.decode('utf-8')
-            df = pd.DataFrame({'text': [content]})
-            return df
-        except Exception as e:
-            raise TypeError(f"Error reading from stream: {e}")
 
     else:
         raise TypeError(

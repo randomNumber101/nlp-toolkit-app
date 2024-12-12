@@ -22,18 +22,10 @@ const RunScreen: React.FC<RunScreenProps> = ({ pipeline, blueprints, inputHandle
     const [activeStepIndex, setActiveStepIndex] = useState<number>(0);
     const [userHasChangedStep, setUserHasChangedStep] = useState<boolean>(false);
 
-    function getHandleData(handle: InputHandle) {
-        if (handle.type === "text") {
-            return handle.data;
-        } else {
-            return handle.path;
-        }
-    }
-
     useEffect(() => {
         // Start the run when the component mounts
         const initiateRun = async () => {
-            const newRunId = await startRun(pipeline.id, getHandleData(inputHandle));
+            const newRunId = await startRun(pipeline.id, inputHandle);
             if (newRunId) {
                 setRunId(newRunId);
                 // Initialize step statuses

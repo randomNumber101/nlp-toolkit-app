@@ -1,13 +1,15 @@
 // src/components/DragAndDrop/DragAndDrop.tsx
+
 import * as React from 'react';
 import { useState, useRef, DragEvent } from 'react';
 import './DragAndDrop.scss';
+import { InputHandle } from '../InputScreen/InputScreen';
 
 interface DragAndDropProps {
-  onFileUpload: (file: File) => void;
+  onFileDataReceived: (inputHandle: InputHandle) => void;
 }
 
-const DragAndDrop: React.FC<DragAndDropProps> = ({ onFileUpload }) => {
+const DragAndDrop: React.FC<DragAndDropProps> = ({ onFileDataReceived }) => {
   const [dragActive, setDragActive] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -32,13 +34,48 @@ const DragAndDrop: React.FC<DragAndDropProps> = ({ onFileUpload }) => {
     }
   };
 
-  const handleFile = (file: File) => {
-    if (file.type === 'text/plain' || file.name.endsWith('.txt')) {
-      onFileUpload(file);
-      setErrorMessage('');
+  const handleFile = async (file: File) => {
+    const validTypes = ['text/plain', 'text/csv'];
+    const validExtensions = ['.txt', '.csv'];
+    const isValidType = validTypes.includes(file.type);
+    const isValidExtension = validExtensions.some(ext => file.name.toLowerCase().endsWith(ext));
+
+    if (isValidType && isValidExtension) {
+      try {
+        const handle = await fileToInputHandle(file);
+        onFileDataReceived(handle);
+        setErrorMessage('');
+      } catch (error) {
+        setErrorMessage('Failed to read the file.');
+        console.error(error);
+      }
     } else {
-      setErrorMessage('Only .txt files are accepted.');
+      setErrorMessage('Only .txt and .csv files are accepted.');
     }
+  };
+
+  const fileToInputHandle = async (file: File): Promise<InputHandle> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const content = reader.result as string;
+        const preview = content.length > 300 ? content.substring(0, 300) + '...' : content;
+        const isCSV = file.name.toLowerCase().endsWith('.csv');
+        const type = isCSV ? 'csv' : 'text';
+        resolve({
+          id: crypto.randomUUID(),
+          type: type,
+          name: file.name,
+          data: content, // Store the full file content here
+          preview,
+        });
+      };
+      reader.onerror = () => {
+        reject('Failed to read file.');
+      };
+      // Read the entire file to get the content
+      reader.readAsText(file);
+    });
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -62,13 +99,13 @@ const DragAndDrop: React.FC<DragAndDropProps> = ({ onFileUpload }) => {
       >
         <input
           type="file"
-          accept=".txt"
+          accept=".txt,.csv"
           ref={fileInputRef}
           onChange={handleFileSelect}
           hidden
         />
         <p>
-          Drag & Drop your .txt file here or{' '}
+          Drag & Drop your .txt or .csv file here or{' '}
           <span className="browse-text" onClick={handleBrowseFiles}>
             browse
           </span>

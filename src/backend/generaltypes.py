@@ -1,5 +1,8 @@
+import copy
+import time
 import typing
 from abc import ABC, abstractmethod
+from collections import Counter
 from typing import Dict, List, Type, Any, Optional
 
 from backend.transferObjects.eventTransferObjects import StepState, LogLevels
@@ -33,8 +36,6 @@ class Payload(Dict[str, Any]):
                 super().__setitem__(k, v)  # Correctly set attribute based on key
 
     def __setitem__(self, key: str, value: Any):
-        if key == "visualizations" and self['visualizations']:
-            raise ValueError("Cannot set visualization object, only update it.")
         if self.link_to_parent is not None:
             self.link_to_parent[key] = value
         else:
@@ -63,9 +64,10 @@ class Payload(Dict[str, Any]):
         except KeyError:
             raise AttributeError(f"'Payload' object has no attribute '{key}'")
 
-    def getVisualization(self, index):
-
-        return self['visualizations'][index]
+    def popVisualizations(self):
+        visualizations = self['visualizations']
+        self['visualizations'] = []
+        return visualizations
 
     def addVisualization(self, viz: Any):
         self['visualizations'].append(viz)
@@ -93,8 +95,6 @@ class Config:
         for p in parameters:
             if p.name not in self.complexFields and p.defaultValue is not None:
                 self.values[p.name] = self.fields[p.name].type.parse(p.defaultValue)
-
-
 
     def setValues(self, vals: dict[str, object]):
         for vName, vValue in vals.items():
@@ -157,6 +157,82 @@ class StepOperation(ABC):
         return self.run(payload, notifier)
 
 
+class CellNotifierWrapper(FrontendNotifier):
+
+    def __init__(self, cellNotifier: FrontendNotifier, successCounter: Counter, cell_index: int,
+                 total_cells: int):
+        self.cellNotifier = cellNotifier
+        self.cell_index = cell_index
+        self.total_cells = total_cells
+        self.counter = successCounter
+
+    def log(self, message: str | List[str], level: LogLevels = LogLevels.DEBUG):
+        prefix = f"Cell {self.cell_index}/{self.total_cells}:"
+        if isinstance(message, str):
+            message = prefix + message
+        else:
+            message = [prefix + m for m in message]
+        return self.cellNotifier.log(message, level)
+
+    def sendStatus(self, stepState: StepState, progress: float = 0.0):
+        if stepState == StepState.SUCCESS:
+            self.counter.update("success")
+        elif stepState == StepState.FAILED:
+            self.counter.update("failed")
+
+        relative_progress = (100 * self.cell_index + progress) / self.total_cells
+        self.cellNotifier.sendStatus(StepState.RUNNING, relative_progress)
+
+
+class ParallelizableTextOperation(StepOperation, ABC):
+
+    def __init__(self, config: Config):
+        self.config = config
+        self.input_column = self.config.get("input column", "text")
+        if isinstance(self.input_column, list):
+            self.input_column = self.input_column[0]  # Assuming single column for simplicity
+
+        # Determine the output column
+        self.output_column = self.config.get("output column", None)
+        if self.output_column == "":
+            self.output_column = self.input_column  # Overwrite
+        elif self.output_column is None:
+            self.output_column = self.input_column  # Default to overwrite if not specified
+        super(ParallelizableTextOperation, self).__init__(config)
+
+    @abstractmethod
+    def single_cell_operation(self, notifier: FrontendNotifier, payload: Payload, text: str) -> str:
+        pass
+
+    def run(self, payload, notifier: FrontendNotifier) -> StepState:
+        start_time = time.time()
+
+        data: pd.DataFrame = payload.data
+
+        print(data)
+
+        counter = Counter({"success": 0, "failed": 0})
+        cell_index = 0
+        num_cells = len(data[self.input_column])
+
+        def transform(text: str):
+            nonlocal cell_index
+            cellNotifier = CellNotifierWrapper(notifier, counter, cell_index, num_cells)
+            cell_index += 1
+            self.initialize(self.config)
+            return self.single_cell_operation(cellNotifier, payload, text)
+
+        data[self.output_column] = data[self.input_column].apply(transform)
+        end_time = time.time()
+        notifier.log(f"Total processing time: {end_time - start_time:.2f} seconds", LogLevels.INFO)
+        if counter["failed"] > 0:
+            notifier.log(f"{counter['failed']} of {num_cells} failed. Data will not be saved.", LogLevels.ERROR)
+            return StepState.FAILED
+
+        payload.data = data
+        return StepState.SUCCESS
+
+
 class StepOperationMapper:
 
     def __init__(self):
@@ -204,7 +280,6 @@ class StepBlueprint:
 
         # Run operation
         return operation_obj(partial_payload, notifier=notifier)
-
 
 
 class Pipeline:

@@ -1,7 +1,7 @@
 // src/components/InputScreen/InputScreen.tsx
 
 import * as React from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import TextArea from '../../components/ValuePickers/TextArea';
 import DragAndDrop from '../../components/DragAndDrop/DragAndDrop';
 import './InputScreen.scss';
@@ -13,10 +13,9 @@ interface InputScreenProps {
 
 export interface InputHandle {
   id: string;
-  type: 'text' | 'file';
+  type: 'text' | 'csv';
   preview: string;
-  data?: string; // For text inputs
-  path?: string; // For file inputs
+  data?: string; // For text inputs and file contents
   name?: string; // Optional, used for file inputs
 }
 
@@ -31,27 +30,27 @@ const stringToInputHandle = (input: string): InputHandle => {
   };
 };
 
-// Converts a File object to an InputHandle by reading the first 300 characters for preview
+// Converts a File object to an InputHandle by reading the entire content for data and the first 300 characters for preview
 const fileToInputHandle = async (file: File): Promise<InputHandle> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => {
       const content = reader.result as string;
       const preview = content.length > 300 ? content.substring(0, 300) + '...' : content;
-      // Assuming pywebview provides access to the full file path
-      // If not, you might need to handle this differently
+      const isCSV = file.name.toLowerCase().endsWith('.csv');
+      const type = isCSV ? 'csv' : 'text';
       resolve({
         id: crypto.randomUUID(),
-        type: 'file',
+        type: type,
         name: file.name,
-        path: (file as any).path || '', // Adjust based on your environment
+        data: content, // Store the full file content here
         preview,
       });
     };
     reader.onerror = () => {
       reject('Failed to read file.');
     };
-    // Read the entire file to get the first 300 characters for the preview
+    // Read the entire file to get the content
     reader.readAsText(file);
   });
 };
@@ -64,7 +63,13 @@ const InputScreen: React.FC<InputScreenProps> = ({
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [inputHandle, setInputHandle] = useState<InputHandle | null>(preloaded);
-  const [inputType, setInputType] = useState<'text' | 'file'>(preloaded?.type ?? 'file'); // To track current input type
+  const [inputType, setInputType] = useState<'text' | 'file'>(
+    preloaded?.type === 'csv' ? 'file' : (preloaded?.type === 'text' ? 'text' : 'file')
+  ); // To track current input type
+
+  useEffect(() => {
+    console.log("New input:", inputHandle)
+  }, [inputHandle])
 
   // Handles the submission of the input
   const handleButtonClick = () => {
@@ -85,21 +90,11 @@ const InputScreen: React.FC<InputScreenProps> = ({
     setErrorMessage('');
   };
 
-  // Handles file uploads and converts them to InputHandle
-  const handleFileUpload = async (file: File) => {
-    if (file.type === 'text/plain' || file.name.endsWith('.txt')) {
-      try {
-        const handle = await fileToInputHandle(file);
-        setInput(''); // Clear any existing text input
-        setInputHandle(handle);
-        setErrorMessage('');
-      } catch (error) {
-        setErrorMessage('Failed to read the file.');
-        console.error(error);
-      }
-    } else {
-      setErrorMessage('Only .txt files are accepted.');
-    }
+  // Handles received file data from DragAndDrop
+  const handleFileDataReceived = (handle: InputHandle) => {
+    setInput(''); // Clear any existing text input
+    setInputHandle(handle);
+    setErrorMessage('');
   };
 
   // Removes the selected file
@@ -130,13 +125,13 @@ const InputScreen: React.FC<InputScreenProps> = ({
 
         {/* Render based on the selected input type */}
         {inputType === 'file' ? (
-          <DragAndDrop onFileUpload={handleFileUpload} />
+          <DragAndDrop onFileDataReceived={handleFileDataReceived} />
         ) : (
           <div className={`textarea-container ${isExpanded ? 'expanded' : ''}`}>
             <TextArea
               value={input}
               onChange={handleTextChange}
-              rows={isExpanded ? 15 : 4} // Adjust rows based on expansion
+              rows={isExpanded ? 25 : 6} // Adjust rows based on expansion
               className="input-textarea"
               placeholder="Enter your input here..."
             />
@@ -147,10 +142,19 @@ const InputScreen: React.FC<InputScreenProps> = ({
         )}
 
         {/* Display file information if a file is uploaded */}
-        {inputHandle && inputHandle.type === 'file' && (
+        {inputHandle && inputHandle.type === 'csv' && (
           <div className="file-info">
             <span className="file-icon">📄</span>
             <span className="file-name">{inputHandle.name}</span>
+            <button className="remove-file-button" onClick={removeFile}>
+              ❌
+            </button>
+          </div>
+        )}
+        {inputHandle && inputHandle.type === 'text' && (
+          <div className="file-info">
+            <span className="file-icon">📝</span>
+            <span className="file-name">Text Input</span>
             <button className="remove-file-button" onClick={removeFile}>
               ❌
             </button>
