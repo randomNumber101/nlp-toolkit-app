@@ -45,7 +45,6 @@
     "@fortawesome/free-solid-svg-icons": "^6.7.1",
     "@fortawesome/react-fontawesome": "^0.2.2",
     "deasync": "^0.1.30",
-    "plotly.js": "^2.35.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },

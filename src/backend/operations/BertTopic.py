@@ -1,10 +1,11 @@
+import webview
 from bertopic import BERTopic
 from sklearn.feature_extraction.text import CountVectorizer
 import pandas as pd
 
 from backend.transferObjects.eventTransferObjects import StepState, LogLevels
 from backend.generaltypes import StepOperation, Payload, FrontendNotifier, Config
-from backend.transferObjects.visualization import HTMLViz
+from backend.transferObjects.visualization import HTMLViz, SimpleTextViz, PlotlyViz, MultiVisualization
 
 
 class BertTopicOperation(StepOperation):
@@ -66,8 +67,16 @@ class BertTopicOperation(StepOperation):
 
             # Prepare visualization
             fig = self.topic_model.visualize_barchart(top_n_topics=top_n)
-            viz_html = fig.to_html(full_html=False, include_plotlyjs='cdn', include_mathjax='cdn')
-            payload.addVisualization(HTMLViz(viz_html))
+            # Generate Plotly visualizations
+            bar_chart = self.topic_model.visualize_barchart(top_n_topics=10)
+            hierarchy = self.topic_model.visualize_hierarchy()
+            heatmap = self.topic_model.visualize_heatmap()
+
+            # Add Plotly visualizations to the payload
+
+            multi = MultiVisualization([PlotlyViz(bar_chart), PlotlyViz(hierarchy), PlotlyViz(heatmap)])
+
+            payload.addVisualization(multi)
 
             # Update payload data
             payload.data = data

@@ -44,5 +44,5 @@ entry = get_entrypoint()
 
 if __name__ == '__main__':
     api = Api()
-    window = webview.create_window('NLP Toolkit', entry, js_api=api)
+    window = webview.create_window('NLP Toolkit', entry, js_api=api, width=1000, height=750)
     webview.start(debug=True)

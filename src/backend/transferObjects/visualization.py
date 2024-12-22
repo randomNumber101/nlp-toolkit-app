@@ -24,13 +24,10 @@ class MultiVisualization(Visualization):
         super(MultiVisualization, self).__init__("multi")
         self.vizList = vizList
 
-
     def serializeContent(self) -> list:
         return [
             viz.toJson() for viz in self.vizList
         ]
-
-
 
 
 class SimpleTextViz(Visualization):
@@ -59,3 +56,13 @@ class HTMLViz(Visualization):
         }
 
 
+class PlotlyViz(Visualization):
+
+    def __init__(self, plotly_figure):
+        super(PlotlyViz, self).__init__("plotly")
+        self.plotly_json = plotly_figure.to_json()
+
+    def serializeContent(self) -> dict:
+        return {
+            "config": self.plotly_json
+        }
