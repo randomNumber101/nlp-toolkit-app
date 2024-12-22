@@ -1,18 +1,16 @@
-// src/components/MultiVisualization/MultiVisualization.tsx
-
 import * as React from 'react';
 import { useState } from 'react';
 import DynamicVisualization from "./DynamicVisualization";
-import PropTypes from 'prop-types';
 import './MultiVisualization.scss';
 import { VisualizationData } from "../../types/events";
 
-// Assuming VisualizationData is an array of VisualizationData items
 interface MultiVizProps {
     visualizations: VisualizationData[];
+    renderType: string; // "numbered" or "tabbed"
+    tabNames?: string[];
 }
 
-const MultiVisualization: React.FC<MultiVizProps> = ({ visualizations }) => {
+const MultiVisualization: React.FC<MultiVizProps> = ({ visualizations, renderType, tabNames = [] }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
 
     const goToPrevious = () => {
@@ -23,11 +21,13 @@ const MultiVisualization: React.FC<MultiVizProps> = ({ visualizations }) => {
         setCurrentIndex((prevIndex) => (prevIndex === visualizations.length - 1 ? 0 : prevIndex + 1));
     };
 
-    const goToIndex = (index: number) => {
-        setCurrentIndex(index);
+    const visibleRange = () => {
+        const start = Math.max(currentIndex - 5, 0);
+        const end = Math.min(currentIndex + 5, visualizations.length);
+        return { start, end };
     };
 
-    if (!visualizations || visualizations.length === 0) return null;
+    const { start, end } = visibleRange();
 
     return (
         <div className="multi-visualization">
@@ -36,22 +36,42 @@ const MultiVisualization: React.FC<MultiVizProps> = ({ visualizations }) => {
             </div>
             <div className="navigation-arrows">
                 <button onClick={goToPrevious} className="nav-button left">
-                    &#8592;
+                    &#x2190;
                 </button>
                 <button onClick={goToNext} className="nav-button right">
-                    &#8594;
+                    &#x2192;
                 </button>
             </div>
             <div className="tabs">
-                {visualizations.map((viz, index) => (
-                    <button
-                        key={index}
-                        className={`tab-button ${index === currentIndex ? 'active' : ''}`}
-                        onClick={() => goToIndex(index)}
-                    >
-                        {index + 1}
-                    </button>
-                ))}
+                {renderType === "numbered" ? (
+                    // Numbered View
+                    visualizations.slice(start, end).map((_, index) => {
+                        const absoluteIndex = start + index;
+                        return (
+                            <button
+                                key={absoluteIndex}
+                                className={`number-tab ${absoluteIndex === currentIndex ? 'active' : ''}`}
+                                onClick={() => setCurrentIndex(absoluteIndex)}
+                            >
+                                {absoluteIndex + 1}
+                            </button>
+                        );
+                    })
+                ) : (
+                    // Tabbed View
+                    visualizations.slice(start, end).map((_, index) => {
+                        const absoluteIndex = start + index;
+                        return (
+                            <button
+                                key={absoluteIndex}
+                                className={`tab-button ${absoluteIndex === currentIndex ? 'active' : ''}`}
+                                onClick={() => setCurrentIndex(absoluteIndex)}
+                            >
+                                {tabNames[absoluteIndex] || `Tab ${absoluteIndex + 1}`}
+                            </button>
+                        );
+                    })
+                )}
             </div>
         </div>
     );

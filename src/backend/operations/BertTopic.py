@@ -74,7 +74,11 @@ class BertTopicOperation(StepOperation):
 
             # Add Plotly visualizations to the payload
 
-            multi = MultiVisualization([PlotlyViz(bar_chart), PlotlyViz(hierarchy), PlotlyViz(heatmap)])
+            multi = MultiVisualization(
+                [PlotlyViz(bar_chart), PlotlyViz(hierarchy), PlotlyViz(heatmap)],
+                render_type="tabbed",
+                tab_names=["Bar Chart", "Hierarchy", "Heatmap"]
+            )
 
             payload.addVisualization(multi)
 

@@ -1,8 +1,13 @@
 .plotly-container {
     width: 100%;
     height: 100%;
-    min-height: 400px; // Adjust as needed
+    box-sizing: border-box;
+    overflow: hidden;
+    max-width: 100%; /* Prevents exceeding parent width */
+    max-height: 100%; /* Prevents exceeding parent height */
+    padding: 0;
 }
+
 
 .plotly-error {
     color: red;

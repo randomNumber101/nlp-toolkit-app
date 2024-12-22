@@ -1,5 +1,3 @@
-/* src/components/RunStep/RunStep.scss */
-
 .run-step {
     flex: 0 0 100%;
     width: 100%;
@@ -7,9 +5,9 @@
     align-items: center;       /* Vertically center the content */
     justify-content: center;   /* Horizontally center the content */
     box-sizing: border-box;
-    height: 100vh;             /* Full viewport height */
+    height: auto;              /* Adjust height based on content */
+    min-height: 100vh;         /* Ensure full viewport height */
     overflow-y: auto;          /* Enable vertical scrolling if content overflows */
-    overflow-x: hidden;        /* Prevent horizontal scrolling */
     padding: 20px;             /* Optional padding */
 
     &.active {
@@ -23,19 +21,19 @@
     }
 
     .run-step-content {
-        width: 80%;            /* 80% of the viewport width */
-        max-width: 800px;      /* Optional: Limit maximum width */
+        width: 90%;            /* Allow horizontal expansion up to 90% */
+        max-width: 1200px;     /* Optional: Limit maximum width for readability */
         margin: 0 auto;
         background-color: #fff;
         border: 1px solid #ddd;
         border-radius: 5px;
         padding: 20px;
-        box-sizing: border-box; /* Ensure padding is included in width */
+        box-sizing: border-box;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         display: flex;
         flex-direction: column;
         justify-content: flex-start;
-        max-height: 90vh;      /* Keep the content within the viewport */
+        max-height: 90vh;      /* Keep the content within the viewport vertically */
         overflow-y: auto;      /* Enable vertical scrolling if content overflows */
         overflow-x: hidden;    /* Prevent horizontal scrolling */
 
@@ -126,7 +124,9 @@
             }
 
             .result-area {
-                 width: 100%;
+                width: 100%;
+                height: 100%;
+                box-sizing: border-box;
                 overflow: hidden;
                 padding: 10px;
                 border-radius: 5px;

@@ -1,24 +1,23 @@
-/* Update MultiVisualization.scss */
-
-
 .multi-visualization {
     display: flex;
     flex-direction: column;
     align-items: center;
     margin: 20px 0;
     position: relative;
-    width: 100%; /* Set to 100% to fit parent */
+    width: 100%;
     max-width: 800px;
     border: 1px solid #ddd;
     border-radius: 8px;
     background-color: #fff;
     padding: 20px;
-    box-sizing: border-box; /* Include padding and border in width */
+    box-sizing: border-box;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 
     .visualization-content {
         width: 100%;
         min-height: 200px;
+        box-sizing: border-box; /* Ensures padding and borders are included in dimensions */
+        overflow: hidden; /* Prevents content overflow */
         display: flex;
         justify-content: center;
         align-items: center;
@@ -26,12 +25,56 @@
     }
 
     .navigation-arrows {
-        /* Adjust positioning if necessary */
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+
+        .nav-button {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #555;
+            transition: transform 0.2s, color 0.2s;
+
+            &:hover {
+                color: #007bff;
+                transform: scale(1.2);
+            }
+
+            &.left {
+                margin-right: auto;
+            }
+
+            &.right {
+                margin-left: auto;
+            }
+        }
     }
 
     .tabs {
-        /* Ensure tabs don't overflow */
+        display: flex;
+        gap: 10px;
         flex-wrap: wrap;
         justify-content: center;
+        margin-top: 10px;
+
+        .number-tab, .tab-button {
+            background: none;
+            border: none;
+            font-size: 1rem;
+            color: #555;
+            cursor: pointer;
+            transition: color 0.3s;
+
+            &.active {
+                font-weight: bold;
+                color: #007bff;
+            }
+
+            &:hover {
+                color: #007bff;
+            }
+        }
     }
 }

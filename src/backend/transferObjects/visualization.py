@@ -20,14 +20,23 @@ class Visualization:
 
 class MultiVisualization(Visualization):
 
-    def __init__(self, vizList: List[Visualization]):
+    def __init__(self, vizList: List[Visualization], render_type: str = "numbered", tab_names: List[str] = None):
+        """
+        :param vizList: List of Visualization objects.
+        :param render_type: "numbered" or "tabbed".
+        :param tab_names: Optional names for the tabs (used only in tabbed view).
+        """
         super(MultiVisualization, self).__init__("multi")
         self.vizList = vizList
+        self.render_type = render_type
+        self.tab_names = tab_names if tab_names else [f"Viz {i+1}" for i in range(len(vizList))]
 
-    def serializeContent(self) -> list:
-        return [
-            viz.toJson() for viz in self.vizList
-        ]
+    def serializeContent(self) -> dict:
+        return {
+            "visualizations": [viz.toJson() for viz in self.vizList],
+            "render_type": self.render_type,
+            "tab_names": self.tab_names
+        }
 
 
 class SimpleTextViz(Visualization):

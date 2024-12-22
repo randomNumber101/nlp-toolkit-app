@@ -22,11 +22,15 @@ const DynamicVisualization: React.FC<DynamicVizProps> = ({ visualization }) => {
             return <HTMLVisualization content={visualization.content.html} />;
 
         case 'multi':
-            return <MultiVisualization visualizations={visualization.content} />;
+            return <MultiVisualization
+                visualizations={visualization.content.visualizations}
+                renderType={visualization.content.render_type}
+                tabNames={visualization.content.tab_names}
+            />;
 
         case 'plotly':
             console.log(visualization.content)
-            return <PlotlyVisualization  plotlyConfigString={visualization.content.config}/>;
+            return <PlotlyVisualization  content={visualization.content.config}/>;
 
         // Future visualization types can be handled here
         default:

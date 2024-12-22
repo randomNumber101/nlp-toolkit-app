@@ -1,27 +1,33 @@
-import * as React from 'react'
-
+import * as React from "react";
 import { useEffect, useRef } from "react";
 
 interface PlotlyVisualizationProps {
-    plotlyConfigString: string; // Plotly JSON configuration
+    content: string; // Plotly JSON configuration
 }
 
-const PlotlyVisualization: React.FC<PlotlyVisualizationProps> = ({ plotlyConfigString }) => {
+const PlotlyVisualization: React.FC<PlotlyVisualizationProps> = ({ content }) => {
     const plotRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-    if (plotRef.current) {
-        if ((window as any).Plotly) {
-            const plotlyConfig = JSON.parse(plotlyConfigString);
+        if (plotRef.current && (window as any).Plotly) {
+            const plotlyConfig = JSON.parse(content);
+
+            // Add responsive and margin configuration
+            plotlyConfig.layout = {
+                ...(plotlyConfig.layout || {}),
+                autosize: true,
+                margin: { t: 40, b: 40, l: 40, r: 40 },
+            };
+            plotlyConfig.config = {
+                ...(plotlyConfig.config || {}),
+                responsive: true,
+            };
+
             (window as any).Plotly.newPlot(plotRef.current, plotlyConfig.data, plotlyConfig.layout, plotlyConfig.config);
-        } else {
-            console.error("Plotly is not loaded.");
         }
-    }
-}, [plotlyConfigString]);
+    }, [content]);
 
-
-    return <div ref={plotRef} style={{ width: "100%", height: "100%" }} />;
+    return <div ref={plotRef} className="plotly-container" />;
 };
 
 export default PlotlyVisualization;
