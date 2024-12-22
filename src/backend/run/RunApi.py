@@ -58,7 +58,7 @@ class RunStorageApi:
     def saveResult(self, run_id, data: pandas.DataFrame):
         base_path = os.path.join(self.directory, run_id)
         save_path = os.path.join(base_path, "result.pkl")
-        return data.to_pickle(save_path)
+        return data.to_csv(save_path)
 
     def getResult(self, run_id) -> pandas.DataFrame:
         base_path = os.path.join(self.directory, run_id)

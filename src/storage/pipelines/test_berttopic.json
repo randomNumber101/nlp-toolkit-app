@@ -1,0 +1,19 @@
+{
+    "id": "test_berttopic",
+    "name": "Topic Modelling",
+    "description": "Detects and clusters texts by topics using BertTopic.",
+    "steps": [
+        {
+            "stepId": "BertTopic",
+            "values": {
+                "topic modeling": {
+                    "min_cluster_size": 2,
+                    "vectorizer": {
+                        "max_df": 0.95,
+                        "min_df": "1"
+                    }
+                }
+            }
+        }
+    ]
+}

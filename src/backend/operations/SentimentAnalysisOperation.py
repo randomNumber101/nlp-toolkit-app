@@ -14,6 +14,7 @@ class SentimentAnalysisOperation(ParallelizableTextOperation):
     def initialize(self, config: Config):
         super().initialize(config)
         self.do_sentiment = config["sentiment analysis"]["activate"]
+        self.text_sample_size = 35
         self.language = config["sentiment analysis"]["language"]
         if self.do_sentiment:
             if self.language == "en":
@@ -31,11 +32,29 @@ class SentimentAnalysisOperation(ParallelizableTextOperation):
                 label = result['label']
                 score = round(result['score'], 4)
 
+                # Sample text logic
+                text_sample = text if len(text) <= self.text_sample_size else text[:35] + "..."
+
+                # Styling based on label
+                label_color = "#52c41a" if label == "POSITIVE" else "#f5222d"
+
                 stats_html = f"""
-                <div style="font-family: Arial, sans-serif; padding: 10px;">
-                    <h4 style="color: #333; text-align: center;">Sentiment Analysis Result</h4>
-                    <p><strong>Label:</strong> {label}</p>
-                    <p><strong>Score:</strong> {score}</p>
+                <div style="font-family: Arial, sans-serif; padding: 20px; border-radius: 8px; background: #f9f9f9; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+                    <h4 style="color: #333; text-align: center; margin-bottom: 20px;">Sentiment Analysis Result</h4>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #fff; border-radius: 6px; border: 1px solid #ddd;">
+                        <div style="flex: 1; margin-right: 10px;">
+                            <p style="margin: 0; color: #555;"><strong>Text:</strong></p>
+                            <p style="margin: 0; color: #333; font-style: italic;">"{text_sample}"</p>
+                        </div>
+                        <div style="text-align: center; flex: 0 0 100px;">
+                            <p style="margin: 0; font-size: 14px; color: #555;"><strong>Label:</strong></p>
+                            <p style="margin: 5px 0; font-size: 16px; font-weight: bold; color: {label_color};">{label}</p>
+                        </div>
+                        <div style="text-align: center; flex: 0 0 100px;">
+                            <p style="margin: 0; font-size: 14px; color: #555;"><strong>Score:</strong></p>
+                            <p style="margin: 5px 0; font-size: 16px; font-weight: bold; color: #1890ff;">{score}</p>
+                        </div>
+                    </div>
                 </div>
                 """
 

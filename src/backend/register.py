@@ -4,7 +4,7 @@ from typing import Dict, List, Tuple
 from backend import utils
 from backend.generaltypes import StepOperation, Payload, StepOperationMapper
 from backend.operations import BertTopic
-from backend.operations.BertTopic import BertTopicModelingOperation
+from backend.operations.BertTopic import BertTopicOperation
 from backend.operations.DataPreparationOperation import DataPreparationOperation
 from backend.operations.DummyOperation import DummyOperation
 from backend.operations.SentimentAnalysisOperation import SentimentAnalysisOperation
@@ -121,7 +121,7 @@ def registerClasses():
         Register StepOperations
     '''
     Register.OperationMapper.registerOperation("DummyStep", DummyOperation)  # Dummy Operation for Dummy Step
-    Register.OperationMapper.registerOperation("BertTopic", BertTopicModelingOperation)
+    Register.OperationMapper.registerOperation("BertTopic", BertTopicOperation)
     Register.OperationMapper.registerOperation("DataPreparation", DataPreparationOperation)
     Register.OperationMapper.registerOperation("SentimentAnalysis", SentimentAnalysisOperation)
 

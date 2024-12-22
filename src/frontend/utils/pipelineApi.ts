@@ -136,7 +136,7 @@ export async function getRunVisualization(run_id : string, step_index: number): 
   }
 }
 
-export async function getRunResult(run_id : string, step_index: number): Promise<any> {
+export async function getRunResult(run_id : string): Promise<any> {
   await waitForPywebview()
   try {
     const response = await window.pywebview.api.RUNS.getResult(run_id);

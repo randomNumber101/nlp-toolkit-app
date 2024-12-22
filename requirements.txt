@@ -3,3 +3,6 @@ pywebview~=5.2
 pyinstaller; sys_platform != 'darwin'
 py2app; sys_platform == 'darwin'
 pandas~=2.2.3
+scikit-learn~=1.6.0
+spacy~=3.8.2
+transformers~=4.47.0

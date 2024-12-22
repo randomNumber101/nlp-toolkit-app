@@ -1,13 +1,79 @@
 {
-  "id" : "BertTopic",
-  "name": "Classify nouns",
-  "parameters": {},
-  "inputs": {
-    "data" : "CSV[text,label,number]",
-    "original_data" : "CSV[text,label,number]"
+  "id": "BertTopic",
+  "name": "BERT Topic Modeling",
+  "parameters": {
+    "input column": {
+      "type": "string",
+      "default": "text",
+      "description": "The column containing text data to be processed.",
+      "input": {
+        "type": "text_field"
+      }
+    },
+    "output column": {
+      "type": "string",
+      "default": "topic",
+      "description": "The prefix for the output columns (e.g., topic_id and topic_words).",
+      "input": {
+        "type": "text_field"
+      }
+    },
+    "topic modeling": {
+      "type": "complex",
+      "description": "Configuration for topic modeling using BERTopic.",
+      "language": {
+        "type": "string",
+        "description": "The language used for BERTopic embeddings.",
+        "input": {
+          "type": "list",
+          "possibilities": ["english", "german", "multilingual"]
+        },
+        "default": "english"
+      },
+      "min_cluster_size": {
+        "type": "int",
+        "default": 10,
+        "input" : {
+          "type" : "slider",
+          "min" : 1,
+          "max" : 100,
+          "step" : 1
+        },
+        "description": "The minimum size of topic clusters."
+      },
+      "vectorizer": {
+        "type": "complex",
+        "description": "Optional configuration for CountVectorizer used in BERTopic.",
+        "max_df": {
+          "type": "float",
+          "default": 0.95,
+          "input" : {
+            "type" : "slider",
+            "min" : 0,
+            "max" : 1,
+            "step" : 0.05
+          },
+          "description": "Ignore terms with document frequency (%) higher than this."
+        },
+        "min_df": {
+          "type": "int",
+          "default": 2,
+          "input" : {
+            "type" : "slider",
+            "min" : 1,
+            "max" : 100,
+            "step" : 1
+          },
+          "description": "Ignore terms with document frequency lower than this, measured in the number of documents."
+        }
+      }
+    }
   },
-  "outputs" : {
-    "detected nouns" : "list[int]",
-    "visualization" : "html"
+  "inputs": {
+    "data": "CSV[]"
+  },
+  "outputs": {
+    "data": "CSV[]",
+    "visualization": "html"
   }
 }

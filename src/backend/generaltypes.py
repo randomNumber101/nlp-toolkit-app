@@ -1,4 +1,5 @@
 import copy
+import itertools
 import time
 import typing
 from abc import ABC, abstractmethod
@@ -77,7 +78,7 @@ class Payload(Dict[str, Any]):
         return Payload(partial_values, link_to_parent=self)
 
 
-class Config:
+class Config(dict[str, Any]):
     def __init__(self, parameters: List[Parameter]):
         super().__init__()
 
@@ -129,6 +130,10 @@ class Config:
 
     def __setitem__(self, key, value):
         self.setValues({key: value})
+
+    def __iter__(self):
+        complexVals = filter(lambda x: x in self.complexFields, self.fields)
+        return itertools.chain(self.values, complexVals)
 
 
 class FrontendNotifier(ABC):
