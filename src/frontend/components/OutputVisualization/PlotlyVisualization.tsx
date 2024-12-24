@@ -1,6 +1,8 @@
 import * as React from "react";
 import { useEffect, useRef } from "react";
 
+import "./PlotlyVisualization.scss";
+
 interface PlotlyVisualizationProps {
     content: string; // Plotly JSON configuration
 }
@@ -16,7 +18,7 @@ const PlotlyVisualization: React.FC<PlotlyVisualizationProps> = ({ content }) =>
             plotlyConfig.layout = {
                 ...(plotlyConfig.layout || {}),
                 autosize: true,
-                margin: { t: 40, b: 40, l: 40, r: 40 },
+                margin: { t: 40, b: 40, l: 40, r: 40 }
             };
             plotlyConfig.config = {
                 ...(plotlyConfig.config || {}),

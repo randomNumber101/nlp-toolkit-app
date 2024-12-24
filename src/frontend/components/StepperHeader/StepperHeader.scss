@@ -1,5 +1,13 @@
 /* src/components/StepperHeader/StepperHeader.scss */
 
+
+/* Hide the stepper header when the overlay is active */
+body.overlay-active .app-container .stepper-header {
+    display: none;
+}
+
+
+
 .stepper-header {
   display: flex;
   align-items: center;
@@ -27,13 +35,13 @@
     /* Active Step Styling */
     &.active .step-number {
       border: 2px solid #1890ff; /* Blue border */
-      background-color: #1890ff;  /* Blue inside */
-      color: #000;                 /* Black text */
+      background-color: #d9d9d9;  /* Blue inside */
+      color: #1890ff;                 /* Black text */
     }
 
     /* Completed Step Styling */
     &.completed .step-number {
-      border: 2px solid #1890ff; /* Blue border */
+      border: 2px solid #000; /* Blue border */
       background-color: #d9d9d9;  /* Gray inside */
       color: #000;                 /* Black text */
     }
@@ -42,14 +50,13 @@
       width: 30px;
       height: 30px;
       border-radius: 50%;
-      background-color: #d9d9d9; /* Gray background */
-      color: #000;                /* Black text */
+      color: #d9d9d9;                /* Gray text */
       display: flex;
       align-items: center;
       justify-content: center;
       margin-bottom: 5px;
       transition: border-color 0.3s, background-color 0.3s, color 0.3s;
-      border: 2px solid #d9d9d9; /* Gray border */
+      border: 2px dashed #d9d9d9; /* Gray border */
     }
 
     .step-label {

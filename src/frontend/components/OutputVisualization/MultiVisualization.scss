@@ -5,7 +5,7 @@
     margin: 20px 0;
     position: relative;
     width: 100%;
-    max-width: 800px;
+    max-width: 90%; /* Allow expansion up to 90% of the screen width */
     border: 1px solid #ddd;
     border-radius: 8px;
     background-color: #fff;
@@ -16,7 +16,7 @@
     .visualization-content {
         width: 100%;
         min-height: 200px;
-        box-sizing: border-box; /* Ensures padding and borders are included in dimensions */
+        box-sizing: border-box;
         overflow: hidden; /* Prevents content overflow */
         display: flex;
         justify-content: center;
@@ -32,14 +32,13 @@
         .nav-button {
             background: none;
             border: none;
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             cursor: pointer;
             color: #555;
             transition: transform 0.2s, color 0.2s;
 
             &:hover {
                 color: #007bff;
-                transform: scale(1.2);
             }
 
             &.left {

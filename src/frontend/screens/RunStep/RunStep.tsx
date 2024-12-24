@@ -1,5 +1,3 @@
-// src/components/RunStep/RunStep.tsx
-
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 import './RunStep.scss';
@@ -10,6 +8,7 @@ import { StepBlueprint } from '../../types';
 import { getRunVisualization } from '../../utils/pipelineApi';
 import { useBackendEvent } from '../../utils/useBackendEvents';
 import DynamicVisualization from "../../components/OutputVisualization/DynamicVisualization";
+import OverlayWindow from '../../components/OverlayWindow/OverlayWindow';
 
 interface RunStepProps {
     step: StepBlueprint;
@@ -23,6 +22,7 @@ interface RunStepProps {
 const RunStep: React.FC<RunStepProps> = ({ step, status, isActive, runId, stepNumber, totalSteps }) => {
     const [visualization, setVisualization] = useState<VisualizationData | null>(null);
     const [logs, setLogs] = useState<Log[]>([]);
+    const [isOverlayOpen, setIsOverlayOpen] = useState(false);
 
     // Fetch visualization when step succeeds
     useEffect(() => {
@@ -73,7 +73,6 @@ const RunStep: React.FC<RunStepProps> = ({ step, status, isActive, runId, stepNu
             statusClass = 'not-started';
         }
 
-        // Convert enum to string and format
         statusText = StepState[status.state].replace('_', ' ').toUpperCase();
 
         return (
@@ -81,6 +80,14 @@ const RunStep: React.FC<RunStepProps> = ({ step, status, isActive, runId, stepNu
                 <span className="text">{statusText}</span>
             </div>
         );
+    };
+
+    const openOverlay = () => {
+        setIsOverlayOpen(true);
+    };
+
+    const closeOverlay = () => {
+        setIsOverlayOpen(false);
     };
 
     return (
@@ -106,15 +113,22 @@ const RunStep: React.FC<RunStepProps> = ({ step, status, isActive, runId, stepNu
                 </div>
                 {status.state === StepState.SUCCESS && (
                     <div className="result-group">
-                        <h4>Result</h4>
+                        <h4>
+                            Result{" "}
+                        </h4>
                         <div className="result-area">
-                            <DynamicVisualization visualization={visualization}/>
+                            <DynamicVisualization visualization={visualization} />
                         </div>
+                        <span className="fullscreen-icon" onClick={openOverlay} title="Open in full screen">
+                            🔍
+                        </span>
                     </div>
                 )}
-                {/* Log Console */}
                 <LogConsole logs={logs} />
             </div>
+            <OverlayWindow isOpen={isOverlayOpen} onClose={closeOverlay} title="Result Visualization">
+                {visualization && <DynamicVisualization visualization={visualization} />}
+            </OverlayWindow>
         </div>
     );
 };
