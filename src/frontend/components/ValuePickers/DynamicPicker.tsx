@@ -5,6 +5,7 @@ import OptionsPicker from './OptionsPicker';
 import CheckboxPicker from './CheckboxPicker'; // Import CheckboxPicker
 import { Parameter } from '../../types';
 import './DynamicPicker.scss';
+import {useState} from "react";
 
 interface DynamicPickerProps {
   parameter: Parameter;
@@ -19,26 +20,36 @@ const DynamicPicker: React.FC<DynamicPickerProps> = ({ parameter, value, onChang
     onChange({ ...value, [innerName]: newValue });
   };
 
-  if (parameter.type === "complex" && parameter.picker && parameter.picker.parameters) {
-        return (
-          <div className="complex-picker-box">
-            <div className="complex-header">
-              <h4>{parameter.name}</h4>
-              {parameter.description && <p className="description">{parameter.description}</p>}
-            </div>
-            <div className="complex-body">
-              {parameter.picker.parameters.map((innerParam) => (
-                <DynamicPicker
-                  key={innerParam.name}
-                  parameter={innerParam}
-                  value={value?.[innerParam.name] ?? parameter.defaultValue?.[innerParam.name]}
-                  onChange={(val) => handleInnerParamChange(innerParam.name, val)}
-                />
-              ))}
-            </div>
-          </div>
-        );
-      }
+  if (parameter.type === 'complex') {
+    // You can store local state here for collapsed vs expanded
+    const [collapsed, setCollapsed] = useState<boolean>(false);
+
+    return (
+      <div className="complex-picker-box">
+        <div
+          className="complex-header"
+          onClick={() => setCollapsed(!collapsed)}
+          style={{ cursor: 'pointer' }}
+        >
+          <h4>{parameter.name}</h4>
+          {parameter.description && <p className="description">{parameter.description}</p>}
+        </div>
+        <div className={`complex-body ${collapsed ? 'collapsed' : 'expanded'}`}>
+          {/* Map over parameter.picker.parameters only if !collapsed */}
+          {!collapsed &&
+            parameter.picker.parameters.map((innerParam) => (
+              <DynamicPicker
+                key={innerParam.name}
+                parameter={innerParam}
+                value={value?.[innerParam.name] ?? parameter.defaultValue?.[innerParam.name]}
+                onChange={(val) => handleInnerParamChange(innerParam.name, val)}
+              />
+            ))}
+        </div>
+      </div>
+    );
+  }
+
 
 
   // Handle different picker types, including complex types

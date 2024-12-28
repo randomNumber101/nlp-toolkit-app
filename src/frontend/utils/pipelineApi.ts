@@ -140,7 +140,6 @@ export async function getRunResult(run_id: string): Promise<any> {
   await waitForPywebview();
   try {
     const response = await window.pywebview.api.RUNS.getResult(run_id);
-
     // Ensure response is parsed as JSON
     const result = unpackResponse(response);
     if (typeof result === "string") {
