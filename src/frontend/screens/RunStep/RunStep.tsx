@@ -1,3 +1,4 @@
+// RunStep.tsx
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 import './RunStep.scss';
@@ -5,10 +6,11 @@ import TextVisualization from '../../components/OutputVisualization/TextVisualiz
 import LogConsole from '../../components/LogConsole/LogConsole';
 import { StepStatus, StepState, VisualizationData, StepLogUpdate, Log } from '../../types/events';
 import { StepBlueprint } from '../../types';
-import { getRunVisualization } from '../../utils/pipelineApi';
+import { getRunVisualization, getRunResult } from '../../utils/pipelineApi';
 import { useBackendEvent } from '../../utils/useBackendEvents';
 import DynamicVisualization from "../../components/OutputVisualization/DynamicVisualization";
 import OverlayWindow from '../../components/OverlayWindow/OverlayWindow';
+import CsvViewer from '../../components/CsvViewer/CsvViewer';
 
 interface RunStepProps {
     step: StepBlueprint;
@@ -23,6 +25,8 @@ const RunStep: React.FC<RunStepProps> = ({ step, status, isActive, runId, stepNu
     const [visualization, setVisualization] = useState<VisualizationData | null>(null);
     const [logs, setLogs] = useState<Log[]>([]);
     const [isOverlayOpen, setIsOverlayOpen] = useState(false);
+    const [csvData, setCsvData] = useState<any[] | null>(null);
+    const [isCsvViewerOpen, setIsCsvViewerOpen] = useState(false);
 
     // Fetch visualization when step succeeds
     useEffect(() => {
@@ -33,8 +37,10 @@ const RunStep: React.FC<RunStepProps> = ({ step, status, isActive, runId, stepNu
 
     const fetchVisualization = async () => {
         try {
+            console.log("Fetching visualization data...");
             const vizData = await getRunVisualization(runId, status.domain.stepIndex);
             if (vizData) {
+                console.log("Visualization data fetched successfully.", vizData);
                 setVisualization(vizData);
             } else {
                 console.error('Visualization data is null.');
@@ -44,19 +50,35 @@ const RunStep: React.FC<RunStepProps> = ({ step, status, isActive, runId, stepNu
         }
     };
 
-    // Handle log updates specific to this step
+    const fetchCsvData = async () => {
+        try {
+            console.log("Fetching CSV data...");
+            const result = await getRunResult(runId);
+            if (result) {
+                console.log("CSV data fetched successfully.", result);
+                setCsvData(result);
+                setIsCsvViewerOpen(true);
+            } else {
+                console.error('CSV data is null.');
+            }
+        } catch (error) {
+            console.error('Error fetching CSV data:', error);
+        }
+    };
+
     const handleLogUpdate = (event: CustomEvent) => {
+        console.log("Log update event received:", event);
         const logUpdate = event.detail as StepLogUpdate;
         if (
             logUpdate.domain.runId === status.domain.runId &&
             logUpdate.domain.pipelineId === status.domain.pipelineId &&
             logUpdate.domain.stepIndex === status.domain.stepIndex
         ) {
+            console.log("Updating logs for step index:", status.domain.stepIndex);
             setLogs(prevLogs => [...prevLogs, ...logUpdate.logs]);
         }
     };
 
-    // Subscribe to log events
     useBackendEvent('stepLogUpdate', handleLogUpdate);
 
     const renderStatus = () => {
@@ -83,11 +105,23 @@ const RunStep: React.FC<RunStepProps> = ({ step, status, isActive, runId, stepNu
     };
 
     const openOverlay = () => {
+        console.log("Opening visualization overlay.");
         setIsOverlayOpen(true);
     };
 
     const closeOverlay = () => {
+        console.log("Closing visualization overlay.");
         setIsOverlayOpen(false);
+    };
+
+    const openCsvViewer = () => {
+        console.log("Opening CSV viewer.");
+        fetchCsvData();
+    };
+
+    const closeCsvViewer = () => {
+        console.log("Closing CSV viewer.");
+        setIsCsvViewerOpen(false);
     };
 
     return (
@@ -113,21 +147,27 @@ const RunStep: React.FC<RunStepProps> = ({ step, status, isActive, runId, stepNu
                 </div>
                 {status.state === StepState.SUCCESS && (
                     <div className="result-group">
-                        <h4>
-                            Result{" "}
-                        </h4>
+                        <h4>Result</h4>
                         <div className="result-area">
                             <DynamicVisualization visualization={visualization} />
                         </div>
-                        <span className="fullscreen-icon" onClick={openOverlay} title="Open in full screen">
-                            🔍
-                        </span>
+                        <button className="action-button" onClick={openOverlay} title="Open visualization">
+                            🔍 Fullscreen Visualization
+                        </button>
+                        {stepNumber === totalSteps && (
+                            <button className="action-button" onClick={openCsvViewer} title="View CSV">
+                                📄 View CSV
+                            </button>
+                        )}
                     </div>
                 )}
                 <LogConsole logs={logs} />
             </div>
             <OverlayWindow isOpen={isOverlayOpen} onClose={closeOverlay} title="Result Visualization">
                 {visualization && <DynamicVisualization visualization={visualization} />}
+            </OverlayWindow>
+            <OverlayWindow isOpen={isCsvViewerOpen} onClose={closeCsvViewer} title="CSV Viewer">
+                {csvData && <CsvViewer data={csvData} />}
             </OverlayWindow>
         </div>
     );

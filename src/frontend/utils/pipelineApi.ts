@@ -136,14 +136,21 @@ export async function getRunVisualization(run_id : string, step_index: number): 
   }
 }
 
-export async function getRunResult(run_id : string): Promise<any> {
-  await waitForPywebview()
+export async function getRunResult(run_id: string): Promise<any> {
+  await waitForPywebview();
   try {
     const response = await window.pywebview.api.RUNS.getResult(run_id);
-    const result = unpackResponse(response)
-    return result
+
+    // Ensure response is parsed as JSON
+    const result = unpackResponse(response);
+    if (typeof result === "string") {
+      console.log("Parsing JSON string:", result);
+      return JSON.parse(result);
+    }
+    return result; // Already an object
   } catch (error) {
     console.error("Failed to invoke event:", error);
     return null;
   }
 }
+

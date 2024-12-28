@@ -57,14 +57,14 @@ class RunStorageApi:
 
     def saveResult(self, run_id, data: pandas.DataFrame):
         base_path = os.path.join(self.directory, run_id)
-        save_path = os.path.join(base_path, "result.pkl")
+        save_path = os.path.join(base_path, "result.csv")
         return data.to_csv(save_path)
 
     def getResult(self, run_id) -> pandas.DataFrame:
         base_path = os.path.join(self.directory, run_id)
-        save_path = os.path.join(base_path, "result.pkl")
+        save_path = os.path.join(base_path, "result.csv")
         if os.path.isfile(save_path):
-            return pandas.read_pickle(save_path)
+            return pandas.read_csv(save_path)
         raise FileNotFoundError("No result has been saved yet. Make sure that the run has finished.")
 
 
@@ -109,4 +109,4 @@ class RunApi:
         return self._runStorageApi.getVisualization(run_id, stepIndex)
 
     def getResult(self, run_id):
-        return self._runStorageApi.getResult(run_id).to_json()
+        return self._runStorageApi.getResult(run_id).to_json(orient="records")
