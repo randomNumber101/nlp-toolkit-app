@@ -1,12 +1,33 @@
+.options-picker-wrapper {
+  display: flex;
+  align-items: center;
+  width: 100%; /* Ensure full-width alignment */
+  margin-bottom: 15px; /* Consistent spacing between pickers */
+}
+
 .options-picker {
-  width: 85%; // Larger width for text fields and option selectors
-  padding: 8px; // Increased padding for larger input boxes
+  width: 100%;
+  padding: 12px; /* Increased padding for a more prominent look */
   border: 1px solid #ccc;
-  border-radius: 4px;
+  border-radius: 10px;
+  text-align: center;
+  font-size: large; /* Set font size as requested */
+  background-color: #fff;
   transition: box-shadow 0.3s, border 0.3s;
 
   &:hover {
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-    border: 1px solid #3498db;
+    border: 1px solid #3498db; /* Highlighted border on hover */
   }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+    border-color: #3498db;
+  }
+}
+
+.options-picker option {
+  font-size: large; /* Option text size for readability */
+  padding: 10px; /* Increased padding for dropdown options */
 }

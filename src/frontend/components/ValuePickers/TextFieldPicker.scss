@@ -1,12 +1,14 @@
 .text-field {
-  width: 85%; // Larger width for text fields and option selectors
-  padding: 8px; // Increased padding for larger input boxes
+  min-width: 25%;
+  font-size: large;
+  text-align: center;
+  padding: 8px;
   border: 1px solid #ccc;
-  border-radius: 4px;
+  border-radius: 6px;
   transition: box-shadow 0.3s, border 0.3s;
 
   &:hover {
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-    border: 1px solid #3498db;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid #4caf50;
   }
 }

@@ -1,17 +1,12 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import './PipelineConfigScreen.scss';
-import {
-  DragDropContext,
-  Droppable,
-  Draggable,
-  DropResult,
-} from 'react-beautiful-dnd';
-
+import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
 import { Pipeline, StepBlueprint, StepValues } from '../../types';
 import OperationBox from '../../components/OperationBox/OperationBox';
 import TextFieldPicker from '../../components/ValuePickers/TextFieldPicker';
-import OperationConfigPanel from "../../components/OperationConfigPanel/OperationConfigPanel";
+import OperationConfigPanel from '../../components/OperationConfigPanel/OperationConfigPanel';
+import { FaSave, FaArrowLeft, FaPlay } from 'react-icons/fa';
 
 interface PipelineConfigScreenProps {
   initialPipe: Pipeline | null;
@@ -30,12 +25,11 @@ const PipelineConfigScreen: React.FC<PipelineConfigScreenProps> = ({
 }) => {
   const [pipeline, setPipeline] = useState<Pipeline>(initialPipe);
   const [pipelineName, setPipelineName] = useState(pipeline?.name ?? '');
-  const [pipelineDescription, setPipelineDescription] = useState(
-    pipeline?.description ?? 'No description'
-  );
+  const [pipelineDescription, setPipelineDescription] = useState(pipeline?.description ?? 'No description');
   const [steps, setSteps] = useState<StepValues[]>(pipeline?.steps ?? []);
   const [selectedStepIndex, setSelectedStepIndex] = useState<number | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [showSaved, setShowSaved] = useState(false);
 
   useEffect(() => {
     setPipelineName(pipeline?.name ?? '');
@@ -55,41 +49,35 @@ const PipelineConfigScreen: React.FC<PipelineConfigScreenProps> = ({
     setSteps(reorderedSteps);
   };
 
-  const handleAddOperation = () => {
-    const newStep: StepValues = {
-      stepId: 'new-step-' + Math.random().toString(36).substr(2, 9),
-      values: null,
-      uniqueId: `unique-${Date.now()}-${Math.random()}`,
-    };
-    setSteps([...steps, newStep]);
+  const handleSavePipeline = () => {
+    onSavePipeline({
+      ...pipeline,
+      name: pipelineName,
+      description: pipelineDescription,
+      steps,
+    });
+    setShowSaved(true);
+    setTimeout(() => setShowSaved(false), 2000);
   };
 
   return (
     <div className="pipeline-config-screen">
+      {/* Header */}
       <div className="pipeline-header">
         <h2>Pipeline Settings</h2>
         <label>Pipeline Name:</label>
-        <input
-          type="text"
-          value={pipelineName}
-          onChange={(e) => setPipelineName(e.target.value)}
-        />
+        <TextFieldPicker value={pipelineName} onChange={(name) => setPipelineName(name)} />
         <label>Description:</label>
-        <TextFieldPicker
-          value={pipelineDescription}
-          onChange={(desc) => setPipelineDescription(desc)}
-        />
+        <TextFieldPicker value={pipelineDescription} onChange={(desc) => setPipelineDescription(desc)} />
       </div>
 
+      {/* Operations */}
       <div className="operations-container">
+        <h2>Operations</h2>
         <DragDropContext onDragStart={onDragStart} onDragEnd={onDragEnd}>
           <Droppable droppableId="operations" direction="horizontal">
             {(provided) => (
-              <div
-                className="box-list"
-                ref={provided.innerRef}
-                {...provided.droppableProps}
-              >
+              <div className="box-list" ref={provided.innerRef} {...provided.droppableProps}>
                 {steps.map((step, index) => {
                   const blueprint = blueprintMap[step.stepId];
                   const operationName = blueprint?.name ?? `Operation #${index + 1}`;
@@ -112,65 +100,50 @@ const PipelineConfigScreen: React.FC<PipelineConfigScreenProps> = ({
                         )}
                       </Draggable>
 
-                      {index <= steps.length - 1 && !isDragging && (
-                        <div className="arrow show">
-                          →
-                        </div>
-                      )}
+                      {index <= steps.length - 1 && !isDragging && <div className="arrow show">→</div>}
                     </React.Fragment>
                   );
                 })}
                 {provided.placeholder}
-
-                {
-                  !isDragging && (
-                      <div className="add-operation-card" onClick={handleAddOperation}>
-                        + Add Operation
-                      </div>
-                    )
-                }
+                {!isDragging && (
+                  <div className="add-operation-card" onClick={() => setSteps([...steps, { stepId: 'new', values: null, uniqueId: `unique-${Date.now()}` }])}>
+                    + Add Operation
+                  </div>
+                )}
               </div>
             )}
           </Droppable>
         </DragDropContext>
       </div>
 
+      {/* Config Panel */}
       {selectedStepIndex !== null && (
         <div className="config-panel">
           <OperationConfigPanel
-            operationName={
-              blueprintMap[steps[selectedStepIndex].stepId]?.name ??
-              `Operation #${selectedStepIndex + 1}`
-            }
+            operationName={blueprintMap[steps[selectedStepIndex].stepId]?.name ?? `Operation #${selectedStepIndex + 1}`}
             blueprint={blueprintMap[steps[selectedStepIndex].stepId]}
             values={steps[selectedStepIndex]}
             onUpdate={(updatedValues) => {
               const updatedSteps = [...steps];
-              updatedSteps[selectedStepIndex] = {
-                ...updatedSteps[selectedStepIndex],
-                ...updatedValues,
-              };
+              updatedSteps[selectedStepIndex] = { ...updatedSteps[selectedStepIndex], ...updatedValues };
               setSteps(updatedSteps);
             }}
           />
         </div>
       )}
 
-      <div style={{ marginTop: '20px' }}>
-        <button onClick={onPrevious}>Back</button>
-        <button
-          onClick={() =>
-            onSavePipeline({
-              ...pipeline,
-              name: pipelineName,
-              description: pipelineDescription,
-              steps,
-            })
-          }
-        >
-          Save
+      {/* Buttons */}
+
+      <div className="button-container">
+        <button className="back-button" onClick={onPrevious}>
+          <FaArrowLeft /> Back
         </button>
-        <button onClick={onNext}>Run Pipeline</button>
+        <button className={`save-button ${showSaved ? 'show-saved' : ''}`} onClick={handleSavePipeline}>
+          <FaSave /> Save
+        </button>
+        <button className="run-button" onClick={onNext}>
+          <FaPlay /> Run Pipeline
+        </button>
       </div>
     </div>
   );

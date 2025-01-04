@@ -12,13 +12,15 @@ const CheckboxPicker: React.FC<CheckboxPickerProps> = ({ value, onChange }) => {
   };
 
   return (
-    <div className="boolean-picker">
-      <input
-        type="checkbox"
-        checked={value}
-        onChange={handleCheckboxChange}
-        className="boolean-checkbox"
-      />
+    <div className="checkbox-picker">
+      <label className="switch">
+        <input
+          type="checkbox"
+          checked={value}
+          onChange={handleCheckboxChange}
+        />
+        <span className="slider round"></span>
+      </label>
     </div>
   );
 };

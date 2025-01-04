@@ -2,10 +2,10 @@ import * as React from 'react';
 import TextFieldPicker from './TextFieldPicker';
 import SliderPicker from './SliderPicker';
 import OptionsPicker from './OptionsPicker';
-import CheckboxPicker from './CheckboxPicker'; // Import CheckboxPicker
+import CheckboxPicker from './CheckboxPicker';
 import { Parameter } from '../../types';
 import './DynamicPicker.scss';
-import {useState} from "react";
+import { useState } from 'react';
 
 interface DynamicPickerProps {
   parameter: Parameter;
@@ -21,7 +21,6 @@ const DynamicPicker: React.FC<DynamicPickerProps> = ({ parameter, value, onChang
   };
 
   if (parameter.type === 'complex') {
-    // You can store local state here for collapsed vs expanded
     const [collapsed, setCollapsed] = useState<boolean>(false);
 
     return (
@@ -35,7 +34,6 @@ const DynamicPicker: React.FC<DynamicPickerProps> = ({ parameter, value, onChang
           {parameter.description && <p className="description">{parameter.description}</p>}
         </div>
         <div className={`complex-body ${collapsed ? 'collapsed' : 'expanded'}`}>
-          {/* Map over parameter.picker.parameters only if !collapsed */}
           {!collapsed &&
             parameter.picker.parameters.map((innerParam) => (
               <DynamicPicker
@@ -50,15 +48,12 @@ const DynamicPicker: React.FC<DynamicPickerProps> = ({ parameter, value, onChang
     );
   }
 
-
-
-  // Handle different picker types, including complex types
+  // Handle simple picker types
   let pickerElement;
   switch (parameter.picker?.name) {
     case 'text_field':
       pickerElement = <TextFieldPicker value={defaultValue} onChange={onChange} />;
       break;
-
     case 'slider':
       pickerElement = (
         <SliderPicker
@@ -70,7 +65,6 @@ const DynamicPicker: React.FC<DynamicPickerProps> = ({ parameter, value, onChang
         />
       );
       break;
-
     case 'list':
       pickerElement = (
         <OptionsPicker
@@ -80,7 +74,6 @@ const DynamicPicker: React.FC<DynamicPickerProps> = ({ parameter, value, onChang
         />
       );
       break;
-
     case 'checkbox':
       pickerElement = (
         <CheckboxPicker
@@ -90,16 +83,14 @@ const DynamicPicker: React.FC<DynamicPickerProps> = ({ parameter, value, onChang
         />
       );
       break;
-
     default:
       pickerElement = <div>Unsupported picker type: {parameter.picker?.name}</div>;
   }
 
   return (
-    <div className="picker-container">
-      <label className="picker-label">{parameter.name}</label>
-      {pickerElement}
-      {parameter.description && <span className="tooltip">{parameter.description}</span>}
+    <div className="picker-row">
+      <div className="picker-label">{parameter.name}</div>
+      <div className="picker-element">{pickerElement}</div>
     </div>
   );
 };

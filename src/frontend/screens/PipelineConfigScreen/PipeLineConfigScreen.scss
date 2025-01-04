@@ -28,7 +28,7 @@
 
     .box-list {
       display: flex;
-      gap: 10px; /* Space between boxes */
+      gap: 10px;
       align-items: center;
       justify-content: center;
     }
@@ -67,12 +67,74 @@
 
   .config-panel {
     margin-top: 20px;
-    padding: 15px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    background-color: #fff;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    box-shadow: 5px 5px 5px darkgray, lightgray 0px 0px 3px inset;
+  }
+
+  .button-container {
+    border-top: 1px solid #ddd; /* Horizontal line */
+    padding-top: 20px; /* Space between the line and the buttons */
+    margin-top: 20px; /* Space above the line */
+    display: flex;
+    justify-content: space-between;
+
+    button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 20px;
+      font-size: 1rem;
+      font-weight: bold;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s, box-shadow 0.3s;
+    }
+
+    .back-button {
+      background-color: #f0f0f0;
+      color: #333;
+      &:hover {
+        background-color: #e0e0e0;
+        box-shadow: 0 0 5px #ccc;
+      }
+    }
+
+    .save-button {
+      background-color: #4caf50;
+      color: white;
+      position: relative;
+
+      &:hover {
+        background-color: #45a049;
+        box-shadow: 0 0 5px #3e8e41;
+      }
+
+      &:after {
+        content: "✔ Saved!";
+        position: absolute;
+        top: -25px;
+        right: 10px;
+        background: #4caf50;
+        color: white;
+        padding: 5px;
+        border-radius: 3px;
+        font-size: 0.9rem;
+        display: none;
+      }
+
+      &.show-saved:after {
+        display: block;
+      }
+    }
+
+    .run-button {
+      background-color: #2196f3;
+      color: white;
+
+      &:hover {
+        background-color: #1e88e5;
+        box-shadow: 0 0 5px #1565c0;
+      }
+    }
   }
 }
-
-
