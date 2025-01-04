@@ -1,237 +1,165 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import { FaTrash, FaArrowUp, FaArrowDown, FaChevronRight } from 'react-icons/fa';
-
 import './PipelineConfigScreen.scss';
-import { loadStepBlueprint } from '../../utils/pipelineApi';
+import {
+  DragDropContext,
+  Droppable,
+  Draggable,
+  DropResult,
+} from 'react-beautiful-dnd';
+
 import { Pipeline, StepBlueprint, StepValues } from '../../types';
-import StepConfig from '../../components/StepConfig';
+import OperationBox from '../../components/OperationBox/OperationBox';
+import OperationConfigPanel from '../../components/OperationConfigPanel/OperationConfigPanel';
 import TextFieldPicker from '../../components/ValuePickers/TextFieldPicker';
 
 interface PipelineConfigScreenProps {
   initialPipe: Pipeline | null;
   blueprintMap: { [key: string]: StepBlueprint };
+  onSavePipeline: (updatedPipeline: Pipeline) => void;
   onPrevious: () => void;
   onNext: () => void;
-  onSavePipeline: (updatedPipeline: Pipeline) => void;
 }
 
 const PipelineConfigScreen: React.FC<PipelineConfigScreenProps> = ({
   initialPipe,
   blueprintMap,
+  onSavePipeline,
   onPrevious,
   onNext,
-  onSavePipeline,
 }) => {
-  // Local state
   const [pipeline, setPipeline] = useState<Pipeline>(initialPipe);
   const [pipelineName, setPipelineName] = useState(pipeline?.name ?? '');
-  const [pipelineDescription, setDescription] = useState(pipeline?.description ?? 'No description');
-  const [steps, setSteps] = useState<StepValues[]>(pipeline?.steps ?? []);
-  const [blueprints] = useState<{ [key: string]: StepBlueprint }>(blueprintMap);
-
-  // For the "fan" approach if you want multiple slides
-  const [activeSlide, setActiveSlide] = useState<number>(0);
-
-  // Track which steps are collapsed
-  const [collapsedSteps, setCollapsedSteps] = useState<boolean[]>(
-    steps.map(() => false)
+  const [pipelineDescription, setPipelineDescription] = useState(
+    pipeline?.description ?? 'No description'
   );
+  const [steps, setSteps] = useState<StepValues[]>(pipeline?.steps ?? []);
+  const [selectedStepIndex, setSelectedStepIndex] = useState<number | null>(null);
 
   useEffect(() => {
-    setPipelineName(pipeline?.name);
-    setDescription(pipeline?.description ?? 'No description');
+    setPipelineName(pipeline?.name ?? '');
+    setPipelineDescription(pipeline?.description ?? 'No description');
     setSteps(pipeline?.steps ?? []);
-    // If pipeline changes, re-init collapsed array
-    setCollapsedSteps((prev) => steps.map(() => false));
   }, [pipeline]);
 
-  /* ------------------------------
-   * Handlers
-   * ------------------------------ */
-  const handleAddStep = () => {
+  const onDragEnd = (result: DropResult) => {
+    if (!result.destination) return;
+
+    const reorderedSteps = Array.from(steps);
+    const [movedStep] = reorderedSteps.splice(result.source.index, 1);
+    reorderedSteps.splice(result.destination.index, 0, movedStep);
+    setSteps(reorderedSteps);
+  };
+
+  const handleAddOperation = () => {
     const newStep: StepValues = {
-      stepId: 'DummyStep', // Ideally generate a unique ID
+      stepId: 'new-step-' + Math.random().toString(36).substr(2, 9),
       values: null,
+      uniqueId: `unique-${Date.now()}-${Math.random()}`,
     };
     setSteps([...steps, newStep]);
-    setCollapsedSteps([...collapsedSteps, false]);
-  };
-
-  const handleDeleteStep = (index: number) => {
-    const newSteps = [...steps];
-    newSteps.splice(index, 1);
-    setSteps(newSteps);
-
-    const newCollapsed = [...collapsedSteps];
-    newCollapsed.splice(index, 1);
-    setCollapsedSteps(newCollapsed);
-  };
-
-  const handleMoveStep = (index: number, direction: 'up' | 'down') => {
-    const newSteps = [...steps];
-    const targetIndex = direction === 'up' ? index - 1 : index + 1;
-    if (targetIndex < 0 || targetIndex >= newSteps.length) return;
-    [newSteps[index], newSteps[targetIndex]] = [newSteps[targetIndex], newSteps[index]];
-    setSteps(newSteps);
-
-    // Move collapsed state as well
-    const newCollapsed = [...collapsedSteps];
-    [newCollapsed[index], newCollapsed[targetIndex]] = [
-      newCollapsed[targetIndex],
-      newCollapsed[index],
-    ];
-    setCollapsedSteps(newCollapsed);
-  };
-
-  const handleSavePipeline = () => {
-    if (pipeline) {
-      const updatedPipeline = {
-        ...pipeline,
-        name: pipelineName,
-        description: pipelineDescription,
-        steps: steps,
-      };
-      onSavePipeline(updatedPipeline);
-    }
-  };
-
-  const handleUpdatedValues = (stepIndex: number, values: StepValues) => {
-    const updatedSteps = [...steps];
-    updatedSteps[stepIndex] = { ...updatedSteps[stepIndex], ...values };
-    setSteps(updatedSteps);
-  };
-
-  // Toggle collapse for a step
-  const handleToggleCollapse = (index: number) => {
-    const newCollapsed = [...collapsedSteps];
-    newCollapsed[index] = !newCollapsed[index];
-    setCollapsedSteps(newCollapsed);
-  };
-
-  // Navigation if you have multiple "slides"
-  const goToSlide = (direction: 'prev' | 'next') => {
-    if (direction === 'prev') {
-      setActiveSlide((prev) => Math.max(prev - 1, 0));
-    } else {
-      setActiveSlide((prev) => Math.min(prev + 1, 1)); // or however many slides you have
-    }
   };
 
   return (
-    <div className="pipeline-config-container">
-      {/* Optional nav buttons (like in the Run Screen) */}
-      <button
-        className="nav-button left"
-        onClick={() => goToSlide('prev')}
-        disabled={activeSlide === 0}
-        aria-label="Previous Slide"
-      >
-        ‹
-      </button>
-
-      <div className="pipeline-config-wrapper">
-        {/* The slides container */}
-        <div
-          className="pipeline-config-slides"
-          style={{ transform: `translateX(-${activeSlide * 100}%)` }}
-        >
-          {/* Slide 1: Basic pipeline details */}
-          <div className="config-slide">
-            <div className="screen-header">
-              <h2>Pipeline Setup</h2>
-              <p>Define the pipeline’s name, description, and steps.</p>
-            </div>
-            <div className="pipeline-details">
-              <label>
-                Pipeline Name
-                <input
-                  type="text"
-                  value={pipelineName}
-                  onChange={(e) => setPipelineName(e.target.value)}
-                />
-              </label>
-
-              <label>Description</label>
-              <TextFieldPicker
-                value={pipelineDescription}
-                onChange={(newDesc) => setDescription(newDesc)}
-              />
-            </div>
-
-            <div className="steps-list">
-              <h3>Pipeline Steps</h3>
-              {steps.map((step, index) => {
-                const blueprint = blueprints[step.stepId];
-                const isCollapsed = collapsedSteps[index];
-                return (
-                  <div key={index} className="step-card">
-                    <div className="step-header" onClick={() => handleToggleCollapse(index)}>
-                      <h4>{blueprint?.name ?? `Step #${index + 1}`}</h4>
-                      {/* Chevron icon rotates on collapse */}
-                      <FaChevronRight
-                        className={`collapse-icon ${isCollapsed ? 'collapsed' : ''}`}
-                      />
-                    </div>
-
-                    <div
-                      className={`step-body ${!isCollapsed ? 'expanded' : ''}`}
-                      style={{ maxHeight: isCollapsed ? '0' : '600px' }} // or auto with transitions
-                    >
-                      <StepConfig
-                        blueprint={blueprint}
-                        values={step}
-                        onUpdate={(vals) => handleUpdatedValues(index, vals)}
-                      />
-                      <div className="step-actions">
-                        <button onClick={() => handleMoveStep(index, 'up')}>
-                          <FaArrowUp /> Move Up
-                        </button>
-                        <button onClick={() => handleMoveStep(index, 'down')}>
-                          <FaArrowDown /> Move Down
-                        </button>
-                        <button onClick={() => handleDeleteStep(index)}>
-                          <FaTrash /> Delete
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Add Step Button */}
-            <button onClick={handleAddStep} className="add-step-button">
-              + Add Step
-            </button>
-
-            {/* Navigation Buttons at bottom */}
-            <div className="navigation">
-              <button onClick={onPrevious}>Go back</button>
-              <button onClick={handleSavePipeline}>Save</button>
-              <button onClick={onNext}>Run Pipeline</button>
-            </div>
-          </div>
-
-          {/* Slide 2: Potential advanced config or something else */}
-          <div className="config-slide">
-            <div className="screen-header">
-              <h2>Advanced Configuration</h2>
-              <p>Additional advanced pipeline options can go here.</p>
-            </div>
-            {/* Content for Slide 2 */}
-          </div>
-        </div>
+    <div className="pipeline-config-screen">
+      <div className="pipeline-header">
+        <h2>Pipeline Configuration</h2>
+        <label>Pipeline Name:</label>
+        <input
+          type="text"
+          value={pipelineName}
+          onChange={(e) => setPipelineName(e.target.value)}
+        />
+        <label>Description:</label>
+        <TextFieldPicker
+          value={pipelineDescription}
+          onChange={(desc) => setPipelineDescription(desc)}
+        />
       </div>
 
-      <button
-        className="nav-button right"
-        onClick={() => goToSlide('next')}
-        disabled={activeSlide === 1} // or the last slide index
-        aria-label="Next Slide"
-      >
-        ›
-      </button>
+      <div className="operations-container">
+        <h2>Operations Configurations</h2>
+        <DragDropContext onDragEnd={onDragEnd}>
+          <Droppable droppableId="operations" direction="horizontal">
+            {(provided) => (
+              <div
+                className="box-list"
+                ref={provided.innerRef}
+                {...provided.droppableProps}
+              >
+                {steps.map((step, index) => {
+                  const blueprint = blueprintMap[step.stepId];
+                  const operationName = blueprint?.name ?? `Operation #${index + 1}`;
+                  return (
+                    <Draggable
+                      key={step.uniqueId}
+                      draggableId={step.uniqueId}
+                      index={index}
+                    >
+                      {(provided) => (
+                        <div
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                          onClick={() => setSelectedStepIndex(index === selectedStepIndex ? null : index)}
+                        >
+                          <OperationBox
+                            operationName={operationName}
+                            operationDescription={blueprint?.description ?? ''}
+                          />
+                        </div>
+                      )}
+                    </Draggable>
+                  );
+                })}
+                {provided.placeholder}
+                {/* Add Operation Card */}
+                <div className="add-operation-card" onClick={handleAddOperation}>
+                  + Add Operation
+                </div>
+              </div>
+            )}
+          </Droppable>
+        </DragDropContext>
+      </div>
+
+      {selectedStepIndex !== null && (
+        <div className="config-panel">
+          <OperationConfigPanel
+            operationName={
+              blueprintMap[steps[selectedStepIndex].stepId]?.name ??
+              `Operation #${selectedStepIndex + 1}`
+            }
+            blueprint={blueprintMap[steps[selectedStepIndex].stepId]}
+            values={steps[selectedStepIndex]}
+            onUpdate={(updatedValues) => {
+              const updatedSteps = [...steps];
+              updatedSteps[selectedStepIndex] = {
+                ...updatedSteps[selectedStepIndex],
+                ...updatedValues,
+              };
+              setSteps(updatedSteps);
+            }}
+          />
+        </div>
+      )}
+
+      <div style={{ marginTop: '20px' }}>
+        <button onClick={onPrevious}>Back</button>
+        <button
+          onClick={() =>
+            onSavePipeline({
+              ...pipeline,
+              name: pipelineName,
+              description: pipelineDescription,
+              steps,
+            })
+          }
+        >
+          Save
+        </button>
+        <button onClick={onNext}>Run Pipeline</button>
+      </div>
     </div>
   );
 };

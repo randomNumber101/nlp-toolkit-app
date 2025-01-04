@@ -1,0 +1,21 @@
+.operation-box {
+  padding: 10px 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: #fff;
+  cursor: grab;
+  transition: box-shadow 0.2s;
+
+  &:hover {
+    box-shadow: 0 4px 5px rgba(0, 0, 0, 0.1);
+  }
+
+  &.selected {
+    border-color: #1890ff;
+    background-color: #f0f5ff;
+  }
+
+  &:active {
+    cursor: grabbing;
+  }
+}

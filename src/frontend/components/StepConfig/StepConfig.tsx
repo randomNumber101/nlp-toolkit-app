@@ -2,8 +2,8 @@
 
 import * as React from 'react';
 import { useState, useEffect } from 'react';
-import { StepBlueprint, StepValues } from '../types';
-import DynamicPicker from './ValuePickers/DynamicPicker';
+import {StepBlueprint, StepValues} from "../../types";
+import DynamicPicker from "../ValuePickers/DynamicPicker";
 
 interface StepConfigProps {
   blueprint: StepBlueprint;

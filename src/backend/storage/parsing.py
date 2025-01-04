@@ -222,9 +222,10 @@ class PipelineParser:
         # Parse steps
         steps = []
         for step_data in json_data.get("steps", []):
+            uniqueId = step_data.get("uniqueId", str(uuid.uuid4()))
             step_id = step_data["stepId"]
             values = step_data.get("values", {})
-            step = StepValues(step_id, values)
+            step = StepValues(uniqueId, step_id, values)
             steps.append(step)
 
         # Create and return Pipeline instance

@@ -1,0 +1,15 @@
+/* src/components/OperationConfigPanel/OperationConfigPanel.scss */
+
+.operation-config-panel {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 15px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+
+  .panel-header {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+}

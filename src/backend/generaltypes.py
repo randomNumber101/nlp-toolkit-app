@@ -250,7 +250,8 @@ class StepOperationMapper:
 
 
 class StepValues:
-    def __init__(self, stepId: str, values: Dict[str, object]):
+    def __init__(self, uniqueId: str, stepId: str, values: Dict[str, object]):
+        self.uniqueId = uniqueId
         self.stepId = stepId
         self.values = values
 

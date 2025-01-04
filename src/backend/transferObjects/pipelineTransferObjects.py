@@ -77,12 +77,14 @@ class StepBlueprintTransferObject:
 
 
 class StepValuesTransferObject:
-    def __init__(self, stepId: str, values: Dict[str, object]):
+    def __init__(self, uniqueId: str, stepId: str, values: Dict[str, object]):
+        self.uniqueId = uniqueId
         self.stepId = stepId
         self.values = values
 
     def to_dict(self):
         return {
+            "uniqueId": self.uniqueId,
             "stepId": self.stepId,
             "values": self.values  # Assuming values are JSON-serializable already
         }
@@ -144,7 +146,7 @@ def convert_step_blueprint_to_transfer(blueprint: 'StepBlueprint') -> StepBluepr
 
 
 def convert_step_values_to_transfer(step_values: 'StepValues') -> StepValuesTransferObject:
-    return StepValuesTransferObject(stepId=step_values.stepId, values=step_values.values)
+    return StepValuesTransferObject(uniqueId=step_values.uniqueId, stepId=step_values.stepId, values=step_values.values)
 
 
 def convert_pipeline_to_transfer(pipeline: 'Pipeline') -> PipelineTransferObject:
