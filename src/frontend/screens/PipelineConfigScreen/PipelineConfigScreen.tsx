@@ -10,8 +10,8 @@ import {
 
 import { Pipeline, StepBlueprint, StepValues } from '../../types';
 import OperationBox from '../../components/OperationBox/OperationBox';
-import OperationConfigPanel from '../../components/OperationConfigPanel/OperationConfigPanel';
 import TextFieldPicker from '../../components/ValuePickers/TextFieldPicker';
+import OperationConfigPanel from "../../components/OperationConfigPanel/OperationConfigPanel";
 
 interface PipelineConfigScreenProps {
   initialPipe: Pipeline | null;
@@ -35,6 +35,7 @@ const PipelineConfigScreen: React.FC<PipelineConfigScreenProps> = ({
   );
   const [steps, setSteps] = useState<StepValues[]>(pipeline?.steps ?? []);
   const [selectedStepIndex, setSelectedStepIndex] = useState<number | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
 
   useEffect(() => {
     setPipelineName(pipeline?.name ?? '');
@@ -42,7 +43,10 @@ const PipelineConfigScreen: React.FC<PipelineConfigScreenProps> = ({
     setSteps(pipeline?.steps ?? []);
   }, [pipeline]);
 
+  const onDragStart = () => setIsDragging(true);
+
   const onDragEnd = (result: DropResult) => {
+    setIsDragging(false);
     if (!result.destination) return;
 
     const reorderedSteps = Array.from(steps);
@@ -63,7 +67,7 @@ const PipelineConfigScreen: React.FC<PipelineConfigScreenProps> = ({
   return (
     <div className="pipeline-config-screen">
       <div className="pipeline-header">
-        <h2>Pipeline Configuration</h2>
+        <h2>Pipeline Settings</h2>
         <label>Pipeline Name:</label>
         <input
           type="text"
@@ -78,8 +82,7 @@ const PipelineConfigScreen: React.FC<PipelineConfigScreenProps> = ({
       </div>
 
       <div className="operations-container">
-        <h2>Operations Configurations</h2>
-        <DragDropContext onDragEnd={onDragEnd}>
+        <DragDropContext onDragStart={onDragStart} onDragEnd={onDragEnd}>
           <Droppable droppableId="operations" direction="horizontal">
             {(provided) => (
               <div
@@ -91,32 +94,41 @@ const PipelineConfigScreen: React.FC<PipelineConfigScreenProps> = ({
                   const blueprint = blueprintMap[step.stepId];
                   const operationName = blueprint?.name ?? `Operation #${index + 1}`;
                   return (
-                    <Draggable
-                      key={step.uniqueId}
-                      draggableId={step.uniqueId}
-                      index={index}
-                    >
-                      {(provided) => (
-                        <div
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                          onClick={() => setSelectedStepIndex(index === selectedStepIndex ? null : index)}
-                        >
-                          <OperationBox
-                            operationName={operationName}
-                            operationDescription={blueprint?.description ?? ''}
-                          />
+                    <React.Fragment key={step.uniqueId}>
+                      <Draggable draggableId={step.uniqueId} index={index}>
+                        {(provided) => (
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                            onClick={() => setSelectedStepIndex(index === selectedStepIndex ? null : index)}
+                          >
+                            <OperationBox
+                              operationName={operationName}
+                              operationDescription={blueprint?.description ?? ''}
+                              selected={selectedStepIndex === index}
+                            />
+                          </div>
+                        )}
+                      </Draggable>
+
+                      {index <= steps.length - 1 && !isDragging && (
+                        <div className="arrow show">
+                          →
                         </div>
                       )}
-                    </Draggable>
+                    </React.Fragment>
                   );
                 })}
                 {provided.placeholder}
-                {/* Add Operation Card */}
-                <div className="add-operation-card" onClick={handleAddOperation}>
-                  + Add Operation
-                </div>
+
+                {
+                  !isDragging && (
+                      <div className="add-operation-card" onClick={handleAddOperation}>
+                        + Add Operation
+                      </div>
+                    )
+                }
               </div>
             )}
           </Droppable>
