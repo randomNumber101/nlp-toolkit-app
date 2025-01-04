@@ -20,9 +20,6 @@ const OperationConfigPanel: React.FC<OperationConfigPanelProps> = ({
 }) => {
   return (
     <div className="operation-config-panel">
-      <div className="panel-header">Operation Configuration</div>
-
-      {/* Use your StepConfig or custom form here */}
       <StepConfig
         blueprint={blueprint}
         values={values}

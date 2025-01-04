@@ -37,11 +37,26 @@ class BertTopicOperation(StepOperation):
                              LogLevels.ERROR)
                 return StepState.FAILED
 
-            notifier.log("Analyzing topics. This might take some time...", LogLevels.INFO)
-            notifier.sendStatus(StepState.RUNNING, progress=5)
+            texts = data[self.input_column].tolist()
 
-            # Fit BERTopic model
-            topics, probs = self.topic_model.fit_transform(data[self.input_column].tolist())
+            notifier.log("Starting BERTopic modeling process...", LogLevels.INFO)
+            notifier.sendStatus(StepState.RUNNING, progress=0)
+
+            # Step 1: Fitting the BERTopic model
+            notifier.log("Fitting BERTopic model to data...", LogLevels.INFO)
+            notifier.sendStatus(StepState.RUNNING, progress=10)
+            self.topic_model.fit(texts)
+            notifier.log("BERTopic model fitting completed.", LogLevels.INFO)
+            notifier.sendStatus(StepState.RUNNING, progress=50)
+
+            # Step 2: Transforming the data to get topics and probabilities
+            notifier.log("Transforming data to assign topics...", LogLevels.INFO)
+            notifier.sendStatus(StepState.RUNNING, progress=70)
+            topics, probs = self.topic_model.transform(texts)
+            notifier.log("Topic assignment completed.", LogLevels.INFO)
+            notifier.sendStatus(StepState.RUNNING, progress=85)
+
+            # Step 3: Logging the topics and their probabilities
             notifier.log(f"Topics generated: {list(zip(topics, probs))}", LogLevels.DEBUG)
             topic_freq = self.topic_model.get_topic_freq()
 
@@ -64,33 +79,27 @@ class BertTopicOperation(StepOperation):
             # Determine the number of topics to visualize
             top_n = min(10, num_topics)
             notifier.log(f"Visualizing top {top_n} topics.", LogLevels.INFO)
+            notifier.sendStatus(StepState.RUNNING, progress=90)
 
-            # Prepare visualization
-            fig = self.topic_model.visualize_barchart(top_n_topics=top_n)
-            # Generate Plotly visualizations
-            bar_chart = self.topic_model.visualize_barchart(top_n_topics=10)
+            # Prepare visualizations
+            bar_chart = self.topic_model.visualize_barchart(top_n_topics=top_n)
             hierarchy = self.topic_model.visualize_hierarchy()
             heatmap = self.topic_model.visualize_heatmap()
 
             # Add Plotly visualizations to the payload
-
-            multi = MultiVisualization(
+            multi_viz = MultiVisualization(
                 [PlotlyViz(bar_chart), PlotlyViz(hierarchy), PlotlyViz(heatmap)],
                 render_type="tabbed",
                 tab_names=["Bar Chart", "Hierarchy", "Heatmap"]
             )
-
-            payload.addVisualization(multi)
+            payload.addVisualization(multi_viz)
 
             # Update payload data
             payload.data = data
+            notifier.sendStatus(StepState.RUNNING, progress=100)
             notifier.log("BERTopic modeling completed successfully.", LogLevels.INFO)
             return StepState.SUCCESS
 
         except Exception as e:
             notifier.log(f"Error during BERTopic modeling: {str(e)}", LogLevels.ERROR)
             return StepState.FAILED
-
-
-
-

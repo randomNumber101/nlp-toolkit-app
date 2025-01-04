@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 import {StepBlueprint, StepValues} from "../../types";
+import "./StepConfig.scss";
 import DynamicPicker from "../ValuePickers/DynamicPicker";
 
 interface StepConfigProps {
@@ -32,8 +33,8 @@ const StepConfigClass: React.FC<StepConfigProps> = ({ blueprint, values, onUpdat
 
   return (
     <div className="step-config">
-      <h3>{blueprint.name}</h3>
-      <p>{blueprint.description}</p>
+      <div className="name">{blueprint.name}</div>
+      <div className="description">{blueprint.description}</div>
 
       {/* Render DynamicPicker with updatedValues */}
       {blueprint.inOutDef.staticParameters.map((parameter) => (

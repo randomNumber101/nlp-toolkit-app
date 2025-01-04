@@ -20,6 +20,19 @@ const DynamicPicker: React.FC<DynamicPickerProps> = ({ parameter, value, onChang
     onChange({ ...value, [innerName]: newValue });
   };
 
+  const [showTooltip, setShowTooltip] = useState(false);
+  const [tooltipPosition, setTooltipPosition] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
+
+  const handleMouseEnter = (e: React.MouseEvent) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setTooltipPosition({ top: rect.top - 10, left: rect.left + rect.width / 2 });
+    setShowTooltip(true);
+  };
+
+  const handleMouseLeave = () => {
+    setShowTooltip(false);
+  };
+
   if (parameter.type === 'complex') {
     const [collapsed, setCollapsed] = useState<boolean>(false);
 
@@ -88,9 +101,21 @@ const DynamicPicker: React.FC<DynamicPickerProps> = ({ parameter, value, onChang
   }
 
   return (
-    <div className="picker-row">
+    <div
+      className="picker-row"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
       <div className="picker-label">{parameter.name}</div>
       <div className="picker-element">{pickerElement}</div>
+      {showTooltip && parameter.description && (
+        <div
+          className="tooltip"
+          style={{ top: tooltipPosition.top, left: tooltipPosition.left }}
+        >
+          {parameter.description}
+        </div>
+      )}
     </div>
   );
 };

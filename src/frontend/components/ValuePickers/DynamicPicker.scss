@@ -2,24 +2,17 @@
   display: flex;
   align-items: center;
   padding: 8px 5px;
-
   border-radius: 10px;
   box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  -webkit-box-sizing: border-box;
+  position: relative;
 
   &:hover {
     box-shadow: 0 0 0 3px #dedede inset;
   }
 
-  &:last-child {
-    border-bottom: none;
-  }
-
   .picker-label {
     flex: 1;
     text-align: right;
-    fonte-weight: bold;
     padding-right: 30px;
   }
 
@@ -27,11 +20,24 @@
     flex: 2;
     text-align: left;
 
-    /* Specific fix for checkboxes */
     input[type='checkbox'] {
       margin-right: 10px;
       vertical-align: middle;
     }
+  }
+
+  .tooltip {
+    position: fixed;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    transform: translate(-50%, -100%);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    pointer-events: none; /* Prevent tooltip from interfering with hover */
   }
 }
 
@@ -40,7 +46,7 @@
   padding: 15px;
   border: 2px solid #ddd;
   border-radius: 5px;
-  background-color: rgba(84, 250, 36, 0.15);
+  background-color: rgba(84, 250, 36, 0.125);
 
   .complex-header {
     display: flex;
@@ -71,3 +77,4 @@
     }
   }
 }
+

@@ -7,9 +7,9 @@
             "stepId": "BertTopic",
             "values": {
                 "topic modeling": {
-                    "min_cluster_size": 2,
+                    "min_cluster_size": 4,
                     "vectorizer": {
-                        "max_df": 0.95,
+                        "max_df": 0.5,
                         "min_df": "1"
                     }
                 }
