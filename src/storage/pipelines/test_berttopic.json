@@ -7,13 +7,16 @@
             "stepId": "BertTopic",
             "values": {
                 "topic modeling": {
-                    "min_cluster_size": 4,
+                    "min_cluster_size": 2,
                     "vectorizer": {
-                        "max_df": 0.5,
+                        "max_df": 0.35,
                         "min_df": "1"
                     }
                 }
             }
         }
+    ],
+    "tags": [
+        "pipelines"
     ]
 }

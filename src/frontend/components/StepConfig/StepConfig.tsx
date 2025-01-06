@@ -1,8 +1,6 @@
-// src/components/StepConfigClass.tsx
-
 import * as React from 'react';
 import { useState, useEffect } from 'react';
-import {StepBlueprint, StepValues} from "../../types";
+import { StepBlueprint, StepValues } from "../../types";
 import "./StepConfig.scss";
 import DynamicPicker from "../ValuePickers/DynamicPicker";
 
@@ -16,19 +14,16 @@ const StepConfigClass: React.FC<StepConfigProps> = ({ blueprint, values, onUpdat
   const [updatedValues, setUpdatedValues] = useState(values.values || {});
 
   useEffect(() => {
-    console.log("Values changed: ", updatedValues)
-    onUpdate({ ...values, values: updatedValues });
-  }, [updatedValues]);
-
-  useEffect(() => {
     setUpdatedValues(values.values || {});
   }, [values, blueprint]);
 
   const handleTempChange = (paramName: string, newValue: any) => {
-    setUpdatedValues((prevValues) => ({
-      ...prevValues,
+    const newUpdatedValues = {
+      ...updatedValues,
       [paramName]: newValue,
-    }));
+    };
+    setUpdatedValues(newUpdatedValues);
+    onUpdate({ ...values, values: newUpdatedValues });
   };
 
   return (
@@ -41,7 +36,7 @@ const StepConfigClass: React.FC<StepConfigProps> = ({ blueprint, values, onUpdat
         <DynamicPicker
           key={parameter.name}
           parameter={parameter}
-          value={updatedValues[parameter.name]} // Use updatedValues here
+          value={updatedValues[parameter.name]}
           onChange={(newValue) => handleTempChange(parameter.name, newValue)}
         />
       ))}

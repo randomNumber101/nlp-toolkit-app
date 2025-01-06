@@ -1,3 +1,5 @@
+// src/components/PipelineConfigScreen/PipelineConfigScreen.scss
+
 .pipeline-config-screen {
   padding: 20px;
 
@@ -31,6 +33,7 @@
       gap: 10px;
       align-items: center;
       justify-content: center;
+      position: relative;
     }
 
     .arrow {
@@ -56,18 +59,100 @@
       color: #797979;
       background: #f9f9f9;
       cursor: pointer;
-      transition: background-color 0.2s;
+      position: relative;
+      transition: background-color 0.2s, color 0.2s;
 
       &:hover {
         color: #a4a4a4;
         background-color: #cefdbb;
+      }
+
+      .operation-toolbox {
+        position: absolute;
+        bottom: 110%;
+        left: 50%;
+        transform: translateX(-50%);
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        padding: 10px;
+        width: 200px;
+        z-index: 10;
+        animation: fadeIn 0.3s ease-in-out;
+
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translate(-50%, 0) scale(0.95);
+          }
+          to {
+            opacity: 1;
+            transform: translate(-50%, 0) scale(1);
+          }
+        }
+
+        .toolbox-item {
+          padding: 8px;
+          border-bottom: 1px solid #eee;
+          cursor: pointer;
+          position: relative;
+
+          &:last-child {
+            border-bottom: none;
+          }
+
+          &:hover {
+            background-color: #f1f1f1;
+          }
+
+          .operation-name {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 3px;
+          }
+
+          .operation-description {
+            display: none;
+            font-size: 0.85rem;
+            color: #555;
+            max-width: 550px;
+            word-wrap: break-word;
+            white-space: normal;
+            text-align: center;
+          }
+
+          &:hover .operation-description {
+            display: block;
+            position: absolute;
+            top: 50%;
+            right: 110%; /* Changed from left to right */
+            transform: translateY(-50%);
+            background: #333;
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 3px;
+            z-index: 20;
+            opacity: 0;
+            animation: tooltipFadeIn 0.2s forwards;
+          }
+        }
+
+        @keyframes tooltipFadeIn {
+          to {
+            opacity: 1;
+          }
+        }
       }
     }
   }
 
   .config-panel {
     margin-top: 20px;
-    box-shadow: 5px 5px 5px darkgray, lightgray 0px 0px 3px inset;
+    box-shadow: 5px 5px 5px darkgray, 0px 0px 3px inset lightgray;
+    padding: 15px;
+    border-radius: 5px;
+    background-color: #fff;
   }
 
   .button-container {
@@ -88,6 +173,11 @@
       border-radius: 5px;
       cursor: pointer;
       transition: background-color 0.3s, box-shadow 0.3s;
+      position: relative;
+
+      svg {
+        margin-right: 5px;
+      }
     }
 
     .back-button {
@@ -112,18 +202,21 @@
       &:after {
         content: "✔ Saved!";
         position: absolute;
-        top: -25px;
+        top: -30px;
         right: 10px;
         background: #4caf50;
         color: white;
-        padding: 5px;
+        padding: 5px 10px;
         border-radius: 3px;
         font-size: 0.9rem;
         display: none;
+        opacity: 0;
+        transition: opacity 0.3s;
       }
 
       &.show-saved:after {
         display: block;
+        opacity: 1;
       }
     }
 

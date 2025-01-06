@@ -1,5 +1,7 @@
+// src/components/PipelineConfigScreen/PipelineConfigScreen.tsx
+
 import * as React from 'react';
-import {useEffect, useMemo, useState} from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import './PipelineConfigScreen.scss';
 import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
 import { Pipeline, StepBlueprint, StepValues } from '../../types';
@@ -7,8 +9,8 @@ import OperationBox from '../../components/OperationBox/OperationBox';
 import TextFieldPicker from '../../components/ValuePickers/TextFieldPicker';
 import OperationConfigPanel from '../../components/OperationConfigPanel/OperationConfigPanel';
 import { FaSave, FaArrowLeft, FaPlay } from 'react-icons/fa';
-import {useBlueprintContext} from "../../utils/BlueprintContext";
-import {listToMap} from "../../utils/functional";
+import { useBlueprintContext } from "../../utils/BlueprintContext";
+import { listToMap } from "../../utils/functional";
 
 interface PipelineConfigScreenProps {
   initialPipe: Pipeline | null;
@@ -30,15 +32,20 @@ const PipelineConfigScreen: React.FC<PipelineConfigScreenProps> = ({
   const [selectedStepIndex, setSelectedStepIndex] = useState<number | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [showSaved, setShowSaved] = useState(false);
+  const [showOperationToolbox, setShowOperationToolbox] = useState(false);
+
+  const toolboxRef = useRef<HTMLDivElement>(null);
+  const addOperationRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setPipelineName(pipeline?.name ?? '');
     setPipelineDescription(pipeline?.description ?? 'No description');
     setSteps(pipeline?.steps ?? []);
+    console.log("Pipeline updated");
   }, [pipeline]);
 
-  const {blueprints, _setBp} = useBlueprintContext()
-  const blueprintMap = listToMap(blueprints, (bp: StepBlueprint) => bp.id)
+  const { blueprints } = useBlueprintContext();
+  const blueprintMap = useMemo(() => listToMap(blueprints, (bp: StepBlueprint) => bp.id), [blueprints]);
 
   const onDragStart = () => setIsDragging(true);
 
@@ -62,6 +69,43 @@ const PipelineConfigScreen: React.FC<PipelineConfigScreenProps> = ({
     setShowSaved(true);
     setTimeout(() => setShowSaved(false), 2000);
   };
+
+  const handleAddOperationClick = () => {
+    setShowOperationToolbox((prev) => !prev);
+  };
+
+  const handleOperationSelect = (blueprint: StepBlueprint) => {
+    const newStep: StepValues = {
+      stepId: blueprint.id,
+      values: {},
+      uniqueId: `unique-${Date.now()}`,
+    };
+    setSteps([...steps, newStep]);
+    setShowOperationToolbox(false);
+  };
+
+  const handleClickOutside = (event: MouseEvent) => {
+    if (
+      toolboxRef.current &&
+      !toolboxRef.current.contains(event.target as Node) &&
+      addOperationRef.current &&
+      !addOperationRef.current.contains(event.target as Node)
+    ) {
+      setShowOperationToolbox(false);
+    }
+  };
+
+  useEffect(() => {
+    if (showOperationToolbox) {
+      document.addEventListener('mousedown', handleClickOutside);
+    } else {
+      document.removeEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showOperationToolbox]);
 
   return (
     <div className="pipeline-config-screen">
@@ -103,14 +147,32 @@ const PipelineConfigScreen: React.FC<PipelineConfigScreenProps> = ({
                         )}
                       </Draggable>
 
-                      {index <= steps.length - 1 && !isDragging && <div className="arrow show">→</div>}
+                      {index < steps.length - 1 && !isDragging && <div className="arrow show">→</div>}
                     </React.Fragment>
                   );
                 })}
                 {provided.placeholder}
                 {!isDragging && (
-                  <div className="add-operation-card" onClick={() => setSteps([...steps, { stepId: 'new', values: null, uniqueId: `unique-${Date.now()}` }])}>
+                  <div
+                    className="add-operation-card"
+                    onClick={handleAddOperationClick}
+                    ref={addOperationRef}
+                  >
                     + Add Operation
+                    {showOperationToolbox && (
+                      <div className="operation-toolbox" ref={toolboxRef}>
+                        {blueprints.map((blueprint) => (
+                          <div
+                            key={blueprint.id}
+                            className="toolbox-item"
+                            onClick={() => handleOperationSelect(blueprint)}
+                          >
+                            <span className="operation-name">{blueprint.name}</span>
+                            <span className="operation-description">{blueprint.description}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -136,7 +198,6 @@ const PipelineConfigScreen: React.FC<PipelineConfigScreenProps> = ({
       )}
 
       {/* Buttons */}
-
       <div className="button-container">
         <button className="back-button" onClick={onPrevious}>
           <FaArrowLeft /> Back

@@ -9,6 +9,7 @@ import { faCog, faPlay } from '@fortawesome/free-solid-svg-icons';
 import { usePipelineContext } from '../../utils/PipelineContext';
 import { useBlueprintContext } from '../../utils/BlueprintContext';
 import { listToMap } from "../../utils/functional";
+import {savePipeline} from "../../utils/pipelineApi";
 
 interface LandingPageProps {
   onAddPipeline: () => void;
@@ -58,13 +59,15 @@ const LandingPage: React.FC<LandingPageProps> = ({
     const operationPipelines = blueprints.map((blueprint) => {
       const operationPipelineId = `${blueprint.id}-single-operation`;
       if (!pipelines.find((pipeline) => pipeline.id === operationPipelineId)) {
-        return {
-          id: operationPipelineId,
-          name: blueprint.name,
-          description: blueprint.description,
-          steps: [{ stepId: blueprint.id, uniqueId: `unique-${Date.now()}` }],
-          tags: ["operations"] // Assign "operations" tag
-        } as Pipeline;
+        const newPipeline = {
+              id: operationPipelineId,
+              name: blueprint.name,
+              description: blueprint.description,
+              steps: [{ stepId: blueprint.id, uniqueId: `unique-${Date.now()}` }],
+              tags: ["operations"]
+          } as Pipeline
+        savePipeline(newPipeline).catch(console.log)
+        return newPipeline
       }
       return null;
     }).filter((pipeline) => pipeline !== null) as Pipeline[];
