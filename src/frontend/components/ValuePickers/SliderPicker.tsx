@@ -12,7 +12,6 @@ interface SliderPickerProps {
 
 const SliderPicker: React.FC<SliderPickerProps> = ({ value, onChange, min, max, step }) => {
 
-  console.log("Value", value)
   const initialValue = value != undefined ? value : min;
   const [displayValue, setDisplayValue] = useState(initialValue);
 

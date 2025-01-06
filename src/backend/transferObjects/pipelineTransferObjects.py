@@ -61,18 +61,20 @@ class InOutDefTransferObject:
 
 
 class StepBlueprintTransferObject:
-    def __init__(self, id: str, name: str, description: str, inOutDef: InOutDefTransferObject):
+    def __init__(self, id: str, name: str, description: str, inOutDef: InOutDefTransferObject, tags: List[str] = None):
         self.id = id
         self.name = name
         self.description = description
         self.inOutDef = inOutDef
+        self.tags = tags if tags else []
 
     def to_dict(self):
         return {
             "id": self.id,
             "name": self.name,
             "description": self.description,
-            "inOutDef": self.inOutDef.to_dict()
+            "inOutDef": self.inOutDef.to_dict(),
+            "tags": self.tags
         }
 
 
@@ -92,18 +94,20 @@ class StepValuesTransferObject:
 
 class PipelineTransferObject:
     def __init__(self, id: Optional[str] = None, name: Optional[str] = None, description: str = "",
-                 steps: List[StepValuesTransferObject] = None):
+                 steps: List[StepValuesTransferObject] = None, tags: List[str] = None):
         self.id = id if id else uuid.uuid4().hex
         self.name = name if name else f"Pipeline {self.id}"
         self.description = description
         self.steps = steps if steps else []
+        self.tags = tags if tags is not None else []
 
     def to_dict(self):
         return {
             "id": self.id,
             "name": self.name,
             "description": self.description,
-            "steps": [step.to_dict() for step in self.steps]
+            "steps": [step.to_dict() for step in self.steps],
+            "tags": self.tags
         }
 
 
@@ -142,7 +146,7 @@ def convert_in_out_def_to_transfer(in_out_def: 'InputOutputDefinition') -> InOut
 def convert_step_blueprint_to_transfer(blueprint: 'StepBlueprint') -> StepBlueprintTransferObject:
     in_out_def_transfer = convert_in_out_def_to_transfer(blueprint.inOutDef)
     return StepBlueprintTransferObject(id=blueprint.stepId, name=blueprint.name, description=blueprint.description,
-                                       inOutDef=in_out_def_transfer)
+                                       inOutDef=in_out_def_transfer, tags=blueprint.tags)
 
 
 def convert_step_values_to_transfer(step_values: 'StepValues') -> StepValuesTransferObject:
@@ -152,4 +156,4 @@ def convert_step_values_to_transfer(step_values: 'StepValues') -> StepValuesTran
 def convert_pipeline_to_transfer(pipeline: 'Pipeline') -> PipelineTransferObject:
     steps_transfer = [convert_step_values_to_transfer(step) for step in pipeline.steps]
     return PipelineTransferObject(id=pipeline.id, name=pipeline.name, description=pipeline.description,
-                                  steps=steps_transfer)
+                                  steps=steps_transfer, tags=pipeline.tags)

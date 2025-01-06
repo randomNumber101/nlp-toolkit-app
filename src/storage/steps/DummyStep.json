@@ -1,6 +1,8 @@
 {
   "id" : "DummyStep",
   "name": "Classify nouns",
+  "description": "Empty operation for testing.",
+  "tags": ["simple", "batch processing"],
   "parameters": {
     "threshold" : {
       "type" : "float",

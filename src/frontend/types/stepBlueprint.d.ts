@@ -6,4 +6,5 @@ export interface StepBlueprint {
   name: string;
   description: string;
   inOutDef: InOutDef;
+  tags: string[];
 }

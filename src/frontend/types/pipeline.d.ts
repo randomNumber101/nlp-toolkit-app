@@ -6,4 +6,5 @@ export interface Pipeline {
   name: string;
   description: string;
   steps: StepValues[];
+  tags: string[];
 }

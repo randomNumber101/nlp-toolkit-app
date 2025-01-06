@@ -9,14 +9,15 @@ import { Pipeline, StepBlueprint } from '../../types';
 import { startRun } from '../../utils/pipelineApi';
 import { useBackendEvent } from '../../utils/useBackendEvents';
 import { InputHandle } from "../InputScreen/InputScreen";
+import {useBlueprintContext} from "../../utils/BlueprintContext";
+import {listToMap} from "../../utils/functional";
 
 interface RunScreenProps {
     pipeline: Pipeline;
-    blueprints: { [key: string]: StepBlueprint }
     inputHandle: InputHandle;
 }
 
-const RunScreen: React.FC<RunScreenProps> = ({ pipeline, blueprints, inputHandle }) => {
+const RunScreen: React.FC<RunScreenProps> = ({ pipeline, inputHandle }) => {
     const [runId, setRunId] = useState<string | null>(null);
     const [stepsStatus, setStepsStatus] = useState<StepStatus[]>([]);
     const [activeStepIndex, setActiveStepIndex] = useState<number>(0);
@@ -44,6 +45,10 @@ const RunScreen: React.FC<RunScreenProps> = ({ pipeline, blueprints, inputHandle
 
         initiateRun();
     }, [pipeline, inputHandle]);
+
+    // Get Blueprints from Context
+    const {blueprints, setBlueprints} = useBlueprintContext()
+    const blueprintMap = listToMap(blueprints, (bp: StepBlueprint) => bp.id)
 
     // Handler for status updates
     const handleStatusUpdate = (event: CustomEvent) => {
@@ -101,7 +106,7 @@ const RunScreen: React.FC<RunScreenProps> = ({ pipeline, blueprints, inputHandle
                         {pipeline.steps.map((step, index) => (
                             <RunStep
                                 key={index}
-                                step={blueprints[step.stepId]}
+                                step={blueprintMap[step.stepId]}
                                 status={stepsStatus[index]}
                                 isActive={index === activeStepIndex}
                                 runId={runId}

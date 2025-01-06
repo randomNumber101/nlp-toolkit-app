@@ -40,4 +40,10 @@ export const streamToString = async (stream: ReadableStream<Uint8Array>): Promis
   return result;
 };
 
+export function listToMap<T,S>(list: T[], key: (T) => S) : Record<S, T> {
+  const newMap = {} as Record<S,T>
+  list.forEach(e => newMap[key(e)] = e)
+  return newMap
+}
+
 export default stringToStream;

@@ -1,6 +1,8 @@
 {
   "id": "DataPreparation",
   "name": "Data Preparation",
+  "description": "Removed stop words, lowercases words and removed non-ascii characters.",
+  "tags": ["simple", "batch processing"],
   "parameters": {
     "column": {
       "type": "string",

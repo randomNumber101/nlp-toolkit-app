@@ -1,6 +1,8 @@
 {
   "id": "BertTopic",
   "name": "BERT Topic Modeling",
+  "description": "Finds and assigns topics in a batch of texts using BERT embeddings.",
+  "tags": ["multiple texts only", "advanced"],
   "parameters": {
     "input column": {
       "type": "string",

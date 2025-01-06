@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useEffect, useState } from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import './PipelineConfigScreen.scss';
 import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
 import { Pipeline, StepBlueprint, StepValues } from '../../types';
@@ -7,10 +7,11 @@ import OperationBox from '../../components/OperationBox/OperationBox';
 import TextFieldPicker from '../../components/ValuePickers/TextFieldPicker';
 import OperationConfigPanel from '../../components/OperationConfigPanel/OperationConfigPanel';
 import { FaSave, FaArrowLeft, FaPlay } from 'react-icons/fa';
+import {useBlueprintContext} from "../../utils/BlueprintContext";
+import {listToMap} from "../../utils/functional";
 
 interface PipelineConfigScreenProps {
   initialPipe: Pipeline | null;
-  blueprintMap: { [key: string]: StepBlueprint };
   onSavePipeline: (updatedPipeline: Pipeline) => void;
   onPrevious: () => void;
   onNext: () => void;
@@ -18,7 +19,6 @@ interface PipelineConfigScreenProps {
 
 const PipelineConfigScreen: React.FC<PipelineConfigScreenProps> = ({
   initialPipe,
-  blueprintMap,
   onSavePipeline,
   onPrevious,
   onNext,
@@ -36,6 +36,9 @@ const PipelineConfigScreen: React.FC<PipelineConfigScreenProps> = ({
     setPipelineDescription(pipeline?.description ?? 'No description');
     setSteps(pipeline?.steps ?? []);
   }, [pipeline]);
+
+  const {blueprints, _setBp} = useBlueprintContext()
+  const blueprintMap = listToMap(blueprints, (bp: StepBlueprint) => bp.id)
 
   const onDragStart = () => setIsDragging(true);
 

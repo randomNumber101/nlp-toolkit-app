@@ -10,10 +10,12 @@ import InputScreen from './InputScreen/InputScreen';
 import RunScreen from './RunScreen/RunScreen';
 import StepperHeader from '../components/StepperHeader/StepperHeader';
 import LoadingAnimation from "../components/LoadingScreen/Loading";
-import { invokeEvent, listPipelines, loadStepBlueprint, savePipeline } from "../utils/pipelineApi";
+import {invokeEvent, listPipelines, listStepBlueprints, loadStepBlueprint, savePipeline} from "../utils/pipelineApi";
 import { Pipeline, StepBlueprint } from '../types';
 import { InputHandle } from './InputScreen/InputScreen';
 import { useBackendEvent } from "../utils/useBackendEvents";
+import {BlueprintContext, BlueprintProvider} from "../utils/BlueprintContext";
+import {PipelineContext} from "../utils/PipelineContext";
 
 type Screen =
   | 'loading'
@@ -36,66 +38,51 @@ function App() {
   const [inputHandle, setInput] = useState<InputHandle | null>(null);
 
   const [pipelines, setPipelines] = useState<Pipeline[]>([]);
-  const [blueprintMap, setBlueprintMap] = useState<{ [key: string]: StepBlueprint }>({});
+  const [blueprints, setBlueprints] = useState<StepBlueprint[]>([])
 
-  useBackendEvent("test", (event) => {
-    console.log(event);
-  });
-
-  useEffect(() => {
-    invokeEvent("test", {
-      status: "succeeded",
-      data: { number: 420 },
-    }).then(() => console.log("Sent event."));
-  }, []);
-
-  async function loadBlueprints(pipeline: Pipeline) {
-    const _current_screen = currentScreen;
-    setCurrentScreen('loading');
-    if (pipeline != null) {
-      console.log("Loading blueprints..")
-      // Only update blueprint map if selectedPipeline is not null
-      const loadedBlueprints = await Promise.all(pipeline.steps.map(s => loadStepBlueprint(s.stepId)));
-      const bpMap = {} as { [key: string]: StepBlueprint };
-      loadedBlueprints.forEach(bp => {
-        bpMap[bp.id] = bp;
-      });
-      setBlueprintMap(bpMap);
-    } else {
-      console.error("Blueprint Map is null as pipeline is: ", pipeline)
-      setBlueprintMap({});
-    }
-    setCurrentScreen(_current_screen);
+  function getBlueprintMap() {
+    const bpMap = {} as { [key: string]: StepBlueprint };
+    blueprints.forEach(bp => {
+      bpMap[bp.id] = bp;
+    });
+    return bpMap
   }
 
-  async function loadPipelines() {
+
+  async function loadConfigurations() {
     const _current_screen = currentScreen;
-    setCurrentScreen('loading');
+
+    // Only set the loading screen if configuration is needed
+    if (_current_screen !== "input")
+      setCurrentScreen('loading');
+
+    // Load pipelines
     const pipelines = await listPipelines();
     setPipelines(pipelines);
+
+    // Load Operation Blueprints
+    const loadedBlueprints = await listStepBlueprints()
+    setBlueprints(loadedBlueprints)
+
     setCurrentScreen(_current_screen);
   }
 
   useEffect(() => {
     if (currentScreen === 'loading') {
       // Initial load
-      goToInputScreen();
+      loadConfigurations().then(() => goToInputScreen())
     }
   }, []);
 
   const goToLandingPage = () => {
-    loadPipelines().then(() => {
-      setCurrentScreen('landing');
-      setCurrentStep(1);
-    });
+    setCurrentScreen('landing');
+    setCurrentStep(1);
   };
 
   const goToConfigScreen = (pipeline: Pipeline) => {
     setSelectedPipeline(pipeline);
-    loadBlueprints(pipeline).then(() => {
-      setCurrentScreen('pipelineConfig');
-      setCurrentStep(2);
-    });
+    setCurrentScreen('pipelineConfig');
+    setCurrentStep(2);
   };
 
   const goToInputScreen = () => {
@@ -105,10 +92,8 @@ function App() {
 
   const goToResultsScreen = (pipeline: Pipeline) => {
     setSelectedPipeline(pipeline);
-    loadBlueprints(pipeline).then(() => {
-      setCurrentScreen('results');
-      setCurrentStep(3);
-    });
+    setCurrentScreen('results');
+    setCurrentStep(3);
   };
 
   const onSavePipeline = (pipeline: Pipeline) => {
@@ -165,7 +150,6 @@ function App() {
       case 'landing':
         return (
           <LandingPage
-            pipelines={pipelines}
             onAddPipeline={() => setCurrentScreen('pipelineConfig')}
             onSelectPipeline={goToConfigScreen}
             onRunPipeline={goToResultsScreen}
@@ -175,7 +159,6 @@ function App() {
         return (
           <PipelineConfigScreen
             initialPipe={selectedPipeline}
-            blueprintMap={blueprintMap}
             onPrevious={goToLandingPage}
             onNext={() => {
               if (selectedPipeline) {
@@ -191,7 +174,6 @@ function App() {
             <RunScreen
               pipeline={selectedPipeline}
               inputHandle={inputHandle}
-              blueprints={blueprintMap}
             />
           );
         } else {
@@ -205,9 +187,13 @@ function App() {
   return (
     <div className="app-container">
       <StepperHeader steps={steps} currentStep={currentStep} onStepClick={handleStepClick} />
-      <div className="app-content">
-        {renderScreen()}
-      </div>
+      <PipelineContext.Provider value={{pipelines, setPipelines}}>
+        <BlueprintContext.Provider value={{blueprints, setBlueprints}}>
+          <div className="app-content">
+            {renderScreen()}
+          </div>
+        </BlueprintContext.Provider>
+      </PipelineContext.Provider>
     </div>
   );
 }

@@ -1,6 +1,8 @@
 {
   "id": "SentimentAnalysis",
   "name": "Sentiment Analysis",
+  "description": "Predicts text sentiments (positive/negative) and outputs prediction certainty.",
+  "tags": ["batch processing", "advanced"],
   "parameters": {
     "input column": {
       "type": "string",

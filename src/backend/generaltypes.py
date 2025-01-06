@@ -257,12 +257,14 @@ class StepValues:
 
 
 class StepBlueprint:
-    def __init__(self, stepId, name, operation: type[StepOperation], description, inOutDef: InputOutputDefinition):
+    def __init__(self, stepId, name, operation: type[StepOperation], description, inOutDef: InputOutputDefinition,
+                 tags: List[str] = None):
         self.stepId = stepId
         self.name = name
         self.operation = operation
         self.description = description
         self.inOutDef = inOutDef
+        self.tags = tags if tags else []
 
     def run(self, configValues: StepValues, payload: Payload, notifier: FrontendNotifier):
         config = Config(self.inOutDef.inputs_static)
@@ -285,10 +287,11 @@ class StepBlueprint:
 
 
 class Pipeline:
-    def __init__(self, id, name, description="", steps: List[StepValues] = None):
+    def __init__(self, id, name, description="", steps: List[StepValues] = None, tags: List[str] = None):
         self.id = id
         self.name = name
         self.description = description
         if steps is None:
             steps = []
         self.steps = steps
+        self.tags = tags

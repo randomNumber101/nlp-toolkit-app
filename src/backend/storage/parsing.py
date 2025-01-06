@@ -184,6 +184,7 @@ class StepBlueprintParser:
         step_id = get(stepObject, "id")
         name = get(stepObject, "name")
         description = getOptional(stepObject, "description", "")
+        tags = getOptional(stepObject, "tags", [])
 
         # Parse parameters, inputs, and outputs
         parameter_definitions = getOptional(stepObject, "parameters", {})
@@ -200,7 +201,7 @@ class StepBlueprintParser:
 
         # Instantiate the StepBlueprint
         operation = self.operationMapper.getOperation(step_id)
-        step_blueprint = StepBlueprint(step_id, name, operation, description, inOutDef=in_out_def)
+        step_blueprint = StepBlueprint(step_id, name, operation, description, inOutDef=in_out_def, tags=tags)
 
         return step_blueprint
 
@@ -228,8 +229,10 @@ class PipelineParser:
             step = StepValues(uniqueId, step_id, values)
             steps.append(step)
 
+        tags = json_data.get("tags", [])
+
         # Create and return Pipeline instance
-        return Pipeline(id=pipeline_id, name=name, description=description, steps=steps)
+        return Pipeline(id=pipeline_id, name=name, description=description, steps=steps, tags=tags)
 
     @staticmethod
     def to_json(pipeline: Pipeline) -> Dict[str, Any]:
@@ -247,6 +250,7 @@ class PipelineParser:
                     "values": step.values
                 }
                 for step in pipeline.steps
-            ]
+            ],
+            "tags": pipeline.tags
         }
         return pipeline_dict

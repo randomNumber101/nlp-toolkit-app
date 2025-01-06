@@ -1,18 +1,70 @@
-/* src/components/LandingPage/LandingPage.scss */
+// src/components/LandingPage/LandingPage.scss
 
 .landing-page {
   padding: 20px;
   text-align: center;
-  background-color: #f0f2f5; /* Same as the run screen background */
+  background-color: #f0f2f5;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
 
   h1 {
-    margin-bottom: 40px;
-    color: #000; /* Black text */
+    margin-bottom: 20px;
+    color: #000;
   }
+
+  /* Tag Filter Panel Styling */
+  .tag-filter-panel {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 30px;
+  }
+
+  .tag-box {
+    padding: 6px 12px;
+    background-color: #e0e0e0;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    user-select: none;
+    font-size: 0.9em;
+    color: #555;
+
+    &:hover {
+      background-color: #d5d5d5;
+    }
+
+    &.selected {
+      background-color: #52c41a;
+      color: #fff;
+    }
+
+
+    &.operations-tag {
+
+      color: #4682b4;
+      outline: 2px solid #4682b4;
+
+      &.selected {
+        background-color: #4682b4;
+        color: #fff;
+      }
+    }
+
+    &.pipelines-tag {
+      outline: 2px solid #52c41a;
+      color: #52c41a;
+
+      &.selected {
+        background-color: #52c41a;
+        color: #fff;
+      }
+    }
+  }
+
 
   .pipeline-list {
     display: flex;
@@ -23,116 +75,177 @@
     max-width: 1200px;
   }
 
-  .pipeline-card {
+  .pipeline-card,
+  .operation-card {
     position: relative;
-    background-color: #e0e0e0; /* Grayish background */
-    border: 2px solid transparent;
     border-radius: 10px;
     width: 300px;
     height: 200px;
-    box-sizing: border-box;
-    color: #000; /* Black text color */
+    background-color: #e7e7e7;
+    border: 2px solid transparent;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center; /* Center content vertically */
-    cursor: pointer;
+    justify-content: flex-start; /* Start from top */
+    cursor: default; /* Non-clickable */
     overflow: hidden;
-    transition: background-color 0.3s ease, border-color 0.3s ease, border-width 0.3s ease, box-shadow 0.3s ease;
-
-    .configure-button {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background: none;
-      border: none;
-      color: #555; /* Grayish black */
-      font-size: 1.5em;
-      cursor: pointer;
-      display: none; /* Hidden by default */
-      z-index: 2;
-
-      &:hover {
-        color: #000; /* Darker on hover */
-      }
-    }
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
 
     .card-content {
+      padding: 20px;
       text-align: center;
+      z-index: 1;
+      transition: transform 0.3s ease;
 
-      h3 {
+      .pipeline-title {
         margin: 0;
         font-size: 1.8em;
-        color: #000; /* Black title text */
-        line-height: 1.2; /* Adjust line height to prevent overlapping */
-        transition: margin 0.3s ease;
-      }
-    }
-
-    .description {
-      opacity: 0;
-      max-height: 0;
-      overflow: hidden;
-      transition: opacity 0.3s ease, max-height 0.3s ease;
-      text-align: center;
-
-      p {
-        margin: 0;
-        color: #555; /* Grayish black */
-      }
-    }
-
-    &:hover {
-      background-color: #f0fff0; /* Greenish white */
-      border-color: #52c41a; /* Greenish border */
-      border-width: 4px; /* Increase border width on hover */
-      box-shadow: 0 0 10px rgba(82, 196, 26, 0.6);
-      animation: pulsate 1.5s infinite;
-
-      .configure-button {
-        display: block; /* Show gear icon on hover */
+        color: #000;
+        transition: transform 0.3s ease;
       }
 
       .description {
-        opacity: 1;
-        max-height: 100px; /* Reveal description */
-      }
-
-      .card-content h3 {
-        margin-bottom: 10px; /* Move title up */
+        margin-top: 10px;
+        color: #555;
+        font-size: 1em;
+        transition: opacity 0.3s ease;
       }
     }
-  }
 
-  @keyframes pulsate {
-    0% {
-      box-shadow: 0 0 10px rgba(82, 196, 26, 0.6);
+    .card-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 40%; /* Cover lower 60% of the card */
+      background-color: rgba(240, 255, 240, 0.95); /* Light overlay */
+      display: flex;
+      flex-direction: row; /* Row layout */
+      align-items: center;
+      justify-content: center;
+      transform: translateY(100%); /* Hidden below the card */
+      transition: transform 0.5s ease, background-color 0.3s ease;
+      pointer-events: none; /* Prevent interactions when hidden */
+      z-index: 2; /* Ensure it's above other elements */
     }
-    50% {
-      box-shadow: 0 0 20px rgba(82, 196, 26, 0.8);
-    }
-    100% {
-      box-shadow: 0 0 10px rgba(82, 196, 26, 0.6);
-    }
-  }
 
-  .add-pipeline-button {
-    margin-top: 40px;
-    background: none;
-    border: none;
-    color: #000; /* Black color */
-    font-size: 3em;
-    cursor: pointer;
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    line-height: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    .overlay-button {
+      background-color: #a9a9a9; /* Gray when not hovered */
+      border: none;
+      color: #fff;
+      padding: 15px 0;
+      height: 100%;
+      width: 50%; /* Each button takes up 50% of the card's width */
+      font-size: 1.2em;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.3s ease;
+      pointer-events: auto; /* Enable interactions when visible */
+
+      svg {
+        pointer-events: none; /* Prevent icon from capturing pointer events */
+      }
+    }
+
+    .play-button {
+      background-color: #a9a9a9; /* Gray when not hovered */
+      border-top-left-radius: 50px;
+
+      &:hover {
+        background-color: #52c41a; /* Green on hover */
+      }
+    }
+
+    .config-button {
+      background-color: #a9a9a9; /* Gray when not hovered */
+      border-top-right-radius: 50px;
+
+      &:hover {
+        background-color: #1e90ff; /* Blue on hover */
+      }
+    }
 
     &:hover {
-      color: #52c41a; /* Greenish on hover */
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+      background-color: #f0fff0;
+
+      .card-content {
+        .pipeline-title {
+          transform: translateY(-10px); /* Move title to top */
+        }
+
+        .description {
+          opacity: 0; /* Hide description on hover */
+        }
+      }
+
+      .card-overlay {
+        transform: translateY(0); /* Slide in the overlay */
+        pointer-events: auto; /* Enable interactions */
+      }
+    }
+
+    /* Specific styles for operation-card */
+  }
+
+  .pipeline-card {
+    &:hover {
+      .card-content {
+        .pipeline-title {
+          color: #52c41a; /* Green title on hover */
+        }
+      }
     }
   }
+
+  .operation-card {
+    background-color: #d3e5ff;
+
+    &:hover {
+      background-color: #cce7ff;
+      border-color: #4682b4;
+
+      .card-content {
+        .pipeline-title {
+          color: #4682b4; /* Green title on hover */
+        }
+      }
+    }
+
+    .card-overlay {
+      background-color: rgba(204, 231, 255, 0.95); /* Light blue overlay */
+    }
+
+    .overlay-button {
+      background-color: #a9a9a9; /* Gray when not hovered */
+
+      &:hover.play-button {
+        background-color: #52c41a; /* Green on hover */
+      }
+
+      &:hover.config-button {
+        background-color: #1e90ff; /* Blue on hover */
+      }
+    }
+  }
+
+    /* Add Pipeline Button Styling */
+    .add-pipeline-button {
+      margin-top: 40px;
+      background: none;
+      border: 2px solid #52c41a;
+      color: #52c41a;
+      font-size: 2.5em;
+      cursor: pointer;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.3s ease, color 0.3s ease;
+
+      &:hover {
+        background-color: #52c41a;
+        color: #fff;
+      }
+    }
 }
