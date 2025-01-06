@@ -6,3 +6,6 @@ pandas~=2.2.3
 scikit-learn~=1.6.0
 spacy~=3.8.2
 transformers~=4.47.0
+numpy~=2.0.2
+torch~=2.5.1
+bertopic~=0.16.4

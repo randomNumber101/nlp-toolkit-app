@@ -11,11 +11,13 @@ from backend.transferObjects.visualization import HTMLViz
 
 class SentimentAnalysisOperation(ParallelizableTextOperation):
 
-    def initialize(self, config: Config):
-        super().initialize(config)
+    def initialize(self, config: Config, notifier: FrontendNotifier):
+        super().initialize(config, notifier)
         self.do_sentiment = config["sentiment analysis"]["activate"]
         self.text_sample_size = 35
         self.language = config["sentiment analysis"]["language"]
+
+        notifier.log("Initializing Sentiment Analysis Operation for language " + self.language)
         if self.do_sentiment:
             if self.language == "en":
                 self.sentiment_pipeline = pipeline("sentiment-analysis",

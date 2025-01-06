@@ -99,7 +99,7 @@ class RunApi:
             runner = PipelineRunner(self._eventApi, self._runStorageApi)
             runner.start(blueprints, pipeline, run_id, input_data)
 
-        runThread = threading.Thread(target=runStep, name=f"StepRunner for {run_id}", daemon=False)
+        runThread = threading.Thread(target=runStep, name=f"StepRunner for {run_id}", daemon=True)
         runThread.start()
 
         return run_id

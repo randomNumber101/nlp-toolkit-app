@@ -68,6 +68,11 @@
           },
           "description": "Ignore terms with document frequency lower than this, measured in the number of documents."
         }
+      },
+      "Use verbose progress reporting" : {
+        "type": "bool",
+        "default": false,
+        "description": "If checked, the progress of the topic modeling process will be reported in the console. Care! his will have severe impact on performance as embeddings will be calculated manually."
       }
     }
   },

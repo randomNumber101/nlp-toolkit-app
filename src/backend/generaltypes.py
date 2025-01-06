@@ -147,11 +147,11 @@ class FrontendNotifier(ABC):
 
 
 class StepOperation(ABC):
-    def __init__(self, config: Config):
-        self.initialize(config)
+    def __init__(self, config: Config, frontendNotifier: FrontendNotifier = None):
+        self.initialize(config, frontendNotifier)
 
     @abstractmethod
-    def initialize(self, config: Config):
+    def initialize(self, config: Config, frontendNotifier: FrontendNotifier):
         pass
 
     @abstractmethod
@@ -191,7 +191,7 @@ class CellNotifierWrapper(FrontendNotifier):
 
 class ParallelizableTextOperation(StepOperation, ABC):
 
-    def __init__(self, config: Config):
+    def __init__(self, config: Config, notifier: FrontendNotifier):
         self.config = config
         self.input_column = self.config.get("input column", "text")
         if isinstance(self.input_column, list):
@@ -203,7 +203,7 @@ class ParallelizableTextOperation(StepOperation, ABC):
             self.output_column = self.input_column  # Overwrite
         elif self.output_column is None:
             self.output_column = self.input_column  # Default to overwrite if not specified
-        super(ParallelizableTextOperation, self).__init__(config)
+        super(ParallelizableTextOperation, self).__init__(config, notifier)
 
     @abstractmethod
     def single_cell_operation(self, notifier: FrontendNotifier, payload: Payload, text: str) -> str:
@@ -277,7 +277,11 @@ class StepBlueprint:
             return StepState.FAILED
 
         # Create the actual operation instance
-        operation_obj = self.operation(config)
+        try:
+            operation_obj = self.operation(config, notifier)
+        except Exception as e:
+            notifier.log(f"Error while creating operation instance: {e}", LogLevels.ERROR)
+            return StepState.FAILED
 
         # Restrict the payload to only own the values that are relevant for this operation:
         partial_payload = payload.partialView(self.inOutDef.inputs_dynamic)

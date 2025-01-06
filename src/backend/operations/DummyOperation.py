@@ -38,10 +38,8 @@ dummy_html_visualization = """
 
 class DummyOperation(StepOperation):
 
-    def initialize(self, config: Config):
-        print("Loading config for DummyStep...")
-        print(config)
-        print(config["LLM config"])
+    def initialize(self, config: Config, frontendNotifier: FrontendNotifier):
+        frontendNotifier.log("Dummy Operation initialized!")
         time.sleep(0.1)
 
     def run(self, payload: Payload, notifier: FrontendNotifier) -> StepState:

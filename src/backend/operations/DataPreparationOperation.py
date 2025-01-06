@@ -8,13 +8,15 @@ from backend.transferObjects.visualization import HTMLViz
 
 class DataPreparationOperation(ParallelizableTextOperation):
 
-    def initialize(self, config: Config):
-        super().initialize(config)
+    def initialize(self, config: Config, notifier: FrontendNotifier):
+        super().initialize(config, notifier)
         self.nlp = spacy.load(self.config["remove stopwords"]["language"])
         self.do_stopwords = config["remove stopwords"]["activate"]
         self.do_lowercase = config["lowercase"]
         self.do_no_ascii = config["remove non-ascii"]
         self.stopword_counter = Counter()
+        notifier.log("Data Preparation Operation initialized!")
+
 
 
     def single_cell_operation(self, notifier: FrontendNotifier, payload: Payload, text: str) -> str:
