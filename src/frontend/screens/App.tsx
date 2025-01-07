@@ -166,6 +166,8 @@ function App() {
               }
             }}
             onSavePipeline={onSavePipeline}
+            inputFileName={inputHandle?.name ?? "input"}
+            outputFileName={"output"}
           />
         );
       case 'results':

@@ -8,7 +8,7 @@ import { Pipeline, StepBlueprint, StepValues } from '../../types';
 import OperationBox from '../../components/OperationBox/OperationBox';
 import TextFieldPicker from '../../components/ValuePickers/TextFieldPicker';
 import OperationConfigPanel from '../../components/OperationConfigPanel/OperationConfigPanel';
-import { FaSave, FaArrowLeft, FaPlay } from 'react-icons/fa';
+import { FaSave, FaArrowLeft, FaPlay, FaFileAlt } from 'react-icons/fa';
 import { useBlueprintContext } from "../../utils/BlueprintContext";
 import { listToMap } from "../../utils/functional";
 
@@ -17,6 +17,8 @@ interface PipelineConfigScreenProps {
   onSavePipeline: (updatedPipeline: Pipeline) => void;
   onPrevious: () => void;
   onNext: () => void;
+  inputFileName: string;    // New Prop
+  outputFileName: string;   // New Prop
 }
 
 const PipelineConfigScreen: React.FC<PipelineConfigScreenProps> = ({
@@ -24,6 +26,8 @@ const PipelineConfigScreen: React.FC<PipelineConfigScreenProps> = ({
   onSavePipeline,
   onPrevious,
   onNext,
+  inputFileName,
+  outputFileName,
 }) => {
   const [pipeline, setPipeline] = useState<Pipeline>(initialPipe);
   const [pipelineName, setPipelineName] = useState(pipeline?.name ?? '');
@@ -125,6 +129,16 @@ const PipelineConfigScreen: React.FC<PipelineConfigScreenProps> = ({
           <Droppable droppableId="operations" direction="horizontal">
             {(provided) => (
               <div className="box-list" ref={provided.innerRef} {...provided.droppableProps}>
+                {/* Input Box */}
+                <div className="file-box input-box">
+                  <FaFileAlt className="file-icon" />
+                  <span className="file-name">{inputFileName}</span>
+                </div>
+
+                {/* Arrow after Input Box */}
+                <div className="arrow show">→</div>
+
+                {/* Draggable Operations */}
                 {steps.map((step, index) => {
                   const blueprint = blueprintMap[step.stepId];
                   const operationName = blueprint?.name ?? `Operation #${index + 1}`;
@@ -133,6 +147,7 @@ const PipelineConfigScreen: React.FC<PipelineConfigScreenProps> = ({
                       <Draggable draggableId={step.uniqueId} index={index}>
                         {(provided) => (
                           <div
+                            className="draggable-operation"
                             ref={provided.innerRef}
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
@@ -147,18 +162,21 @@ const PipelineConfigScreen: React.FC<PipelineConfigScreenProps> = ({
                         )}
                       </Draggable>
 
-                      {index < steps.length - 1 && !isDragging && <div className="arrow show">→</div>}
+                      {/* Arrow between operations */}
+                      {!isDragging && (<div className="arrow show">→</div>)}
                     </React.Fragment>
                   );
                 })}
-                {provided.placeholder}
+
+                {/* Add Operation Card */}
+
                 {!isDragging && (
                   <div
                     className="add-operation-card"
                     onClick={handleAddOperationClick}
                     ref={addOperationRef}
                   >
-                    + Add Operation
+                    +
                     {showOperationToolbox && (
                       <div className="operation-toolbox" ref={toolboxRef}>
                         {blueprints.map((blueprint) => (
@@ -175,6 +193,16 @@ const PipelineConfigScreen: React.FC<PipelineConfigScreenProps> = ({
                     )}
                   </div>
                 )}
+                {/* Arrow before Output Box */}
+                <div className="arrdow show">→</div>
+
+                {/* Output Box */}
+                <div className="file-box output-box">
+                  <FaFileAlt className="file-icon" />
+                  <span className="file-name">{outputFileName}</span>
+                </div>
+
+                {provided.placeholder}
               </div>
             )}
           </Droppable>
