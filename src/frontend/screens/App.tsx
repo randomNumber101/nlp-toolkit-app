@@ -109,6 +109,20 @@ function App() {
     setPipelines(newPipelines);
   };
 
+  const onAddPipeline = () => {
+    const newPipeline = {
+      id: `pipeline-${Date.now()}`,
+      name: 'New Pipeline',
+      description: 'No description',
+      steps: [],
+      tags: [],
+    } as Pipeline;
+
+    setPipelines([...pipelines, newPipeline]);
+    setSelectedPipeline(newPipeline);
+    setCurrentScreen('pipelineConfig')
+  }
+
   const handleInput = (input: InputHandle) => {
     setInput(input);
     goToLandingPage();
@@ -150,7 +164,7 @@ function App() {
       case 'landing':
         return (
           <LandingPage
-            onAddPipeline={() => setCurrentScreen('pipelineConfig')}
+            onAddPipeline={onAddPipeline}
             onSelectPipeline={goToConfigScreen}
             onRunPipeline={goToResultsScreen}
           />

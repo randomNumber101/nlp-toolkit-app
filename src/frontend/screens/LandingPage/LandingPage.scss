@@ -44,7 +44,6 @@
 
 
     &.operations-tag {
-
       color: #4682b4;
       outline: 2px solid #4682b4;
 
@@ -117,7 +116,6 @@
       left: 0;
       width: 100%;
       height: 40%; /* Cover lower 60% of the card */
-      background-color: rgba(240, 255, 240, 0.95); /* Light overlay */
       display: flex;
       flex-direction: row; /* Row layout */
       align-items: center;
@@ -129,7 +127,7 @@
     }
 
     .overlay-button {
-      background-color: #a9a9a9; /* Gray when not hovered */
+      background-color: rgba(169, 169, 169, 0.7); /* Gray when not hovered */
       border: none;
       color: #fff;
       padding: 15px 0;
@@ -146,7 +144,6 @@
     }
 
     .play-button {
-      background-color: #a9a9a9; /* Gray when not hovered */
       border-top-left-radius: 50px;
 
       &:hover {
@@ -155,7 +152,6 @@
     }
 
     .config-button {
-      background-color: #a9a9a9; /* Gray when not hovered */
       border-top-right-radius: 50px;
 
       &:hover {
@@ -165,7 +161,6 @@
 
     &:hover {
       box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
-      background-color: #f0fff0;
 
       .card-content {
         .pipeline-title {
@@ -187,7 +182,16 @@
   }
 
   .pipeline-card {
+    outline: 2px solid #52c41a;
+    .card-content {
+      .pipeline-title {
+        color: #52c41a; /* Blue title */
+      }
+    }
+
     &:hover {
+
+      background-color: #d0ffd0;
       .card-content {
         .pipeline-title {
           color: #52c41a; /* Green title on hover */
@@ -197,7 +201,12 @@
   }
 
   .operation-card {
-    background-color: #d3e5ff;
+    outline: 2px solid #4682b4;
+    .card-content {
+      .pipeline-title {
+        color: #4682b4; /* Blue title */
+      }
+    }
 
     &:hover {
       background-color: #cce7ff;
@@ -212,18 +221,6 @@
 
     .card-overlay {
       background-color: rgba(204, 231, 255, 0.95); /* Light blue overlay */
-    }
-
-    .overlay-button {
-      background-color: #a9a9a9; /* Gray when not hovered */
-
-      &:hover.play-button {
-        background-color: #52c41a; /* Green on hover */
-      }
-
-      &:hover.config-button {
-        background-color: #1e90ff; /* Blue on hover */
-      }
     }
   }
 

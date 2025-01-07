@@ -11,6 +11,7 @@ import OperationConfigPanel from '../../components/OperationConfigPanel/Operatio
 import { FaSave, FaArrowLeft, FaPlay, FaFileAlt } from 'react-icons/fa';
 import { useBlueprintContext } from "../../utils/BlueprintContext";
 import { listToMap } from "../../utils/functional";
+import StepConfig from "../../components/StepConfig/StepConfig";
 
 interface PipelineConfigScreenProps {
   initialPipe: Pipeline | null;
@@ -73,6 +74,13 @@ const PipelineConfigScreen: React.FC<PipelineConfigScreenProps> = ({
     setShowSaved(true);
     setTimeout(() => setShowSaved(false), 2000);
   };
+
+  const handleDeleteStep = (index: number) => () => {
+    const updatedSteps = [...steps];
+    updatedSteps.splice(index, 1);
+    setSteps(updatedSteps);
+    setSelectedStepIndex(null);
+  }
 
   const handleAddOperationClick = () => {
     setShowOperationToolbox((prev) => !prev);
@@ -217,16 +225,18 @@ const PipelineConfigScreen: React.FC<PipelineConfigScreenProps> = ({
       {/* Config Panel */}
       {selectedStepIndex !== null && (
         <div className="config-panel">
-          <OperationConfigPanel
-            operationName={blueprintMap[steps[selectedStepIndex].stepId]?.name ?? `Operation #${selectedStepIndex + 1}`}
-            blueprint={blueprintMap[steps[selectedStepIndex].stepId]}
-            values={steps[selectedStepIndex]}
-            onUpdate={(updatedValues) => {
-              const updatedSteps = [...steps];
-              updatedSteps[selectedStepIndex] = { ...updatedSteps[selectedStepIndex], ...updatedValues };
-              setSteps(updatedSteps);
-            }}
-          />
+          <div className="operation-config-panel">
+            <StepConfig
+              blueprint={blueprintMap[steps[selectedStepIndex].stepId]}
+              values={steps[selectedStepIndex]}
+              onUpdate={(updatedValues) => {
+                const updatedSteps = [...steps];
+                updatedSteps[selectedStepIndex] = { ...updatedSteps[selectedStepIndex], ...updatedValues };
+                setSteps(updatedSteps);
+              }}
+              onDeleteStep={handleDeleteStep(selectedStepIndex)}
+            />
+          </div>
         </div>
       )}
 
