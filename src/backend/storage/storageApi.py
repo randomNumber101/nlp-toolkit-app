@@ -29,6 +29,14 @@ class PipelineApi:
         self.PATHS = paths
         self.PIPELINES = paths.pipelines
 
+
+    def delete_pipeline(self, pipeline_id):
+        file_path = os.path.join(self.PIPELINES, f"{pipeline_id}.json")
+        if not os.path.exists(file_path):
+            return False
+        os.remove(file_path)
+        return True
+
     def save_pipeline(self, pipeline):
         jsonObj = PipelineParser.to_json(pipeline)
         file_path = os.path.join(self.PIPELINES, f"{pipeline.id}.json")
@@ -108,6 +116,9 @@ class StorageApi:
         pipeline = PipelineParser.from_json(pipelineObj)
         self.PIPELINES.save_pipeline(pipeline)
         return True
+
+    def delete_pipeline(self, pipeline_id):
+        return self.PIPELINES.delete_pipeline(pipeline_id)
 
     def load_step(self, step_id):
         stepBP = self.STEPS.load_step(step_id)

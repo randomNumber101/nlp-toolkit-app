@@ -9,7 +9,7 @@ import { faCog, faPlay } from '@fortawesome/free-solid-svg-icons';
 import { usePipelineContext } from '../../utils/PipelineContext';
 import { useBlueprintContext } from '../../utils/BlueprintContext';
 import { listToMap } from "../../utils/functional";
-import {savePipeline} from "../../utils/pipelineApi";
+import {deletePipeline, savePipeline} from "../../utils/pipelineApi";
 
 interface LandingPageProps {
   onAddPipeline: () => void;
@@ -72,6 +72,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
       return null;
     }).filter((pipeline) => pipeline !== null) as Pipeline[];
 
+    let shouldUpdate = false
     // 2. Add "pipelines" Tag to Non-Operation Pipelines
     const updatedPipelines = pipelines.map((pipeline) => {
       // Check if the pipeline is NOT a single operation pipeline
@@ -79,17 +80,19 @@ const LandingPage: React.FC<LandingPageProps> = ({
 
       // If it's not an operation pipeline and doesn't already have the "pipelines" tag, add it
       if (!isOperationPipeline && (!pipeline.tags || pipeline.tags.indexOf('pipelines') == -1)) {
+        shouldUpdate = true
         return {
           ...pipeline,
           tags: pipeline.tags ? [...pipeline.tags, 'pipelines'] : ['pipelines']
         };
       }
-
       return pipeline;
-    });
+    })
 
     // 3. Update Pipelines State
-    setPipelines(updatedPipelines);
+    if (shouldUpdate) {
+      setPipelines(updatedPipelines);
+    }
 
     // 4. Add Operation Pipelines to State if Any
     if (operationPipelines.length > 0) {
@@ -102,6 +105,25 @@ const LandingPage: React.FC<LandingPageProps> = ({
   const handleAddPipeline = () => {
     onAddPipeline();
   };
+
+  // Add this inside the LandingPage component, before the return statement
+
+  const handleDeletePipeline = (pipelineId: string) => {
+    // Confirm deletion (optional)
+
+    deletePipeline(pipelineId).then((didDelete) => {
+      if (!didDelete) {
+        alert('Failed to delete pipeline');
+        // Revert changes
+        setPipelines([...pipelines]);
+      }
+      else {
+        setPipelines(pipelines.filter(pipeline => pipeline.id !== pipelineId));
+      }
+    });
+
+  };
+
 
   // Handler for selecting a pipeline for configuration
   const handleSelectPipeline = (pipeline: Pipeline) => {
@@ -132,41 +154,62 @@ const LandingPage: React.FC<LandingPageProps> = ({
   }, [pipelines, selectedTags, blueprintMap]);
 
   // Render a single pipeline card
-  const pipelineCard = (pipeline: Pipeline) => (
-    <div
-      key={pipeline.id}
-      className={`pipeline-card ${typeof pipeline.id === 'string' && pipeline.id.endsWith('-single-operation') ? 'operation-card' : ''}`}
-    >
-      <div className="card-content">
-        <h3 className="pipeline-title">{pipeline.name}</h3>
-        <div className="description">
-          <p>{pipeline.description}</p>
+  // Modify the pipelineCard function inside LandingPage.tsx
+
+  const pipelineCard = (pipeline: Pipeline) => {
+    const isOperationPipeline = typeof pipeline.id === 'string' && pipeline.id.endsWith('-single-operation');
+
+    return (
+      <div
+        key={pipeline.id}
+        className={`pipeline-card ${isOperationPipeline ? 'operation-card' : ''}`}
+      >
+        {/* Delete Button (only for non-operation pipelines) */}
+        {!isOperationPipeline && (
+          <button
+            className="delete-button"
+            onClick={(e) => {
+              e.stopPropagation(); // Prevent triggering other click events
+              handleDeletePipeline(pipeline.id);
+            }}
+            aria-label="Delete Pipeline"
+          >
+            &times;
+          </button>
+        )}
+
+        <div className="card-content">
+          <h3 className="pipeline-title">{pipeline.name}</h3>
+          <div className="description">
+            <p>{pipeline.description}</p>
+          </div>
+        </div>
+        <div className="card-overlay">
+          <button
+            className="overlay-button play-button"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleRunPipeline(pipeline);
+            }}
+            aria-label="Run Pipeline"
+          >
+            <FontAwesomeIcon icon={faPlay} />
+          </button>
+          <button
+            className="overlay-button config-button"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleSelectPipeline(pipeline);
+            }}
+            aria-label="Configure Pipeline"
+          >
+            <FontAwesomeIcon icon={faCog} />
+          </button>
         </div>
       </div>
-      <div className="card-overlay">
-        <button
-          className="overlay-button play-button"
-          onClick={(e) => {
-            e.stopPropagation();
-            handleRunPipeline(pipeline);
-          }}
-          aria-label="Run Pipeline"
-        >
-          <FontAwesomeIcon icon={faPlay} />
-        </button>
-        <button
-          className="overlay-button config-button"
-          onClick={(e) => {
-            e.stopPropagation();
-            handleSelectPipeline(pipeline);
-          }}
-          aria-label="Configure Pipeline"
-        >
-          <FontAwesomeIcon icon={faCog} />
-        </button>
-      </div>
-    </div>
-  );
+    );
+  };
+
 
   return (
     <div className="landing-page">

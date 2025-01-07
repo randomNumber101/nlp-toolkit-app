@@ -61,6 +61,19 @@ export async function savePipeline(config: Pipeline): Promise<boolean> {
   }
 }
 
+export async function deletePipeline(pipelineId: string): Promise<boolean> {
+  await waitForPywebview();
+  try {
+    console.log("Deleting pipeline", pipelineId)
+    const response = await window.pywebview.api.STORAGE.delete_pipeline(pipelineId);
+    const result = unpackResponse(response);
+    return result as boolean; // Cast result to boolean
+  } catch (error) {
+    console.error("Failed to delete pipeline:", error);
+    return false;
+  }
+}
+
 // List all pipelines
 export async function listPipelines(): Promise<Pipeline[]> {
   await waitForPywebview();

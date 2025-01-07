@@ -118,6 +118,7 @@ function App() {
       tags: [],
     } as Pipeline;
 
+    savePipeline(newPipeline).catch(console.log);
     setPipelines([...pipelines, newPipeline]);
     setSelectedPipeline(newPipeline);
     setCurrentScreen('pipelineConfig')
