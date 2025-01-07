@@ -125,88 +125,96 @@ const PipelineConfigScreen: React.FC<PipelineConfigScreenProps> = ({
       {/* Operations */}
       <div className="operations-container">
         <h2>Operations</h2>
-        <DragDropContext onDragStart={onDragStart} onDragEnd={onDragEnd}>
-          <Droppable droppableId="operations" direction="horizontal">
-            {(provided) => (
-              <div className="box-list" ref={provided.innerRef} {...provided.droppableProps}>
-                {/* Input Box */}
-                <div className="file-box input-box">
-                  <FaFileAlt className="file-icon" />
-                  <span className="file-name">{inputFileName}</span>
+        <div className="pipeline-wrapper">
+          {/* Input Box */}
+          <div className="file-box input-box">
+            <FaFileAlt className="file-icon" />
+            <span className="file-name">{inputFileName}</span>
+          </div>
+
+          {/* Drag and Drop Context */}
+          <DragDropContext onDragStart={onDragStart} onDragEnd={onDragEnd}>
+            <Droppable droppableId="operations" direction="horizontal">
+              {(provided) => (
+                <div className="operations-section" ref={provided.innerRef} {...provided.droppableProps}>
+                  {/* Arrow after Input Box */}
+                  {!isDragging && (
+                      <div className="arrow show">→</div>
+                  )}
+
+                  {/* Draggable Operations */}
+                  {steps.map((step, index) => {
+                    const blueprint = blueprintMap[step.stepId];
+                    const operationName = blueprint?.name ?? `Operation #${index + 1}`;
+                    return (
+                      <React.Fragment key={step.uniqueId}>
+                        <Draggable draggableId={step.uniqueId} index={index}>
+                          {(provided) => (
+                            <div
+                              className="draggable-operation"
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
+                              onClick={() => setSelectedStepIndex(index === selectedStepIndex ? null : index)}
+                            >
+                              <OperationBox
+                                operationName={operationName}
+                                operationDescription={blueprint?.description ?? ''}
+                                selected={selectedStepIndex === index}
+                              />
+                            </div>
+                          )}
+                        </Draggable>
+
+                        {/* Arrow between operations */}
+                        {!isDragging && <div className="arrow show">→</div>}
+                      </React.Fragment>
+                    );
+                  })}
+
+                  {/* Add Operation Card */}
+                  {!isDragging && (
+                    <div
+                      className="add-operation-card"
+                      onClick={handleAddOperationClick}
+                      ref={addOperationRef}
+                    >
+                      +
+                      {showOperationToolbox && (
+                        <div className="operation-toolbox show" ref={toolboxRef}>
+                          {blueprints.map((blueprint) => (
+                            <div
+                              key={blueprint.id}
+                              className="toolbox-item"
+                              onClick={() => handleOperationSelect(blueprint)}
+                            >
+                              <span className="operation-name">{blueprint.name}</span>
+                              <span className="operation-description">{blueprint.description}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Arrow before Output Box */}
+                  {!isDragging && (
+                      <div className="arrow show">→</div>
+                  )}
+
+
+                  {provided.placeholder}
                 </div>
+              )}
+            </Droppable>
+          </DragDropContext>
 
-                {/* Arrow after Input Box */}
-                <div className="arrow show">→</div>
-
-                {/* Draggable Operations */}
-                {steps.map((step, index) => {
-                  const blueprint = blueprintMap[step.stepId];
-                  const operationName = blueprint?.name ?? `Operation #${index + 1}`;
-                  return (
-                    <React.Fragment key={step.uniqueId}>
-                      <Draggable draggableId={step.uniqueId} index={index}>
-                        {(provided) => (
-                          <div
-                            className="draggable-operation"
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            onClick={() => setSelectedStepIndex(index === selectedStepIndex ? null : index)}
-                          >
-                            <OperationBox
-                              operationName={operationName}
-                              operationDescription={blueprint?.description ?? ''}
-                              selected={selectedStepIndex === index}
-                            />
-                          </div>
-                        )}
-                      </Draggable>
-
-                      {/* Arrow between operations */}
-                      {!isDragging && (<div className="arrow show">→</div>)}
-                    </React.Fragment>
-                  );
-                })}
-
-                {/* Add Operation Card */}
-
-                {!isDragging && (
-                  <div
-                    className="add-operation-card"
-                    onClick={handleAddOperationClick}
-                    ref={addOperationRef}
-                  >
-                    +
-                    {showOperationToolbox && (
-                      <div className="operation-toolbox" ref={toolboxRef}>
-                        {blueprints.map((blueprint) => (
-                          <div
-                            key={blueprint.id}
-                            className="toolbox-item"
-                            onClick={() => handleOperationSelect(blueprint)}
-                          >
-                            <span className="operation-name">{blueprint.name}</span>
-                            <span className="operation-description">{blueprint.description}</span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )}
-                {/* Arrow before Output Box */}
-                <div className="arrdow show">→</div>
-
-                {/* Output Box */}
-                <div className="file-box output-box">
-                  <FaFileAlt className="file-icon" />
-                  <span className="file-name">{outputFileName}</span>
-                </div>
-
-                {provided.placeholder}
-              </div>
-            )}
-          </Droppable>
-        </DragDropContext>
+          {/* Output Box */}
+          <div className="file-box output-box">
+            <FaFileAlt className="file-icon" />
+            <span className="file-name">{outputFileName}</span>
+          </div>
+        </div>
       </div>
 
       {/* Config Panel */}
