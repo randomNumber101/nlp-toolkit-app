@@ -132,15 +132,13 @@ const PipelineConfigScreen: React.FC<PipelineConfigScreenProps> = ({
             <span className="file-name">{inputFileName}</span>
           </div>
 
+          <div className="arrow show">→</div>
+
           {/* Drag and Drop Context */}
           <DragDropContext onDragStart={onDragStart} onDragEnd={onDragEnd}>
             <Droppable droppableId="operations" direction="horizontal">
               {(provided) => (
                 <div className="operations-section" ref={provided.innerRef} {...provided.droppableProps}>
-                  {/* Arrow after Input Box */}
-                  {!isDragging && (
-                      <div className="arrow show">→</div>
-                  )}
 
                   {/* Draggable Operations */}
                   {steps.map((step, index) => {
@@ -198,9 +196,6 @@ const PipelineConfigScreen: React.FC<PipelineConfigScreenProps> = ({
                   )}
 
                   {/* Arrow before Output Box */}
-                  {!isDragging && (
-                      <div className="arrow show">→</div>
-                  )}
 
 
                   {provided.placeholder}
@@ -208,6 +203,8 @@ const PipelineConfigScreen: React.FC<PipelineConfigScreenProps> = ({
               )}
             </Droppable>
           </DragDropContext>
+
+          <div className="arrow show">→</div>
 
           {/* Output Box */}
           <div className="file-box output-box">
