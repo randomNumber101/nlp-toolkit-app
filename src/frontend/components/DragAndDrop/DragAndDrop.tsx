@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { useState, useRef, DragEvent } from 'react';
 import './DragAndDrop.scss';
-import { InputHandle } from '../InputScreen/InputScreen';
+import { InputHandle } from '../../screens/InputScreen/InputScreen';
 
 interface DragAndDropProps {
   onFileDataReceived: (inputHandle: InputHandle) => void;
@@ -37,7 +37,7 @@ const DragAndDrop: React.FC<DragAndDropProps> = ({ onFileDataReceived }) => {
   const handleFile = async (file: File) => {
     const validTypes = ['text/plain', 'text/csv'];
     const validExtensions = ['.txt', '.csv'];
-    const isValidType = validTypes.includes(file.type);
+    const isValidType = validTypes.indexOf(file.type) != -1;
     const isValidExtension = validExtensions.some(ext => file.name.toLowerCase().endsWith(ext));
 
     if (isValidType && isValidExtension) {

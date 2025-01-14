@@ -1,7 +1,7 @@
 {
     "id": "test_stopwords",
-    "name": "Data Preparation",
-    "description": "Apply various data preparation techniques for your pipeline",
+    "name": "Sentiment Analysis +",
+    "description": "Removes stop words and executes sentiment analysis",
     "steps": [
         {
             "stepId": "DataPreparation",
@@ -20,16 +20,9 @@
                     "language": "en"
                 }
             }
-        },
-        {
-            "stepId": "DummyStep",
-            "values": {
-                "threshold": 0.3,
-                "LLM config": {
-                    "tokenization": false
-                },
-                "should return": true
-            }
         }
+    ],
+    "tags": [
+        "pipelines"
     ]
 }

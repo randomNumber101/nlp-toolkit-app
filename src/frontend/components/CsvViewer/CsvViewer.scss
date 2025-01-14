@@ -1,35 +1,48 @@
 .csv-viewer {
-    width: 100%;
-    overflow: auto;
+  margin: 20px 0;
+  overflow: auto;
 }
 
 .csv-table {
-    width: 100%;
-    border-collapse: collapse;
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid #ddd;
+
+  th, td {
+    padding: 10px;
+    text-align: left;
     border: 1px solid #ddd;
+    cursor: pointer;
+  }
 
-    th, td {
-        padding: 10px;
-        text-align: left;
-        border: 1px solid #ddd;
-    }
+  th {
+    background-color: #f4f4f4;
+  }
 
-    th {
-        background-color: #f4f4f4;
-        font-weight: bold;
-    }
+  tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
 
-    tr:nth-child(even) {
-        background-color: #f9f9f9;
-    }
-
-    tr:hover {
-        background-color: #f1f1f1;
-    }
+  tr:hover {
+    background-color: #f1f1f1;
+  }
 }
 
-.csv-error {
-    color: red;
-    text-align: center;
-    padding: 20px;
+.remaining-rows {
+  text-align: center;
+  margin: 10px 0;
+  color: #888;
+}
+
+.save-button {
+  margin-top: 10px;
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+
+.save-button:hover {
+  background-color: #0056b3;
 }

@@ -1,10 +1,10 @@
-// src/components/InputScreen/InputScreen.tsx
-
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import TextArea from '../../components/ValuePickers/TextArea';
 import DragAndDrop from '../../components/DragAndDrop/DragAndDrop';
 import './InputScreen.scss';
+import CsvViewer from "../../components/CsvViewer/CsvViewer";
+import OverlayWindow from "../../components/OverlayWindow/OverlayWindow";
 
 interface InputScreenProps {
   preloaded?: InputHandle;
@@ -50,64 +50,54 @@ const fileToInputHandle = async (file: File): Promise<InputHandle> => {
     reader.onerror = () => {
       reject('Failed to read file.');
     };
-    // Read the entire file to get the content
     reader.readAsText(file);
   });
 };
 
-const InputScreen: React.FC<InputScreenProps> = ({
-  preloaded = null,
-  onGoToPipelineScreen,
-}) => {
+const InputScreen: React.FC<InputScreenProps> = ({ preloaded = null, onGoToPipelineScreen }) => {
   const [input, setInput] = useState<string>(preloaded?.type === 'text' ? preloaded.data || '' : '');
-  const [isExpanded, setIsExpanded] = useState<boolean>(false);
-  const [errorMessage, setErrorMessage] = useState<string>('');
   const [inputHandle, setInputHandle] = useState<InputHandle | null>(preloaded);
   const [inputType, setInputType] = useState<'text' | 'file'>(
-    preloaded?.type === 'csv' ? 'file' : (preloaded?.type === 'text' ? 'text' : 'file')
-  ); // To track current input type
+    preloaded?.type === 'csv' ? 'file' : preloaded?.type === 'text' ? 'text' : 'file'
+  );
+  const [isOverlayOpen, setIsOverlayOpen] = useState<boolean>(false);
 
   useEffect(() => {
-    console.log("New input:", inputHandle)
-  }, [inputHandle])
+    console.log('New input:', inputHandle);
+  }, [inputHandle]);
 
-  // Handles the submission of the input
+  const handleFileDataReceived = (handle: InputHandle) => {
+    setInput('');
+    setInputHandle(handle);
+  };
+
+  const handleTextChange = (text: string) => {
+    setInput(text);
+    if (text.trim()) {
+      setInputHandle(stringToInputHandle(text));
+    } else {
+      setInputHandle(null);
+    }
+  };
+
   const handleButtonClick = () => {
     if (inputHandle) {
       onGoToPipelineScreen(inputHandle);
     }
   };
 
-  // Toggles the expansion of the text area
-  const toggleExpand = () => {
-    setIsExpanded(!isExpanded);
+  const toggleOverlay = () => {
+    setIsOverlayOpen(!isOverlayOpen);
   };
 
-  // Handles changes in the text input
-  const handleTextChange = (text: string) => {
-    setInput(text);
-    setInputHandle(text ? stringToInputHandle(text) : null);
-    setErrorMessage('');
-  };
-
-  // Handles received file data from DragAndDrop
-  const handleFileDataReceived = (handle: InputHandle) => {
-    setInput(''); // Clear any existing text input
-    setInputHandle(handle);
-    setErrorMessage('');
-  };
-
-  // Removes the selected file
   const removeFile = () => {
     setInput('');
     setInputHandle(null);
-    setErrorMessage('');
   };
 
   return (
     <div className="input-screen-container">
       <div className="input-methods">
-        {/* Toggle between Text and File Input */}
         <div className="input-toggle">
           <button
             className={`toggle-button ${inputType === 'text' ? 'active' : ''}`}
@@ -123,34 +113,31 @@ const InputScreen: React.FC<InputScreenProps> = ({
           </button>
         </div>
 
-        {/* Render based on the selected input type */}
         {inputType === 'file' ? (
           <DragAndDrop onFileDataReceived={handleFileDataReceived} />
         ) : (
-          <div className={`textarea-container ${isExpanded ? 'expanded' : ''}`}>
-            <TextArea
-              value={input}
-              onChange={handleTextChange}
-              rows={isExpanded ? 25 : 6} // Adjust rows based on expansion
-              className="input-textarea"
-              placeholder="Enter your input here..."
-            />
-            <button className="expand-button" onClick={toggleExpand}>
-              {isExpanded ? 'Collapse' : 'Expand'}
-            </button>
-          </div>
+          <TextArea
+            value={input}
+            onChange={handleTextChange}
+            rows={6}
+            className="input-textarea"
+            placeholder="Enter your input here..."
+          />
         )}
 
-        {/* Display file information if a file is uploaded */}
         {inputHandle && inputHandle.type === 'csv' && (
           <div className="file-info">
             <span className="file-icon">📄</span>
             <span className="file-name">{inputHandle.name}</span>
+            <span className="click-to-view" onClick={toggleOverlay}>
+              🔎 Click to view
+            </span>
             <button className="remove-file-button" onClick={removeFile}>
               ❌
             </button>
           </div>
         )}
+
         {inputHandle && inputHandle.type === 'text' && (
           <div className="file-info">
             <span className="file-icon">📝</span>
@@ -161,18 +148,18 @@ const InputScreen: React.FC<InputScreenProps> = ({
           </div>
         )}
 
-        {/* Display error messages */}
-        {errorMessage && <p className="error-message">{errorMessage}</p>}
+        <button
+          className={`submit-button ${inputHandle ? '' : 'disabled'}`}
+          onClick={handleButtonClick}
+          disabled={!inputHandle}
+        >
+          Choose Pipeline
+        </button>
       </div>
 
-      {/* Submit button */}
-      <button
-        className={`submit-button ${inputHandle ? '' : 'disabled'}`}
-        onClick={handleButtonClick}
-        disabled={!inputHandle}
-      >
-        Choose Pipeline
-      </button>
+      <OverlayWindow isOpen={isOverlayOpen} onClose={toggleOverlay} title="CSV Viewer">
+        <CsvViewer rawData={inputHandle?.data || ''} maxRows={100} maxCellLength={300} />
+      </OverlayWindow>
     </div>
   );
 };

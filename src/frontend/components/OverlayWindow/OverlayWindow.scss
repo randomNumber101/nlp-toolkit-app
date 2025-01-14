@@ -26,10 +26,10 @@
     background-color: #fff;
     border-radius: 10px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    width: 90%;
+    width: 98%;
     max-width: 100%;
     min-height: 70%;
-    max-height: 95%;
+    max-height: 98%;
     overflow: hidden;
     z-index: 200;
     display: flex;
@@ -40,14 +40,14 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px 20px;
+    padding: 5px 20px;
     background-color: #f4f4f4;
     border-bottom: 1px solid #ddd;
 }
 
 .overlay-title {
     margin: 0;
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     color: #333;
 }
 
@@ -67,7 +67,7 @@
 .overlay-body {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    --align-items: center; /* TODO: Reconsider this */
     padding: 20px;
-    overflow-y: auto; /* Enable vertical scrolling */
+    overflow: auto; /* Enable vertical scrolling */
 }
