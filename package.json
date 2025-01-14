@@ -53,6 +53,7 @@
     "papaparse": "^5.5.1",
     "react": "^18.2.0",
     "react-beautiful-dnd": "^13.1.1",
+    "react-data-table-component": "^7.6.2",
     "react-dom": "^18.2.0",
     "react-icons": "^5.4.0"
   },

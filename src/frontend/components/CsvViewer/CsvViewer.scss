@@ -1,31 +1,5 @@
 .csv-viewer {
   margin: 20px 0;
-  overflow: auto;
-}
-
-.csv-table {
-  width: 100%;
-  border-collapse: collapse;
-  border: 1px solid #ddd;
-
-  th, td {
-    padding: 10px;
-    text-align: left;
-    border: 1px solid #ddd;
-    cursor: pointer;
-  }
-
-  th {
-    background-color: #f4f4f4;
-  }
-
-  tr:nth-child(even) {
-    background-color: #f9f9f9;
-  }
-
-  tr:hover {
-    background-color: #f1f1f1;
-  }
 }
 
 .remaining-rows {
@@ -41,8 +15,10 @@
   color: #fff;
   border: none;
   cursor: pointer;
-}
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
 
-.save-button:hover {
-  background-color: #0056b3;
+  &:hover {
+    background-color: #0056b3;
+  }
 }
