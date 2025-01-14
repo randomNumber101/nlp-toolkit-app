@@ -181,7 +181,7 @@ function App() {
               }
             }}
             onSavePipeline={onSavePipeline}
-            inputFileName={inputHandle?.name ?? "input"}
+            inputHandle={inputHandle}
             outputFileName={"output"}
           />
         );

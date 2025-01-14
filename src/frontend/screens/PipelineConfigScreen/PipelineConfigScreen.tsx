@@ -12,14 +12,17 @@ import { FaSave, FaArrowLeft, FaPlay, FaFileAlt } from 'react-icons/fa';
 import { useBlueprintContext } from "../../utils/BlueprintContext";
 import { listToMap } from "../../utils/functional";
 import StepConfig from "../../components/StepConfig/StepConfig";
+import CsvViewer from "../../components/CsvViewer/CsvViewer";
+import OverlayWindow from "../../components/OverlayWindow/OverlayWindow";
+import {InputHandle} from "../InputScreen/InputScreen";
 
 interface PipelineConfigScreenProps {
   initialPipe: Pipeline | null;
   onSavePipeline: (updatedPipeline: Pipeline) => void;
   onPrevious: () => void;
   onNext: () => void;
-  inputFileName: string;    // New Prop
-  outputFileName: string;   // New Prop
+  inputHandle: InputHandle;
+  outputFileName: string;
 }
 
 const PipelineConfigScreen: React.FC<PipelineConfigScreenProps> = ({
@@ -27,7 +30,7 @@ const PipelineConfigScreen: React.FC<PipelineConfigScreenProps> = ({
   onSavePipeline,
   onPrevious,
   onNext,
-  inputFileName,
+  inputHandle,
   outputFileName,
 }) => {
   const [pipeline, setPipeline] = useState<Pipeline>(initialPipe);
@@ -38,6 +41,7 @@ const PipelineConfigScreen: React.FC<PipelineConfigScreenProps> = ({
   const [isDragging, setIsDragging] = useState(false);
   const [showSaved, setShowSaved] = useState(false);
   const [showOperationToolbox, setShowOperationToolbox] = useState(false);
+  const [showInputCsv, setShowInputCsv] = useState(false);
 
   const toolboxRef = useRef<HTMLDivElement>(null);
   const addOperationRef = useRef<HTMLDivElement>(null);
@@ -119,6 +123,13 @@ const PipelineConfigScreen: React.FC<PipelineConfigScreenProps> = ({
     };
   }, [showOperationToolbox]);
 
+  const toggleShowInput = () => {
+    setShowInputCsv(!showInputCsv);
+  }
+
+  const csvData =
+      inputHandle.type === 'csv' ? inputHandle.data : "text \n" + inputHandle.data;
+
   return (
     <div className="pipeline-config-screen">
       {/* Header */}
@@ -135,9 +146,9 @@ const PipelineConfigScreen: React.FC<PipelineConfigScreenProps> = ({
         <h2>Operations</h2>
         <div className="pipeline-wrapper">
           {/* Input Box */}
-          <div className="file-box input-box">
+          <div className="file-box input-box" onClick={toggleShowInput}>
             <FaFileAlt className="file-icon" />
-            <span className="file-name">{inputFileName}</span>
+            <span className="file-name">{inputHandle.name ?? "input"}</span>
           </div>
 
           <div className="arrow show">→</div>
@@ -252,7 +263,14 @@ const PipelineConfigScreen: React.FC<PipelineConfigScreenProps> = ({
           <FaPlay /> Run Pipeline
         </button>
       </div>
+
+      <OverlayWindow isOpen={showInputCsv} onClose={toggleShowInput} title="CSV Viewer">
+        <CsvViewer rawData={csvData} maxRows={100} maxCellLength={300} />
+      </OverlayWindow>
+
     </div>
+
+
   );
 };
 

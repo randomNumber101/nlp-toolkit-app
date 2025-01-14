@@ -62,12 +62,14 @@ const DragAndDrop: React.FC<DragAndDropProps> = ({ onFileDataReceived }) => {
         const preview = content.length > 300 ? content.substring(0, 300) + '...' : content;
         const isCSV = file.name.toLowerCase().endsWith('.csv');
         const type = isCSV ? 'csv' : 'text';
+        const headers = isCSV ? content.split('\n')[0].split(',') : ["text"];
         resolve({
           id: crypto.randomUUID(),
           type: type,
           name: file.name,
           data: content, // Store the full file content here
           preview,
+          headers: headers
         });
       };
       reader.onerror = () => {

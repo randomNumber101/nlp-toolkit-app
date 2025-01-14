@@ -17,6 +17,7 @@ export interface InputHandle {
   preview: string;
   data?: string; // For text inputs and file contents
   name?: string; // Optional, used for file inputs
+  headers: string[]; // Optional, used for CSV inputs
 }
 
 // Converts a string input to an InputHandle
@@ -26,6 +27,7 @@ const stringToInputHandle = (input: string): InputHandle => {
     id: crypto.randomUUID(),
     type: 'text',
     data: input,
+    headers: ["text"],
     preview,
   };
 };

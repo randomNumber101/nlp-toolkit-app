@@ -167,7 +167,7 @@ const RunStep: React.FC<RunStepProps> = ({ step, status, isActive, runId, stepNu
                 {visualization && <DynamicVisualization visualization={visualization} />}
             </OverlayWindow>
             <OverlayWindow isOpen={isCsvViewerOpen} onClose={closeCsvViewer} title="CSV Viewer">
-                {csvData && <CsvViewer data={csvData} />}
+                {csvData && <CsvViewer jsonData={csvData} />}
             </OverlayWindow>
         </div>
     );
