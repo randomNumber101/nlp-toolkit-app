@@ -1,6 +1,48 @@
 .column-picker {
-  .options-picker {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+
+  .column-select {
     min-width: 25%;
+    width: 100%;
+    max-width: 600px;
+    font-size: large;
+    text-align: center;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    transition: box-shadow 0.3s, border 0.3s;
+
+    .other {
+      font-style: italic;
+      font-weight: bold;
+      color: #4caf50;             /* A pleasant green for emphasis */
+      text-decoration: underline;
+      background-color: rgba(76, 175, 80, 0.1); /* A light green tint */
+      padding: 4px 6px;
+      border-radius: 4px;
+      transition: background-color 0.3s, color 0.3s;
+
+      &:hover {
+        background-color: rgba(76, 175, 80, 0.2);
+        color: #388e3c;           /* Slightly darker on hover */
+        cursor: pointer;
+      }
+    }
+
+
+    &:hover {
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      border: 1px solid #4caf50;
+    }
+  }
+
+  .other-input {
+    margin-top: 8px;
+    min-width: 25%;
+    width: 100%;
+    max-width: 600px;
     font-size: large;
     text-align: center;
     padding: 8px;

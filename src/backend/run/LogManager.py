@@ -44,7 +44,6 @@ class LoggerChannel(Channel[Dict[str, Union[str, LogLevels]]]):
             print(LogLevels.prefix(level) + message)
 
 
-# Refactor LogManager to inherit from Multiplexer
 class LogManager(Multiplexer[Dict[str, Union[str, LogLevels]]]):
     def __init__(self, channels: Optional[Dict[str, Channel[Dict[str, Union[str, LogLevels]]]]] = None, log_level: LogLevels = LogLevels.DEBUG):
         super().__init__(channels if channels is not None else {"console": LoggerChannel()})
@@ -55,7 +54,7 @@ class LogManager(Multiplexer[Dict[str, Union[str, LogLevels]]]):
             return
 
         if isinstance(message, str):
-            message = [message]
+            message = message.split("\n")
 
         log_entry = {"messages": message, "level": level}
         self.multiplex(log_entry)

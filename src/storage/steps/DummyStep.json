@@ -1,6 +1,6 @@
 {
   "id" : "DummyStep",
-  "name": "Classify nouns",
+  "name": "Dummy Operation",
   "description": "Empty operation for testing.",
   "tags": ["simple", "batch processing"],
   "parameters": {

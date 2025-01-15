@@ -14,11 +14,11 @@
     },
     "output column": {
       "type": "string",
-      "default": ["text"],
-      "description": "When using CSV, defines the existing or new column name to write the output to. Leave empty to overwrite input.",
+      "description": "When using CSV, defines the existing or new column name to (over-)write the output to.",
       "input": {
-        "type": "text_field"
-      }
+        "type": "column_select"
+      },
+      "default": "text"
     },
     "remove stopwords": {
       "type": "complex",

@@ -20,63 +20,56 @@ class DataPreparationOperation(ParallelizableTextOperation):
 
 
     def single_cell_operation(self, notifier: FrontendNotifier, payload: Payload, text: str) -> str:
+
         stopword_counter = Counter()
-        stats = Counter()
+
+        # Remove stopwords (and count those removed) if requested.
         if self.do_stopwords:
             doc = self.nlp(text)
-
-            notifier.log(f"Stop Words: {doc[0:10]}", LogLevels.DEBUG)
-
             filtered_tokens = []
             for token in doc:
-                if not token.is_stop:
-                    filtered_tokens.append(token.text)
-                else:
+                if token.is_stop:
                     stopword_counter[token.text.lower()] += 1
+                else:
+                    filtered_tokens.append(token.text)
             text = ' '.join(filtered_tokens)
-            stats["stop_words_removed"] += len(doc) - len(filtered_tokens)
 
-        notifier.log("Stop Words finished!", LogLevels.DEBUG)
+        # Combine lowercasing and ASCII removal in one pass.
+        if self.do_lowercase or self.do_no_ascii:
+            new_chars = []
+            for c in text:
+                # Lowercase if enabled.
+                new_char = c.lower() if self.do_lowercase else c
+                # Remove non-ASCII characters if enabled.
+                if self.do_no_ascii and ord(new_char) >= 128:
+                    continue
+                new_chars.append(new_char)
+            text = ''.join(new_chars)
 
-        # Convert text to lowercase
-        if self.do_lowercase:
-            original_upper = sum(1 for c1, c2 in zip(text, text.lower()) if c1.isupper() and c2.islower())
-            text = text.lower()
-            stats["text_lowercased"] += original_upper
-
-        notifier.log("Lower case finished!", LogLevels.DEBUG)
-
-        # Remove non-ASCII characters
-        if self.do_no_ascii:
-            cleaned_text = ''.join(c for c in text if ord(c) < 128)
-            removed = len(text) - len(cleaned_text)
-            text = cleaned_text
-            stats["non_ascii_removed"] += removed
-
-        notifier.log("No ascii finished!", LogLevels.DEBUG)
-
-        # Prepare visualization for the current cell
+        # Prepare a visually improved HTML visualization for stopword removal.
         top_stopwords = stopword_counter.most_common(10)
-        top_stopwords_html = "<ul>"
+        stats_html = """
+        <div style="
+              font-family: Arial, sans-serif;
+              padding: 20px;
+              border: 1px solid #ccc;
+              background: #fefefe;
+              box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+              border-radius: 8px;
+              max-width: 600px;
+              margin: 0 auto;">
+            <h4 style="text-align: center; color: #333; margin-bottom: 16px;">Stopwords Removed</h4>
+            <div style="display: flex; justify-content: center;">
+                <ul style="list-style: none; padding: 0; margin: 0;">
+        """
         for word, count in top_stopwords:
-            top_stopwords_html += f"<li><strong>{word}:</strong> {count}</li>"
-        top_stopwords_html += "</ul>"
-
-        stats_html = f"""
-        <div style="font-family: Arial, sans-serif; padding: 10px;">
-            <h4 style="color: #333; text-align: center;">Cell Data Preparation Statistics</h4>
-            <ul style="list-style-type: none; padding: 0;">
-                <li><strong>Stop Words Removed:</strong> {stats['stop_words_removed']}</li>
-                <li><strong>Text Lowercased:</strong> {stats['text_lowercased']}</li>
-                <li><strong>Non-ASCII Characters Removed:</strong> {stats['non_ascii_removed']}</li>
-            </ul>
-            <h5 style="color: #333;">Top 10 Most Occurring Stop Words</h5>
-            {top_stopwords_html}
+            stats_html += f"<li style='margin: 4px 0;'><span style='color: #4caf50; font-weight: bold;'>{word}</span>: {count}</li>"
+        stats_html += """
+                </ul>
+            </div>
         </div>
         """
 
-        # Add visualization to payload for the current cell
         payload.addVisualization(HTMLViz(stats_html))
-
         notifier.sendStatus(StepState.SUCCESS, progress=100.0)
         return text

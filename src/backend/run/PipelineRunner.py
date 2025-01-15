@@ -1,3 +1,4 @@
+import traceback
 from typing import Dict, List, Union
 
 from backend.run.backendEventApi import BackendEventApi
@@ -62,6 +63,10 @@ class PipelineRunner:
         self.events = events
         self.storage = runStorage
 
+
+    def __call__(self, *args, **kwargs):
+        self.start(*args, **kwargs)
+
     def start(self, blueprints: Dict[str, StepBlueprint], pipeline: Pipeline, run_id: str, input: str):
 
         # 0. Create folder structure
@@ -106,7 +111,9 @@ class PipelineRunner:
             try:
                 result = step.run(stepVals, payload, notifier)
             except Exception as e:
-                notifier.log(f"Exception during run: {repr(e)}", LogLevels.ERROR)
+                traceback_str = traceback.format_exc()
+                notifier.log(traceback_str, LogLevels.ERROR)
+                notifier.log(f"Backend exception during run: {repr(e)}", LogLevels.ERROR)
                 notifier.sendStatus(StepState.FAILED)
                 return
 

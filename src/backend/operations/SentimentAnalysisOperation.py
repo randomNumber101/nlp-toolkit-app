@@ -14,7 +14,7 @@ class SentimentAnalysisOperation(ParallelizableTextOperation):
     def initialize(self, config: Config, notifier: FrontendNotifier):
         super().initialize(config, notifier)
         self.do_sentiment = config["sentiment analysis"]["activate"]
-        self.text_sample_size = 35
+        self.text_sample_size = 400
         self.language = config["sentiment analysis"]["language"]
 
         notifier.log("Initializing Sentiment Analysis Operation for language " + self.language)
@@ -35,7 +35,7 @@ class SentimentAnalysisOperation(ParallelizableTextOperation):
                 score = round(result['score'], 4)
 
                 # Sample text logic
-                text_sample = text if len(text) <= self.text_sample_size else text[:50] + "..."
+                text_sample = text if len(text) <= self.text_sample_size else text[:self.text_sample_size] + "..."
 
                 # Styling based on label
                 label_color = "#52c41a" if label == "POSITIVE" else "#f5222d"
