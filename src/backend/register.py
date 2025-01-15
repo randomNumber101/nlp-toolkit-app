@@ -55,7 +55,6 @@ class BaseTypes:
 
 
 class DataType(ParamType):
-
     Instances: Dict[Tuple[str], "DataType"] = {}
 
     def __init__(self, column_names: List[str]):
@@ -81,8 +80,6 @@ class DataType(ParamType):
         return DataType.Instances[key]
 
 
-
-
 class TextField(ParameterPicker):
     def __init__(self, outputType):
         super(TextField, self).__init__("text_field", outputType=outputType, parameters=[])
@@ -103,6 +100,13 @@ class PossibilitiesPicker(ParameterPicker):
         super().__init__(name="list", outputType=BaseTypes.STRING, parameters=listParams)
 
 
+class ColumnPicker(ParameterPicker):
+    def __init__(self, defaultValue=None):
+        self.default_value = defaultValue
+        self.value = None
+        super().__init__(name="column_select", outputType=BaseTypes.STRING, parameters=[])
+
+
 class Slider(ParameterPicker):
     def __init__(self):
         sliderParams = [
@@ -113,10 +117,7 @@ class Slider(ParameterPicker):
         super().__init__("slider", BaseTypes.FLOAT, sliderParams)
 
 
-
-
 def registerClasses():
-
     '''
         Register StepOperations
     '''
@@ -140,7 +141,9 @@ def registerClasses():
         Register.ParamPickerParser.registerDefault(t, TextField(outputType=t))  # Text field picker as default
     Register.ParamPickerParser.registerDefault(BaseTypes.BOOL, CheckBox())  # Checkbox for bool values
     Register.ParamPickerParser.registerParser("text_field", lambda kws: TextField(BaseTypes.STRING))
-    Register.ParamPickerParser.registerParser("list", lambda kws: PossibilitiesPicker().create_from_json(kws))  # Register list picker
+    Register.ParamPickerParser.registerParser("list", lambda kws: PossibilitiesPicker().create_from_json(
+        kws))  # Register list picker
+    Register.ParamPickerParser.registerParser("column_select", lambda kws: ColumnPicker().create_from_json(kws))
     Register.ParamPickerParser.registerParser("slider",
                                               lambda kws: Slider().create_from_json(kws))  # Register value slider
 

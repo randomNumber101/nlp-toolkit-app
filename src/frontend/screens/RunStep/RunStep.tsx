@@ -6,7 +6,7 @@ import TextVisualization from '../../components/OutputVisualization/TextVisualiz
 import LogConsole from '../../components/LogConsole/LogConsole';
 import { StepStatus, StepState, VisualizationData, StepLogUpdate, Log } from '../../types/events';
 import { StepBlueprint } from '../../types';
-import { getRunVisualization, getRunResult } from '../../utils/pipelineApi';
+import {getRunVisualization, getRunResult, saveRunResult} from '../../utils/pipelineApi';
 import { useBackendEvent } from '../../utils/useBackendEvents';
 import DynamicVisualization from "../../components/OutputVisualization/DynamicVisualization";
 import OverlayWindow from '../../components/OverlayWindow/OverlayWindow';
@@ -124,6 +124,12 @@ const RunStep: React.FC<RunStepProps> = ({ step, status, isActive, runId, stepNu
         setIsCsvViewerOpen(false);
     };
 
+
+    const handleOnSave = () => {
+        console.log("Saving CSV file...");
+        saveRunResult(runId).then(r => r? console.log("CSV file saved successfully.") : console.error("Error saving CSV file."));
+    }
+
     return (
         <div className={`run-step ${isActive ? 'active' : 'inactive'}`}>
             <div className="run-step-content">
@@ -167,7 +173,7 @@ const RunStep: React.FC<RunStepProps> = ({ step, status, isActive, runId, stepNu
                 {visualization && <DynamicVisualization visualization={visualization} />}
             </OverlayWindow>
             <OverlayWindow isOpen={isCsvViewerOpen} onClose={closeCsvViewer} title="CSV Viewer">
-                {csvData && <CsvViewer jsonData={csvData} />}
+                {csvData && <CsvViewer jsonData={csvData} onSaveFile={handleOnSave}/>}
             </OverlayWindow>
         </div>
     );

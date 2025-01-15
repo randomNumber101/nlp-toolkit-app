@@ -15,13 +15,13 @@ import StepConfig from "../../components/StepConfig/StepConfig";
 import CsvViewer from "../../components/CsvViewer/CsvViewer";
 import OverlayWindow from "../../components/OverlayWindow/OverlayWindow";
 import {InputHandle} from "../InputScreen/InputScreen";
+import {useInputHandleContext} from "../../utils/InputHandleContext";
 
 interface PipelineConfigScreenProps {
   initialPipe: Pipeline | null;
   onSavePipeline: (updatedPipeline: Pipeline) => void;
   onPrevious: () => void;
   onNext: () => void;
-  inputHandle: InputHandle;
   outputFileName: string;
 }
 
@@ -30,7 +30,6 @@ const PipelineConfigScreen: React.FC<PipelineConfigScreenProps> = ({
   onSavePipeline,
   onPrevious,
   onNext,
-  inputHandle,
   outputFileName,
 }) => {
   const [pipeline, setPipeline] = useState<Pipeline>(initialPipe);
@@ -42,6 +41,7 @@ const PipelineConfigScreen: React.FC<PipelineConfigScreenProps> = ({
   const [showSaved, setShowSaved] = useState(false);
   const [showOperationToolbox, setShowOperationToolbox] = useState(false);
   const [showInputCsv, setShowInputCsv] = useState(false);
+  const inputHandle = useInputHandleContext();
 
   const toolboxRef = useRef<HTMLDivElement>(null);
   const addOperationRef = useRef<HTMLDivElement>(null);
@@ -55,6 +55,7 @@ const PipelineConfigScreen: React.FC<PipelineConfigScreenProps> = ({
 
   const { blueprints } = useBlueprintContext();
   const blueprintMap = useMemo(() => listToMap(blueprints, (bp: StepBlueprint) => bp.id), [blueprints]);
+
 
   const onDragStart = () => setIsDragging(true);
 

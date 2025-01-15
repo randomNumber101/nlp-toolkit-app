@@ -67,6 +67,9 @@ class BertTopicOperation(StepOperation):
         if self.use_verbose:
             # Verbose Mode Initializations
             notifier.log("Verbose progress reporting is enabled.", LogLevels.INFO)
+            notifier.log("BERTopic will use manual embedding creation with DistilBERT.", LogLevels.INFO)
+            notifier.log("This mode will provide more progress updates during the operation but will be much slower.", LogLevels.WARN)
+            notifier.log("For faster operation, disable verbose mode in the configuration.", LogLevels.INFO)
 
             # Initialize device
             self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -90,6 +93,10 @@ class BertTopicOperation(StepOperation):
         else:
             # Original Mode Initializations
             notifier.log("Verbose progress reporting is disabled. Using original BERTopic workflow.", LogLevels.INFO)
+            notifier.log("BERTopic will use the default workflow for topic modeling.", LogLevels.INFO)
+            notifier.log("This mode may be faster but will not provide detailed progress updates.", LogLevels.WARN)
+            notifier.log("This operation is quite heavy and may take a while to complete. Do not wonder.", LogLevels.WARN)
+
 
     def compute_embeddings(self, texts, notifier):
         """

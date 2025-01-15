@@ -1,17 +1,21 @@
 .csv-viewer {
   margin: 20px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .remaining-rows {
   text-align: center;
+  font-size: 0.9em;
   margin: 10px 0;
   color: #888;
 }
 
 .save-button {
-  margin-top: 10px;
-  padding: 10px 20px;
+  padding: 10px 30px;
   background-color: #007bff;
+  font-size: 1.1em;
   color: #fff;
   border: none;
   cursor: pointer;

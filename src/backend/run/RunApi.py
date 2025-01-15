@@ -1,8 +1,9 @@
 import json
 import os.path
+import shutil
 import threading
 import uuid
-
+from tkinter import filedialog
 
 import pandas
 
@@ -14,7 +15,11 @@ from backend.transferObjects.pipelineTransferObjects import convert_pipeline_to_
 from backend.transferObjects.visualization import Visualization
 
 
+
+
 class RunStorageApi:
+
+    PREVIEW_ROWS_NUM = 150
 
     def __init__(self, run_directory):
         self.directory = run_directory
@@ -60,12 +65,16 @@ class RunStorageApi:
         save_path = os.path.join(base_path, "result.csv")
         return data.to_csv(save_path)
 
-    def getResult(self, run_id) -> pandas.DataFrame:
+    def getResultPath(self, run_id):
         base_path = os.path.join(self.directory, run_id)
         save_path = os.path.join(base_path, "result.csv")
         if os.path.isfile(save_path):
-            return pandas.read_csv(save_path)
+            return save_path
         raise FileNotFoundError("No result has been saved yet. Make sure that the run has finished.")
+
+    def getResult(self, run_id) -> pandas.DataFrame:
+        save_path = self.getResultPath(run_id)
+        return pandas.read_csv(save_path, nrows=RunStorageApi.PREVIEW_ROWS_NUM)
 
 
 class RunApi:
@@ -109,4 +118,22 @@ class RunApi:
         return self._runStorageApi.getVisualization(run_id, stepIndex)
 
     def getResult(self, run_id):
-        return self._runStorageApi.getResult(run_id).to_json(orient="records")
+        dataframe = self._runStorageApi.getResult(run_id)
+        return dataframe.to_json(orient='records')
+
+
+
+    def saveResult(self, run_id):
+        # Open the file save dialog; this will block until the user selects a location.
+        file_path = filedialog.asksaveasfilename(
+            title="Save CSV",
+            defaultextension=".csv",
+            filetypes=[("CSV Files", "*.csv"), ("All Files", "*.*")]
+        )
+        if file_path:
+            # Copy file to location
+            result_path = self._runStorageApi.getResultPath(run_id)
+            shutil.copyfile(result_path, file_path)
+            return None
+        else:
+            raise IOError("No file selected.")

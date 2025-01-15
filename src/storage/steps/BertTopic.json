@@ -6,16 +6,16 @@
   "parameters": {
     "input column": {
       "type": "string",
-      "default": "text",
-      "description": "The column containing text data to be processed.",
+      "description": "When using CSV, defines the column to use this operation on. Defaults to 'text'",
       "input": {
-        "type": "text_field"
-      }
+        "type": "column_select"
+      },
+      "default": "text"
     },
     "output column": {
       "type": "string",
-      "default": "topic",
-      "description": "The prefix for the output columns (e.g., topic_id and topic_words).",
+      "default": ["text"],
+      "description": "When using CSV, defines the existing or new column name to write the output to. Leave empty to overwrite input.",
       "input": {
         "type": "text_field"
       }

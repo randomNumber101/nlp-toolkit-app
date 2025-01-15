@@ -11,10 +11,10 @@ import { useBackendEvent } from '../../utils/useBackendEvents';
 import { InputHandle } from "../InputScreen/InputScreen";
 import {useBlueprintContext} from "../../utils/BlueprintContext";
 import {listToMap} from "../../utils/functional";
+import {useInputHandleContext} from "../../utils/InputHandleContext";
 
 interface RunScreenProps {
     pipeline: Pipeline;
-    inputHandle: InputHandle;
 }
 
 const RunScreen: React.FC<RunScreenProps> = ({ pipeline, inputHandle }) => {
@@ -22,6 +22,8 @@ const RunScreen: React.FC<RunScreenProps> = ({ pipeline, inputHandle }) => {
     const [stepsStatus, setStepsStatus] = useState<StepStatus[]>([]);
     const [activeStepIndex, setActiveStepIndex] = useState<number>(0);
     const [userHasChangedStep, setUserHasChangedStep] = useState<boolean>(false);
+
+    inputHandle = useInputHandleContext();
 
     useEffect(() => {
         // Start the run when the component mounts

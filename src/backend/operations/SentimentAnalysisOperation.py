@@ -30,12 +30,12 @@ class SentimentAnalysisOperation(ParallelizableTextOperation):
     def single_cell_operation(self, notifier: FrontendNotifier, payload: Payload, text: str) -> str:
         try:
             if self.do_sentiment:
-                result = self.sentiment_pipeline(text)[0]
+                result = self.sentiment_pipeline(text, padding=True, truncation=True)[0]
                 label = result['label']
                 score = round(result['score'], 4)
 
                 # Sample text logic
-                text_sample = text if len(text) <= self.text_sample_size else text[:35] + "..."
+                text_sample = text if len(text) <= self.text_sample_size else text[:50] + "..."
 
                 # Styling based on label
                 label_color = "#52c41a" if label == "POSITIVE" else "#f5222d"

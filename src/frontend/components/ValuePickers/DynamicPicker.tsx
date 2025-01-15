@@ -6,6 +6,7 @@ import CheckboxPicker from './CheckboxPicker';
 import { Parameter } from '../../types';
 import './DynamicPicker.scss';
 import { useState } from 'react';
+import ColumnPicker from "./ColumnPicker";
 
 interface DynamicPickerProps {
   parameter: Parameter;
@@ -87,6 +88,9 @@ const DynamicPicker: React.FC<DynamicPickerProps> = ({ parameter, value, onChang
         />
       );
       break;
+    case 'column_select':
+        pickerElement = <ColumnPicker value={defaultValue} onChange={onChange} />;
+        break;
     case 'checkbox':
       pickerElement = (
         <CheckboxPicker

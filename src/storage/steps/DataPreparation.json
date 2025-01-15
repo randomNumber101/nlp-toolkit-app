@@ -1,13 +1,21 @@
 {
   "id": "DataPreparation",
   "name": "Data Preparation",
-  "description": "Removed stop words, lowercases words and removed non-ascii characters.",
+  "description": "Removes stop words, lower-cases words and removes non-ascii characters.",
   "tags": ["simple", "batch processing"],
   "parameters": {
-    "column": {
+    "input column": {
+      "type": "string",
+      "description": "When using CSV, defines the column to use this operation on. Defaults to 'text'",
+      "input": {
+        "type": "column_select"
+      },
+      "default": "text"
+    },
+    "output column": {
       "type": "string",
       "default": ["text"],
-      "description": "When using CSV, defines the column to use this operation on. Defaults to 'text'",
+      "description": "When using CSV, defines the existing or new column name to write the output to. Leave empty to overwrite input.",
       "input": {
         "type": "text_field"
       }
@@ -26,7 +34,7 @@
           "type": "list",
           "possibilities": ["en_core_web_md", "de_core_news_md"]
         },
-        "default": ["en_core_web_md"]
+        "default": "en_core_web_md"
       }
     },
     "lowercase": {

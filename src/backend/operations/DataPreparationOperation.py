@@ -14,30 +14,37 @@ class DataPreparationOperation(ParallelizableTextOperation):
         self.do_stopwords = config["remove stopwords"]["activate"]
         self.do_lowercase = config["lowercase"]
         self.do_no_ascii = config["remove non-ascii"]
-        self.stopword_counter = Counter()
+
         notifier.log("Data Preparation Operation initialized!")
 
 
 
     def single_cell_operation(self, notifier: FrontendNotifier, payload: Payload, text: str) -> str:
-
+        stopword_counter = Counter()
         stats = Counter()
         if self.do_stopwords:
             doc = self.nlp(text)
+
+            notifier.log(f"Stop Words: {doc[0:10]}", LogLevels.DEBUG)
+
             filtered_tokens = []
             for token in doc:
                 if not token.is_stop:
                     filtered_tokens.append(token.text)
                 else:
-                    self.stopword_counter[token.text.lower()] += 1
+                    stopword_counter[token.text.lower()] += 1
             text = ' '.join(filtered_tokens)
             stats["stop_words_removed"] += len(doc) - len(filtered_tokens)
+
+        notifier.log("Stop Words finished!", LogLevels.DEBUG)
 
         # Convert text to lowercase
         if self.do_lowercase:
             original_upper = sum(1 for c1, c2 in zip(text, text.lower()) if c1.isupper() and c2.islower())
             text = text.lower()
             stats["text_lowercased"] += original_upper
+
+        notifier.log("Lower case finished!", LogLevels.DEBUG)
 
         # Remove non-ASCII characters
         if self.do_no_ascii:
@@ -46,8 +53,10 @@ class DataPreparationOperation(ParallelizableTextOperation):
             text = cleaned_text
             stats["non_ascii_removed"] += removed
 
+        notifier.log("No ascii finished!", LogLevels.DEBUG)
+
         # Prepare visualization for the current cell
-        top_stopwords = self.stopword_counter.most_common(10)
+        top_stopwords = stopword_counter.most_common(10)
         top_stopwords_html = "<ul>"
         for word, count in top_stopwords:
             top_stopwords_html += f"<li><strong>{word}:</strong> {count}</li>"

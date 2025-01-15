@@ -1,6 +1,6 @@
 // src/utils/pipelineApi.ts
 
-import { Pipeline, StepBlueprint, StepValues } from "../types";
+import {Pipeline, StepBlueprint} from "../types";
 import {VisualizationData} from "../types/events";
 import {InputHandle} from "../screens/InputScreen/InputScreen";
 
@@ -163,6 +163,20 @@ export async function getRunResult(run_id: string): Promise<any> {
   } catch (error) {
     console.error("Failed to invoke event:", error);
     return null;
+  }
+}
+
+export async function saveRunResult(run_id: string): Promise<boolean> {
+  await waitForPywebview();
+  try {
+    console.log("Saving run result for", run_id)
+    const response = await window.pywebview.api.RUNS.saveResult(run_id);
+    // Ensure response is parsed as JSON
+    unpackResponse(response); // Already an object
+    return true;
+  } catch (error) {
+    console.error("Failed to invoke event:", error);
+    return false;
   }
 }
 

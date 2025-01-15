@@ -33,11 +33,14 @@
     padding: 10px;
     border-radius: 5px;
     font-size: 0.9rem;
-    white-space: nowrap;
     transform: translate(-50%, -100%);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     z-index: 1000;
     pointer-events: none; /* Prevent tooltip from interfering with hover */
+
+    max-width: 600px;
+    overflow-wrap: break-word;
+    text-align: center;
   }
 }
 

@@ -9,7 +9,8 @@
                 "remove stopwords": {
                     "language": "en_core_web_md"
                 },
-                "lowercase": true
+                "lowercase": true,
+                "column": "paper_text"
             }
         },
         {
@@ -18,7 +19,8 @@
                 "sentiment analysis": {
                     "activate": "true",
                     "language": "en"
-                }
+                },
+                "input column": "paper_text"
             }
         }
     ],

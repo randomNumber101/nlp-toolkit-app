@@ -16,6 +16,7 @@ import { InputHandle } from './InputScreen/InputScreen';
 import { useBackendEvent } from "../utils/useBackendEvents";
 import {BlueprintContext, BlueprintProvider} from "../utils/BlueprintContext";
 import {PipelineContext} from "../utils/PipelineContext";
+import {InputHandleContext} from "../utils/InputHandleContext";
 
 type Screen =
   | 'loading'
@@ -35,8 +36,8 @@ function App() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('loading');
   const [currentStep, setCurrentStep] = useState<number>(0);
   const [selectedPipeline, setSelectedPipeline] = useState<Pipeline | null>(null);
-  const [inputHandle, setInput] = useState<InputHandle | null>(null);
 
+  const [inputHandle, setInput] = useState<InputHandle | null>(null);
   const [pipelines, setPipelines] = useState<Pipeline[]>([]);
   const [blueprints, setBlueprints] = useState<StepBlueprint[]>([])
 
@@ -181,7 +182,6 @@ function App() {
               }
             }}
             onSavePipeline={onSavePipeline}
-            inputHandle={inputHandle}
             outputFileName={"output"}
           />
         );
@@ -190,7 +190,6 @@ function App() {
           return (
             <RunScreen
               pipeline={selectedPipeline}
-              inputHandle={inputHandle}
             />
           );
         } else {
@@ -201,14 +200,17 @@ function App() {
     }
   };
 
+
   return (
     <div className="app-container">
       <StepperHeader steps={steps} currentStep={currentStep} onStepClick={handleStepClick} />
       <PipelineContext.Provider value={{pipelines, setPipelines}}>
         <BlueprintContext.Provider value={{blueprints, setBlueprints}}>
-          <div className="app-content">
-            {renderScreen()}
-          </div>
+          <InputHandleContext.Provider value={inputHandle}>
+            <div className="app-content">
+              {renderScreen()}
+            </div>
+          </InputHandleContext.Provider>
         </BlueprintContext.Provider>
       </PipelineContext.Provider>
     </div>

@@ -7,7 +7,7 @@ import './CsvViewer.scss';
 interface CsvViewerProps {
   rawData?: string; // For raw file content
   jsonData?: Array<Record<string, any>>; // For JSON-formatted data
-  onSaveFile?: (fileName: string) => void; // Optional callback for saving
+  onSaveFile?: () => void; // Optional callback for saving
   maxRows?: number; // Number of rows to display
   maxCellLength?: number; // Max cell content length (optional trimming within cells)
 }
@@ -144,8 +144,8 @@ const CsvViewer: React.FC<CsvViewerProps> = ({
         <p className="remaining-rows">+ {remainingRows} more rows...</p>
       )}
       {onSaveFile && (
-        <button className="save-button" onClick={() => onSaveFile('output.csv')}>
-          Save
+        <button className="save-button" onClick={onSaveFile}>
+          Save CSV
         </button>
       )}
     </div>
