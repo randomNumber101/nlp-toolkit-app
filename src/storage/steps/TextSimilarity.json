@@ -1,0 +1,48 @@
+{
+  "id": "TextSimilarityAnalysis",
+  "name": "Text Similarity Analysis",
+  "description": "Computes the similarity between two text columns for each row using a transformer-based semantic similarity measure (cosine similarity on embeddings).",
+  "tags": ["advanced", "batch processing"],
+  "parameters": {
+    "first text column": {
+      "type": "string",
+      "description": "Select the first text column to compare.",
+      "input": {
+        "type": "column_select"
+      },
+      "default": "text1"
+    },
+    "second text column": {
+      "type": "string",
+      "description": "Select the second text column to compare.",
+      "input": {
+        "type": "column_select"
+      },
+      "default": "text2"
+    },
+    "output column": {
+      "type": "string",
+      "description": "Name of the column where similarity scores will be stored.",
+      "input": {
+        "type": "text_field"
+      },
+      "default": "similarity"
+    },
+    "transformer model": {
+      "type": "string",
+      "description": "The transformer model name to use for computing text embeddings.",
+      "input": {
+        "type": "list",
+        "possibilities": ["distilbert-base-uncased", "bert-base-uncased", "roberta-base"]
+      },
+      "default": "distilbert-base-uncased"
+    }
+  },
+  "inputs": {
+    "data": "CSV[]"
+  },
+  "outputs": {
+    "data": "CSV[]",
+    "visualization": "html"
+  }
+}

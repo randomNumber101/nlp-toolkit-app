@@ -3,6 +3,7 @@ from typing import Dict, List, Tuple
 
 from backend import utils
 from backend.generaltypes import StepOperation, Payload, StepOperationMapper
+from backend.operations.TextSimilarityOperation import TextSimilarityAnalysisOperation
 from backend.parameterTypes import ParamType, ParameterPicker, Parameter, ListType
 from backend.run.LogManager import LogManager
 from backend.storage.parsing import ParameterTypeParser, ParameterPickerParser
@@ -127,6 +128,7 @@ def registerClasses():
     Register.OperationMapper.registerOperation("DataPreparation", DataPreparationOperation)
     Register.OperationMapper.registerOperation("SentimentAnalysis", SentimentAnalysisOperation)
     Register.OperationMapper.registerOperation("KeywordExtraction", KeywordExtractionOperation)
+    Register.OperationMapper.registerOperation("TextSimilarityAnalysis", TextSimilarityAnalysisOperation)
 
     '''
         Register types
