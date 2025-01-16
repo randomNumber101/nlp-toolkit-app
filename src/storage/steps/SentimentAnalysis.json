@@ -12,22 +12,17 @@
       },
       "default": "text"
     },
-    "output column": {
+    "output columns prefix": {
       "type": "string",
-      "description": "When using CSV, defines the existing or new column name to (over-)write the output to.",
+      "description": "The prefix to add to the output columns (label and score). Defaults to 'sentiment_'",
       "input": {
-        "type": "column_select"
+        "type": "text_field"
       },
       "default": "text"
     },
     "sentiment analysis": {
       "type": "complex",
       "description": "Perform sentiment analysis on the text.",
-      "activate": {
-        "type": "bool",
-        "default": true,
-        "description": "Activate sentiment analysis."
-      },
       "language": {
         "type": "string",
         "input": {

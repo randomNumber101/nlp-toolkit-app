@@ -10,7 +10,7 @@
                     "language": "en_core_web_md"
                 },
                 "lowercase": true,
-                "input column": "text\r",
+                "input column": "text",
                 "output column": "cleaned"
             }
         },
@@ -18,18 +18,16 @@
             "stepId": "SentimentAnalysis",
             "values": {
                 "sentiment analysis": {
-                    "activate": "true",
                     "language": "en"
                 },
-                "input column": "cleaned",
-                "output column": "sentiment cleaned"
+                "input column": "cleaned"
             }
         },
         {
             "stepId": "SentimentAnalysis",
             "values": {
-                "input column": "text\r",
-                "output column": "sentiment"
+                "input column": "text",
+                "output columns prefix": "sentiment_"
             }
         }
     ],

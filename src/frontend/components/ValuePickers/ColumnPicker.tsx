@@ -14,15 +14,20 @@ const ColumnPicker: React.FC<ColumnPickerProps> = ({ value, onChange }) => {
   const options = inputHandle?.headers?.map(header => header.trim()) || ["text"];
 
   // Determine if the incoming value is not in the available options.
-  const isOther = value && options.indexOf(value) == -1;
+  const isOther = options.indexOf(value) == -1;
 
   // Use component state for the selected option and for a custom "other" text.
   const [selectedOption, setSelectedOption] = useState<string>(isOther ? 'other' : (value || options[0]));
   const [otherValue, setOtherValue] = useState<string>(isOther ? value : '');
 
+  useEffect(() => {
+    console.log(value)
+    console.log("Is other: ", isOther)
+  }, [value]);
+
   // Update the component state when the parent value changes.
   useEffect(() => {
-    const newIsOther = value && options.indexOf(value) == -1;
+    const newIsOther = options.indexOf(value) == -1;
     setSelectedOption(newIsOther ? 'other' : (value || options[0]));
     setOtherValue(newIsOther ? value : '');
   }, [value, options]);
@@ -37,6 +42,9 @@ const ColumnPicker: React.FC<ColumnPickerProps> = ({ value, onChange }) => {
     } else {
       if (otherValue) {
         onChange(otherValue);
+      } else {
+        setOtherValue('')
+        onChange('');
       }
     }
   };
