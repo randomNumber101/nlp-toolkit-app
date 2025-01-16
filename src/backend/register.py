@@ -3,16 +3,17 @@ from typing import Dict, List, Tuple
 
 from backend import utils
 from backend.generaltypes import StepOperation, Payload, StepOperationMapper
-from backend.operations import BertTopic
-from backend.operations.BertTopic import BertTopicOperation
-from backend.operations.DataPreparationOperation import DataPreparationOperation
-from backend.operations.DummyOperation import DummyOperation
-from backend.operations.SentimentAnalysisOperation import SentimentAnalysisOperation
 from backend.parameterTypes import ParamType, ParameterPicker, Parameter, ListType
 from backend.run.LogManager import LogManager
 from backend.storage.parsing import ParameterTypeParser, ParameterPickerParser
-
 import pandas as pd
+
+
+from backend.operations.BertTopic import BertTopicOperation
+from backend.operations.DataPreparationOperation import DataPreparationOperation
+from backend.operations.DummyOperation import DummyOperation
+from backend.operations.KeywordExtractionOperation import KeywordExtractionOperation
+from backend.operations.SentimentAnalysisOperation import SentimentAnalysisOperation
 
 
 class Register:
@@ -125,6 +126,7 @@ def registerClasses():
     Register.OperationMapper.registerOperation("BertTopic", BertTopicOperation)
     Register.OperationMapper.registerOperation("DataPreparation", DataPreparationOperation)
     Register.OperationMapper.registerOperation("SentimentAnalysis", SentimentAnalysisOperation)
+    Register.OperationMapper.registerOperation("KeywordExtraction", KeywordExtractionOperation)
 
     '''
         Register types

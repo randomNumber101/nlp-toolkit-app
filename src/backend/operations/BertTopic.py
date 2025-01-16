@@ -53,7 +53,7 @@ class BertTopicOperation(StepOperation):
 
         # Common configurations
         self.input_column = config.get("input column", "text")
-        self.output_column = config.get("output column", "topic")
+        self.output_column = config.get("output columns prefix", "topic_")
         self.language = config["topic modeling"]["language"]
         self.cluster_size = config["topic modeling"]["min_cluster_size"]
         self.vectorizer_config = config["topic modeling"]["vectorizer"]
@@ -227,8 +227,8 @@ class BertTopicOperation(StepOperation):
                 return StepState.FAILED
 
             # Add results to the DataFrame
-            data[f"{self.output_column}_id"] = topics
-            data[f"{self.output_column}_words"] = [
+            data[f"{self.output_column}id"] = topics
+            data[f"{self.output_column}words"] = [
                 ", ".join([word for word, _ in self.topic_model.get_topic(topic)]) if topic != -1 else "N/A"
                 for topic in topics
             ]

@@ -12,11 +12,11 @@
       },
       "default": "text"
     },
-    "output column": {
+    "output columns prefix": {
       "type": "string",
-      "description": "When using CSV, defines the existing or new column name to (over-)write the output to.",
+      "description": "The prefix to add to the output columns ('id' and 'words'). Defaults to 'topic_'",
       "input": {
-        "type": "column_select"
+        "type": "text_field"
       },
       "default": "text"
     },

@@ -242,6 +242,8 @@ class ParallelizableOperation(StepOperation, ABC):
                 counter["success"] += 1
                 return result
             except Exception as e:
+                traceback_str = traceback.format_exc()
+                notifier.log(traceback_str, LogLevels.ERROR)
                 cellNotifier.log(f"Error processing cell {cell_index}: {e}", LogLevels.ERROR)
                 counter["failed"] += 1
                 # Return a tuple with None for each expected output.
@@ -291,13 +293,14 @@ class ParallelizableTextOperation(ParallelizableOperation, ABC):
     def run(self, payload, notifier) -> 'StepState':
         start_time = time.time()
 
-        # Wrap the single cell operation so that its return value is a tuple.
+        # Save the original operation.
+        original_operation = self.single_cell_operation
+
         def wrapper(cell_notifier, payload, text: str):
-            result = self.single_cell_operation(cell_notifier, payload, text)
+            result = original_operation(cell_notifier, payload, text)
             return (result,)  # Wrap it in a tuple
 
-        # Temporarily swap in our wrapper so that ParallelizableOperation.run sees tuple outputs.
-        original_operation = self.single_cell_operation
+        # Swap in our wrapper so that the parent run method sees tuple outputs.
         self.single_cell_operation = wrapper
         state = super().run(payload, notifier)
         self.single_cell_operation = original_operation
