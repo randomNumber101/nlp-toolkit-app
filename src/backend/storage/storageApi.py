@@ -10,12 +10,44 @@ from ..register import Register
 from ..transferObjects.pipelineTransferObjects import convert_pipeline_to_transfer, convert_step_blueprint_to_transfer
 
 
+import os
+import sys
+import shutil
+
 class Paths:
     def __init__(self):
-        self.storage = os.path.dirname(__file__)
-        self.pipelines = os.path.join(self.storage, "../../storage/pipelines")
-        self.steps = os.path.join(self.storage, "../../storage/steps")
-        self.runs = os.path.join(self.storage, "../../storage/runs")
+        # Determine the target writable location
+        if sys.platform == "darwin":  # macOS
+            self.storage = os.path.expanduser("~/Library/Application Support/YourApp/storage")
+        elif sys.platform == "win32":  # Windows
+            self.storage = os.path.join(os.getenv("APPDATA"), "YourApp", "storage")
+        else:  # Linux
+            self.storage = os.path.expanduser("~/.local/share/YourApp/storage")
+
+        # Ensure storage exists, otherwise extract it
+        self.ensure_storage()
+
+        # Define subdirectories
+        self.pipelines = os.path.join(self.storage, "pipelines")
+        self.steps = os.path.join(self.storage, "steps")
+        self.runs = os.path.join(self.storage, "runs")
+
+        os.makedirs(self.pipelines, exist_ok=True)
+        os.makedirs(self.steps, exist_ok=True)
+        os.makedirs(self.runs, exist_ok=True)
+
+    def ensure_storage(self):
+        """Extracts storage from the packaged app if it doesn't exist."""
+        if not os.path.exists(self.storage):
+            # Get the path of the bundled storage folder
+            if getattr(sys, 'frozen', False):
+                embedded_storage = os.path.join(os.path.dirname(sys.executable), "storage")
+            else:
+                embedded_storage = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../storage"))
+
+            if os.path.exists(embedded_storage):
+                shutil.copytree(embedded_storage, self.storage, dirs_exist_ok=True)
+
 
 
 def list_jsons(path):

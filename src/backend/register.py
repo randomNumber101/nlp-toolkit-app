@@ -9,7 +9,6 @@ from backend.run.LogManager import LogManager
 from backend.storage.parsing import ParameterTypeParser, ParameterPickerParser
 import pandas as pd
 
-
 from backend.operations.BertTopic import BertTopicOperation
 from backend.operations.DataPreparationOperation import DataPreparationOperation
 from backend.operations.DummyOperation import DummyOperation
@@ -56,6 +55,9 @@ class BaseTypes:
         return string in BaseTypes.MAP
 
 
+"""
+Parameter Type for DataFrames (csv)
+"""
 class DataType(ParamType):
     Instances: Dict[Tuple[str], "DataType"] = {}
 

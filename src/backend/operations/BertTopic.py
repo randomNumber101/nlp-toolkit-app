@@ -1,5 +1,6 @@
 import webview
 from bertopic import BERTopic
+from bertopic.vectorizers import ClassTfidfTransformer
 from sklearn.feature_extraction.text import CountVectorizer
 import pandas as pd
 import numpy as np
@@ -60,7 +61,12 @@ class BertTopicOperation(StepOperation):
         self.use_verbose = config["topic modeling"].get("Use verbose progress reporting", False)
 
         # Initialize BERTopic (common to both modes)
-        self.topic_model = BERTopic(language=self.language, min_topic_size=self.cluster_size)
+        ctfidf_model = ClassTfidfTransformer(reduce_frequent_words=True)
+        self.topic_model = BERTopic(
+            language=self.language,
+            min_topic_size=self.cluster_size,
+            ctfidf_model=ctfidf_model)
+
         if self.vectorizer_config:
             self.topic_model.vectorizer_model = CountVectorizer(**self.vectorizer_config)
 

@@ -1,7 +1,7 @@
 {
-  "name": "pywebview-react-boilerplate",
+  "name": "nlptk",
   "version": "1.0.0",
-  "description": "A simple boilerplate to get started with pywebview and React",
+  "description": "A gui application for simple natural language processing operations.",
   "main": "index.js",
   "scripts": {
     "build": "npm run clean && npm run frontend:prod && run-script-os",

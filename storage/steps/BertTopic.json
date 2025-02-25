@@ -72,7 +72,7 @@
       "Use verbose progress reporting" : {
         "type": "bool",
         "default": false,
-        "description": "If checked, the progress of the topic modeling process will be reported in the console. Care! his will have severe impact on performance as embeddings will be calculated manually."
+        "description": "If checked, the progress of the topic modeling process will be reported in the console. Care! This will have severe impact on performance as embeddings will be calculated manually."
       }
     }
   },

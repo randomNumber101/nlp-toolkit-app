@@ -17,7 +17,7 @@ if os.path.exists('dist/index.app'):
 
 ENTRY_POINT = ['src/index.py']
 
-DATA_FILES = tree('gui')
+DATA_FILES = tree('gui') + tree('storage')
 OPTIONS = {
     'argv_emulation': False,
     'strip': False,

@@ -1,16 +1,23 @@
 # -*- mode: python ; coding: utf-8 -*-
 
-
 block_cipher = None
 added_files = [
-    ('.\\gui', 'gui'),
+    ('.\\src\\gui', 'gui'),
+    ('.\\storage', 'storage'),
 ]
 
+hidden_imports = [
+    'clr',
+    'sklearn.tree._partitioner',
+    'scipy.special._cdflib',
+]
+
+
 a = Analysis(['.\\src\\index.py'],
-             pathex=['.\\dist'],
+             pathex=['.\\src'],
              binaries=[],
              datas=added_files,
-             hiddenimports=['clr'],
+             hiddenimports=hidden_imports,
              hookspath=[],
              hooksconfig={},
              runtime_hooks=[],
@@ -19,8 +26,7 @@ a = Analysis(['.\\src\\index.py'],
              win_private_assemblies=False,
              cipher=block_cipher,
              noarchive=False)
-pyz = PYZ(a.pure, a.zipped_data,
-             cipher=block_cipher)
+pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
 
 exe = EXE(pyz,
           a.scripts,
@@ -28,7 +34,7 @@ exe = EXE(pyz,
           a.zipfiles,
           a.datas,
           [],
-          name='pywebview-react',
+          name='NLP Toolkit',
           debug=False,
           bootloader_ignore_signals=False,
           strip=False,

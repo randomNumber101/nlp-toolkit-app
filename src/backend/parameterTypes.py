@@ -3,8 +3,6 @@ import typing
 from abc import ABC, abstractmethod
 from typing import Callable, Type, List, Dict, TypeVar, Generic, cast
 
-
-
 T = TypeVar('T')
 
 
@@ -97,6 +95,14 @@ class ComplexPicker(ParameterPicker):
         self.inner = innerParams
         outputType = ComplexType(innerParams)
         super().__init__(name=name, outputType=outputType, parameters=[])
+
+
+class ListPicker(ParameterPicker):
+    def __init__(self, innerParam: "Parameter" = None, name="list_picker"):
+        self.innerParam = innerParam
+        outputType = ListType(innerParam.type) if innerParam else None
+        super().__init__(name=name, outputType=outputType, parameters=[])
+        self.value = None
 
 
 class Parameter:
