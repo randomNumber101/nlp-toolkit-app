@@ -14,17 +14,17 @@
       "type" : "complex_list",
       "description" : "List of classes to be used for classification",
       "inner_parameters": {
-        "class" : {
-          "type" : "string",
-          "input" : {
-            "type" : "list",
-            "possibilities": ["Class 1", "Class 2", "Class 3"]
-          },
-          "default" : "Class 1"
+        "word list": {
+          "type": "complex_list",
+          "description": "List of words to be scaned for",
+          "inner_parameters": {
+            "word": {
+              "type": "string"
+            },
+            "is regex": "bool"
+          }
         },
-        "id" : {
-          "type" : "int"
-        }
+        "active": "bool"
       }
     },
     "LLM config" : {
