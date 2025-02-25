@@ -90,19 +90,25 @@ class ParameterPicker(ABC):
         return self
 
 
+# A picker class that encapsulates multiple other pickers
 class ComplexPicker(ParameterPicker):
-    def __init__(self, innerParams: List["Parameter"], name="complex"):
+    def __init__(self, innerParams: List["Parameter"]):
         self.inner = innerParams
         outputType = ComplexType(innerParams)
-        super().__init__(name=name, outputType=outputType, parameters=[])
+        super().__init__(name="complex", outputType=outputType, parameters=[])
 
 
-class ListPicker(ParameterPicker):
-    def __init__(self, innerParam: "Parameter" = None, name="list_picker"):
-        self.innerParam = innerParam
-        outputType = ListType(innerParam.type) if innerParam else None
-        super().__init__(name=name, outputType=outputType, parameters=[])
-        self.value = None
+# A picker class that encapsulates an expandable list of a picker (which can be complex)
+class ComplexListPicker(ParameterPicker):
+    def __init__(self, innerParams: List["Parameter"], max_length=50):
+        self.inner = innerParams
+        self.max_length = max_length  # Maximum number of elements in the list
+        if len(innerParams) == 1:
+            innerType = innerParams[0].type
+        else:
+            innerType = ComplexType(innerParams)
+        outputType = ListType(innerType)
+        super().__init__(name="complex_list", outputType=outputType, parameters=[])
 
 
 class Parameter:

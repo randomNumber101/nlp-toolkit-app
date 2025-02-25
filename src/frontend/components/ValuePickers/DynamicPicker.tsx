@@ -7,6 +7,7 @@ import { Parameter } from '../../types';
 import './DynamicPicker.scss';
 import { useState } from 'react';
 import ColumnPicker from "./ColumnPicker";
+import ComplexListPicker from "./ComplexListPicker";
 
 interface DynamicPickerProps {
   parameter: Parameter;
@@ -62,6 +63,16 @@ const DynamicPicker: React.FC<DynamicPickerProps> = ({ parameter, value, onChang
     );
   }
 
+  if (parameter.picker?.name === 'complex_list') {
+    return (
+      <ComplexListPicker
+        parameter={parameter}
+        value={value}
+        onChange={onChange}
+      />
+    );
+  }
+
   // Handle simple picker types
   let pickerElement;
   switch (parameter.picker?.name) {
@@ -101,7 +112,7 @@ const DynamicPicker: React.FC<DynamicPickerProps> = ({ parameter, value, onChang
       );
       break;
     default:
-      pickerElement = <div>Unsupported picker type: {parameter.picker?.name}</div>;
+      pickerElement = <div>Unsupported picker type: {parameter.picker?.name} with type {parameter.type}</div>;
   }
 
   return (

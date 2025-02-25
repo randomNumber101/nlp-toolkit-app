@@ -17,12 +17,14 @@ import shutil
 class Paths:
     def __init__(self):
         # Determine the target writable location
-        if sys.platform == "darwin":  # macOS
-            self.storage = os.path.expanduser("~/Library/Application Support/YourApp/storage")
+        if getattr(sys, 'frozen', True):
+            self.storage = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../storage"))
+        elif sys.platform == "darwin":  # macOS
+            self.storage = os.path.expanduser("~/Library/Application Support/NLP Toolkit/storage")
         elif sys.platform == "win32":  # Windows
-            self.storage = os.path.join(os.getenv("APPDATA"), "YourApp", "storage")
+            self.storage = os.path.join(os.getenv("APPDATA"), "NLP Toolkit", "storage")
         else:  # Linux
-            self.storage = os.path.expanduser("~/.local/share/YourApp/storage")
+            self.storage = os.path.expanduser("~/.local/share/NLP Toolkit/storage")
 
         # Ensure storage exists, otherwise extract it
         self.ensure_storage()
@@ -43,7 +45,7 @@ class Paths:
             if getattr(sys, 'frozen', False):
                 embedded_storage = os.path.join(os.path.dirname(sys.executable), "storage")
             else:
-                embedded_storage = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../storage"))
+                return
 
             if os.path.exists(embedded_storage):
                 shutil.copytree(embedded_storage, self.storage, dirs_exist_ok=True)
@@ -119,6 +121,7 @@ class StepsApi:
         if not os.path.exists(file_path):
             raise FileNotFoundError(f"Step {step_id} does not exist.")
         with open(file_path, 'r') as file:
+            print("Loading step", step_id)
             data = json.load(file)
         step = self.step_parser(data)
         self._cache[step_id] = step

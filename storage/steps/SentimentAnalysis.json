@@ -23,14 +23,16 @@
     "sentiment analysis": {
       "type": "complex",
       "description": "Perform sentiment analysis on the text.",
-      "language": {
-        "type": "string",
-        "input": {
-          "type": "list",
-          "possibilities": ["en", "de"]
-        },
-        "default": "en",
-        "description": "Language of the text for sentiment analysis."
+      "inner_parameters": {
+        "language": {
+          "type": "string",
+          "input": {
+            "type": "list",
+            "possibilities": ["en", "de"]
+          },
+          "default": "en",
+          "description": "Language of the text for sentiment analysis."
+        }
       }
     }
   },

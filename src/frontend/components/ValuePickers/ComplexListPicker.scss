@@ -1,0 +1,72 @@
+.complex-list-picker {
+  margin-top: 20px;
+  padding: 15px;
+  border: 2px solid #ddd;
+  border-radius: 5px;
+  background-color: rgba(84, 250, 36, 0.125);
+
+  .list-header {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 10px;
+
+    h4 {
+      margin: 0;
+      font-size: 1.2rem;
+    }
+
+    .description {
+      font-size: 0.9rem;
+      color: #666;
+      text-align: left;
+      margin-top: 5px;
+    }
+
+    .add-button {
+      margin-top: 10px;
+      padding: 5px 10px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+
+      &:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  .list-body {
+    .list-entry {
+      margin-top: 10px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      background-color: white;
+
+      .entry-controls {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 10px;
+
+        .remove-button {
+          padding: 5px 10px;
+          background-color: #dc3545;
+          color: white;
+          border: none;
+          border-radius: 5px;
+          cursor: pointer;
+        }
+      }
+
+      .entry-content {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+    }
+  }
+}

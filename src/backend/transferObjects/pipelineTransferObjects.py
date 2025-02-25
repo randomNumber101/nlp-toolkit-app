@@ -2,7 +2,8 @@ from typing import List, Dict, Optional
 import uuid
 
 from backend.generaltypes import Pipeline, StepValues, StepBlueprint
-from backend.parameterTypes import ComplexPicker, Parameter, ParameterPicker, StaticParameter, InputOutputDefinition
+from backend.parameterTypes import ComplexPicker, Parameter, ParameterPicker, StaticParameter, InputOutputDefinition, \
+    ComplexListPicker
 
 
 class ParameterTransferObject:
@@ -125,6 +126,9 @@ def convert_picker_to_transfer(picker: 'ParameterPicker') -> PickerObjectTransfe
     values = {}
     if isinstance(picker, ComplexPicker):
         parameters = [convert_parameter_to_transfer(p) for p in picker.inner]
+    if isinstance(picker, ComplexListPicker):
+        parameters = [convert_parameter_to_transfer(p) for p in picker.inner]
+        values["max_length"] = picker.max_length
     else:
         ignore = {"name", "outputType", "initializationParams", "default_values"}
         for k, v in vars(picker).items():

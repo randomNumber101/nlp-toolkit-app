@@ -23,18 +23,20 @@
     "remove stopwords": {
       "type": "complex",
       "description": "Remove insignificant words that are of little use for traditional NLP.",
-      "activate": {
-        "type": "bool",
-        "default": true,
-        "description": "Activate this function."
-      },
-      "language": {
-        "type": "string",
-        "input": {
-          "type": "list",
-          "possibilities": ["en_core_web_md", "de_core_news_md"]
+      "inner_parameters": {
+        "activate": {
+          "type": "bool",
+          "default": true,
+          "description": "Activate this function."
         },
-        "default": "en_core_web_md"
+        "language": {
+          "type": "string",
+          "input": {
+            "type": "list",
+            "possibilities": ["en_core_web_md", "de_core_news_md"]
+          },
+          "default": "en_core_web_md"
+        }
       }
     },
     "lowercase": {

@@ -2,7 +2,7 @@ import re
 import typing
 from typing import Callable, Dict, Any, List
 from backend.parameterTypes import ParameterPicker, Parameter, ParamType, InputOutputDefinition, \
-    StaticParameter, ComplexType, ComplexPicker
+    StaticParameter, ComplexType, ComplexPicker, ComplexListPicker
 from backend.generaltypes import StepBlueprint, StepOperationMapper, Pipeline, StepValues
 import uuid
 
@@ -116,7 +116,43 @@ class ParameterParser:
         description = getOptional(param_obj, "description", "")
         default_value = getOptional(param_obj, "default")
 
-        if not param_type_str == "complex":
+        if param_type_str == "complex":
+            # For Complex (composite) types, parse residual key-values as parameters.
+
+            if "inner_parameters" not in param_obj:
+                print(param_obj)
+                raise SyntaxError(f"Complex type {name} requires inner parameters.")
+
+            parameters = self.parseParameters(param_obj["inner_parameters"])
+            if self.pickerParser is not None:
+                picker = ComplexPicker(parameters)
+                complexType = typing.cast(ComplexType, picker.outputType)
+                default_values = complexType.getDefaults()
+                return StaticParameter(name, picker, description, default_values)
+            else:
+                complexType = ComplexType(parameters)
+                return Parameter(name, complexType, description, complexType.getDefaults())
+
+        elif param_type_str == "complex_list":
+
+            if "inner_parameters" not in param_obj:
+                print(param_obj)
+                raise SyntaxError(f"Complex type {name} requires inner parameters.")
+
+            inner_params = self.parseParameters(get(param_obj, "inner_parameters"))
+            max_list_length = getOptional(param_obj, "max_length", 50)
+
+            if self.pickerParser is None:
+                raise SyntaxError("Complex List ist not allowed as a type for Dynamic parameters.")
+
+            picker = ComplexListPicker(inner_params, max_length=max_list_length)
+            return StaticParameter(name, picker, description, [])
+
+
+
+
+
+        else:
             param_type = self.typeParser(param_type_str, strict=self.strictTyping)
             picker_obj = getOptional(param_obj, "input")
 
@@ -131,24 +167,9 @@ class ParameterParser:
                 return StaticParameter(name, picker, description, default_value)
             else:
                 return Parameter(name, param_type, description, default_value)
-        else:
-            # For Complex (composite) types, parse residual key-values as parameters.
 
-            del param_obj["type"]
-            if "description" in param_obj:
-                del param_obj["description"]
-            if "default" in param_obj:
-                del param_obj["default"]
 
-            parameters = self.parseParameters(param_obj)
-            if self.pickerParser is not None:
-                picker = ComplexPicker(parameters)
-                complexType = typing.cast(ComplexType, picker.outputType)
-                default_values = complexType.getDefaults()
-                return StaticParameter(name, picker, description, default_values)
-            else:
-                complexType = ComplexType(parameters)
-                return Parameter(name, complexType, description, complexType.getDefaults())
+
 
     def parseParameters(self, param_obj: Dict[str, Any]) -> List[Parameter | StaticParameter]:
         parameters = []

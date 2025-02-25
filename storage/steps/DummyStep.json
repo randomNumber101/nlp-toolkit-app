@@ -10,29 +10,49 @@
       "description" : "Sets the classification threshold."
     },
     "should return": "bool",
+    "list of classes" : {
+      "type" : "complex_list",
+      "description" : "List of classes to be used for classification",
+      "inner_parameters": {
+        "class" : {
+          "type" : "string",
+          "input" : {
+            "type" : "list",
+            "possibilities": ["Class 1", "Class 2", "Class 3"]
+          },
+          "default" : "Class 1"
+        },
+        "id" : {
+          "type" : "int"
+        }
+      }
+    },
     "LLM config" : {
       "type" : "complex",
       "description": "Config for the LLM",
-      "model" : {
-        "type" : "string",
-        "input" : {
-          "type" : "list",
-          "possibilities": ["BertForNounClassification", "ProbabilisticClassificaion", "Heuristic"]
+      "inner_parameters": {
+        "model" : {
+          "type" : "string",
+          "input" : {
+            "type" : "list",
+            "possibilities": ["BertForNounClassification", "ProbabilisticClassificaion", "Heuristic"]
+          },
+          "default" : "BertForNounClassification",
+          "description" : "Model used for Classification"
         },
-        "default" : "BertForNounClassification",
-        "description" : "Model used for Classification"
-      },
-      "tokenization" : "bool",
-      "num heads": {
-        "type" : "int",
-        "input" : {
-          "type" : "slider",
-          "min" : 2,
-          "max" : 12,
-          "step" : 2
-        },
-        "default" : 8
+        "tokenization" : "bool",
+        "num heads": {
+          "type" : "int",
+          "input" : {
+            "type" : "slider",
+            "min" : 2,
+            "max" : 12,
+            "step" : 2
+          },
+          "default" : 8
+        }
       }
+
     },
     "dimensions" : {
       "type" : "bool",

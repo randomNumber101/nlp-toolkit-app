@@ -23,56 +23,60 @@
     "topic modeling": {
       "type": "complex",
       "description": "Configuration for topic modeling using BERTopic.",
-      "language": {
-        "type": "string",
-        "description": "The language used for BERTopic embeddings.",
-        "input": {
-          "type": "list",
-          "possibilities": ["english", "german", "multilingual"]
-        },
-        "default": "english"
-      },
-      "min_cluster_size": {
-        "type": "int",
-        "default": 10,
-        "input": {
-          "type": "slider",
-          "min": 1,
-          "max": 100,
-          "step": 1
-        },
-        "description": "The minimum size of topic clusters."
-      },
-      "vectorizer": {
-        "type": "complex",
-        "description": "Optional configuration for CountVectorizer used in BERTopic.",
-        "max_df": {
-          "type": "float",
-          "default": 0.95,
+      "inner_parameters": {
+        "language": {
+          "type": "string",
+          "description": "The language used for BERTopic embeddings.",
           "input": {
-            "type": "slider",
-            "min": 0,
-            "max": 1,
-            "step": 0.05
+            "type": "list",
+            "possibilities": ["english", "german", "multilingual"]
           },
-          "description": "Ignore terms with document frequency (%) higher than this."
+          "default": "english"
         },
-        "min_df": {
+        "min_cluster_size": {
           "type": "int",
-          "default": 2,
+          "default": 10,
           "input": {
             "type": "slider",
             "min": 1,
             "max": 100,
             "step": 1
           },
-          "description": "Ignore terms with document frequency lower than this, measured in the number of documents."
+          "description": "The minimum size of topic clusters."
+        },
+        "vectorizer": {
+          "type": "complex",
+          "description": "Optional configuration for CountVectorizer used in BERTopic.",
+          "inner_parameters": {
+            "max_df": {
+              "type": "float",
+              "default": 0.95,
+              "input": {
+                "type": "slider",
+                "min": 0,
+                "max": 1,
+                "step": 0.05
+              },
+              "description": "Ignore terms with document frequency (%) higher than this."
+          },
+            "min_df": {
+              "type": "int",
+              "default": 2,
+              "input": {
+                "type": "slider",
+                "min": 1,
+                "max": 100,
+                "step": 1
+              },
+              "description": "Ignore terms with document frequency lower than this, measured in the number of documents."
+            }
+          }
+        },
+        "Use verbose progress reporting" : {
+            "type": "bool",
+            "default": false,
+            "description": "If checked, the progress of the topic modeling process will be reported in the console. Care! This will have severe impact on performance as embeddings will be calculated manually."
         }
-      },
-      "Use verbose progress reporting" : {
-        "type": "bool",
-        "default": false,
-        "description": "If checked, the progress of the topic modeling process will be reported in the console. Care! This will have severe impact on performance as embeddings will be calculated manually."
       }
     }
   },
