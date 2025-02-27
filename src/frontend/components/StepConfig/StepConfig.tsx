@@ -10,9 +10,11 @@ interface StepConfigProps {
   values: StepValues;
   onUpdate: (updatedValues: StepValues) => void;
   onDeleteStep: () => void;
+  isSingleOperation?: boolean;
 }
 
-const StepConfigClass: React.FC<StepConfigProps> = ({ blueprint, values, onUpdate , onDeleteStep}) => {
+const StepConfigClass: React.FC<StepConfigProps> =
+    ({ blueprint, values, onUpdate , onDeleteStep, isSingleOperation}) => {
   const [updatedValues, setUpdatedValues] = useState(values.values || {});
   const [isInfoExpanded, setIsInfoExpanded] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -35,9 +37,11 @@ const StepConfigClass: React.FC<StepConfigProps> = ({ blueprint, values, onUpdat
     <div className="step-config">
       <div className="header">
         <div className="name">{blueprint.name}</div>
-        <button className="remove-step-button" onClick={onDeleteStep}>
-            <FaTrash/>
-        </button>
+        {!isSingleOperation && (
+          <button className="remove-step-button" onClick={onDeleteStep}>
+              <FaTrash/>
+          </button>
+        )}
       </div>
 
       {blueprint.information && (

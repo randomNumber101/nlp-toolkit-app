@@ -56,6 +56,8 @@ const PipelineConfigScreen: React.FC<PipelineConfigScreenProps> = ({
   const { blueprints } = useBlueprintContext();
   const blueprintMap = useMemo(() => listToMap(blueprints, (bp: StepBlueprint) => bp.id), [blueprints]);
 
+  const isSingleOperation = steps.length === 1 && pipeline.id.includes("single-operation");
+
 
   const onDragStart = () => setIsDragging(true);
 
@@ -135,8 +137,8 @@ const PipelineConfigScreen: React.FC<PipelineConfigScreenProps> = ({
     <div className="pipeline-config-screen">
       {/* Header */}
       <div className="pipeline-header">
-        <h2>Pipeline Settings</h2>
-        <label>Pipeline Name:</label>
+        <h2>General Settings</h2>
+        <label>Name:</label>
         <TextFieldPicker value={pipelineName} onChange={(name) => setPipelineName(name)} />
         <label>Description:</label>
         <TextFieldPicker value={pipelineDescription} onChange={(desc) => setPipelineDescription(desc)} />
@@ -144,7 +146,7 @@ const PipelineConfigScreen: React.FC<PipelineConfigScreenProps> = ({
 
       {/* Operations */}
       <div className="operations-container">
-        <h2>Operations</h2>
+        <h2>{isSingleOperation? "Configuration": "Operations"}</h2>
         <div className="pipeline-wrapper">
           {/* Input Box */}
           <div className="file-box input-box" onClick={toggleShowInput}>
@@ -185,13 +187,13 @@ const PipelineConfigScreen: React.FC<PipelineConfigScreenProps> = ({
                         </Draggable>
 
                         {/* Arrow between operations */}
-                        {!isDragging && <div className="arrow show">→</div>}
+                        {!isDragging && !isSingleOperation && <div className="arrow show">→</div>}
                       </React.Fragment>
                     );
                   })}
 
                   {/* Add Operation Card */}
-                  {!isDragging && (
+                  {!isDragging && !isSingleOperation && (
                     <div
                       className="add-operation-card"
                       onClick={handleAddOperationClick}
@@ -247,6 +249,7 @@ const PipelineConfigScreen: React.FC<PipelineConfigScreenProps> = ({
                 setSteps(updatedSteps);
               }}
               onDeleteStep={handleDeleteStep(selectedStepIndex)}
+              isSingleOperation={isSingleOperation}
             />
           </div>
         </div>

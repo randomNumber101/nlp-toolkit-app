@@ -27,9 +27,9 @@ type Screen =
 
 const steps = [
   'Select Input',
-  'Select Pipeline',
-  'Configure Pipeline',
-  'Run Pipeline',
+  'Select Operation',
+  'Configure Operation',
+  'Run Operation',
 ];
 
 function App() {
