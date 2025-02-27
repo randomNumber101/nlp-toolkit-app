@@ -161,6 +161,8 @@ class ParameterParser:
                     picker = self.pickerParser.parse(picker_obj)
                 else:
                     picker = self.pickerParser.useDefault(param_type)
+
+
                 return StaticParameter(name, picker, description, default_value)
             elif picker_obj:
                 picker = self.pickerParser.parse(picker_obj)
@@ -205,6 +207,7 @@ class StepBlueprintParser:
         step_id = get(stepObject, "id")
         name = get(stepObject, "name")
         description = getOptional(stepObject, "description", "")
+        information = getOptional(stepObject, "information", None)
         tags = getOptional(stepObject, "tags", [])
 
         # Parse parameters, inputs, and outputs
@@ -222,7 +225,7 @@ class StepBlueprintParser:
 
         # Instantiate the StepBlueprint
         operation = self.operationMapper.getOperation(step_id)
-        step_blueprint = StepBlueprint(step_id, name, operation, description, inOutDef=in_out_def, tags=tags)
+        step_blueprint = StepBlueprint(step_id, name, operation, description,  information=information, inOutDef=in_out_def, tags=tags)
 
         return step_blueprint
 
@@ -240,6 +243,7 @@ class PipelineParser:
         pipeline_id = json_data.get("id", str(uuid.uuid4()))
         name = json_data.get("name", f"Pipeline {pipeline_id}")
         description = json_data.get("description", "")
+        information = json_data.get("information", None)
 
         # Parse steps
         steps = []
@@ -253,7 +257,7 @@ class PipelineParser:
         tags = json_data.get("tags", [])
 
         # Create and return Pipeline instance
-        return Pipeline(id=pipeline_id, name=name, description=description, steps=steps, tags=tags)
+        return Pipeline(id=pipeline_id, name=name, description=description, information=information, steps=steps, tags=tags)
 
     @staticmethod
     def to_json(pipeline: Pipeline) -> Dict[str, Any]:

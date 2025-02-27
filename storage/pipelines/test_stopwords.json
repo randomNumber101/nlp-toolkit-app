@@ -22,13 +22,6 @@
                 },
                 "input column": "cleaned"
             }
-        },
-        {
-            "stepId": "SentimentAnalysis",
-            "values": {
-                "input column": "text",
-                "output columns prefix": "sentiment_"
-            }
         }
     ],
     "tags": [

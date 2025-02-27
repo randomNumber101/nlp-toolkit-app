@@ -32,18 +32,13 @@ class PickerObjectTransfer:
         self.values = values
 
     def to_dict(self):
-        if self.parameters is not None and any(self.parameters):
-            return {
-                "name": self.name,
-                "outputType": "complex",
-                "parameters": [param.to_dict() for param in self.parameters]
-            }
-        else:
-            return {
-                "name": self.name,
-                "outputType": self.outputType,
-                "values": self.values
-            }
+        parameters = [param.to_dict() for param in self.parameters] if self.parameters else None
+        return {
+            "name": self.name,
+            "outputType": "complex",
+            "parameters": parameters,
+            "values": self.values
+        }
 
 
 class InOutDefTransferObject:
@@ -62,10 +57,11 @@ class InOutDefTransferObject:
 
 
 class StepBlueprintTransferObject:
-    def __init__(self, id: str, name: str, description: str, inOutDef: InOutDefTransferObject, tags: List[str] = None):
+    def __init__(self, id: str, name: str, description: str, inOutDef: InOutDefTransferObject, information = None, tags: List[str] = None):
         self.id = id
         self.name = name
         self.description = description
+        self.information = information
         self.inOutDef = inOutDef
         self.tags = tags if tags else []
 
@@ -74,6 +70,7 @@ class StepBlueprintTransferObject:
             "id": self.id,
             "name": self.name,
             "description": self.description,
+            "information": self.information,
             "inOutDef": self.inOutDef.to_dict(),
             "tags": self.tags
         }
@@ -124,17 +121,14 @@ def convert_parameter_to_transfer(param: 'Parameter') -> ParameterTransferObject
 def convert_picker_to_transfer(picker: 'ParameterPicker') -> PickerObjectTransfer:
     parameters = None
     values = {}
-    if isinstance(picker, ComplexPicker):
+    if isinstance(picker, ComplexPicker) or isinstance(picker, ComplexListPicker):
         parameters = [convert_parameter_to_transfer(p) for p in picker.inner]
-    if isinstance(picker, ComplexListPicker):
-        parameters = [convert_parameter_to_transfer(p) for p in picker.inner]
-        values["max_length"] = picker.max_length
-    else:
-        ignore = {"name", "outputType", "initializationParams", "default_values"}
-        for k, v in vars(picker).items():
-            if k in ignore:
-                continue
-            values[k] = v
+
+    ignore = {"name", "outputType", "initializationParams", "default_values", "inner"}
+    for k, v in vars(picker).items():
+        if k in ignore:
+            continue
+        values[k] = v
 
     return PickerObjectTransfer(name=picker.name, outputType=str(picker.outputType), values=values, innerParameters=parameters)
 
@@ -150,6 +144,7 @@ def convert_in_out_def_to_transfer(in_out_def: 'InputOutputDefinition') -> InOut
 def convert_step_blueprint_to_transfer(blueprint: 'StepBlueprint') -> StepBlueprintTransferObject:
     in_out_def_transfer = convert_in_out_def_to_transfer(blueprint.inOutDef)
     return StepBlueprintTransferObject(id=blueprint.stepId, name=blueprint.name, description=blueprint.description,
+                                       information=blueprint.information,
                                        inOutDef=in_out_def_transfer, tags=blueprint.tags)
 
 

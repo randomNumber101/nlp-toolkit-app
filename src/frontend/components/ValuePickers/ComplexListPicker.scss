@@ -5,6 +5,12 @@
   border-radius: 5px;
   background-color: rgba(84, 250, 36, 0.125);
 
+  .description {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 10px;
+  }
+
   .list-body {
     display: flex;
     flex-direction: column;
@@ -44,8 +50,13 @@
           }
 
           .entry-value {
-            font-size: 0.9rem;
-            color: #666;
+            font-size: 1rem;
+            color: #333;
+
+            .empty-value {
+              font-style: italic;
+              color: red;
+            }
           }
         }
 

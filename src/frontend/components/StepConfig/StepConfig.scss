@@ -1,24 +1,24 @@
 .step-config {
-  position: relative; /* Establish a positioning context for the pseudo-element */
+  position: relative;
   border-top: 1px solid #ddd;
   text-align: left;
   padding: 20px 10px;
   border-radius: 20px;
-  overflow: hidden; /* Ensure the pseudo-element doesn't spill out */
-  transition: opacity 0.9s; /* Transition for opacity changes */
+  overflow: hidden;
+  transition: opacity 0.9s;
 
-  /* Pseudo-element for the animated background */
   &::before {
     content: "";
     position: absolute;
     top: 0;
-    right: 0; /* Start from the top right corner */
+    right: 0;
     width: 0;
     height: 0;
     background: linear-gradient(to bottom left, #ffffff, #ff0000);
-    transition: width 1.2s ease, height 1.2s ease; /* Smooth expansion */
-    z-index: -1; /* Place it behind the content */
+    transition: width 1.2s ease, height 1.2s ease;
+    z-index: -1;
   }
+
   &:has(.header .remove-step-button:hover) {
     &::before {
       width: 100%;
@@ -32,84 +32,157 @@
     }
   }
 
-  /* Header Styles */
   .header {
     display: flex;
-    flex-direction: row;
     justify-content: space-between;
     align-items: center;
 
-    /* Name Styles */
     .name {
       font-size: 1.5rem;
       font-weight: 600;
       margin-bottom: 1rem;
       color: #000000;
-      transition: opacity 0.9s; /* Smooth opacity transition */
+      transition: opacity 0.9s;
     }
 
-    /* Remove Step Button Styles */
     .remove-step-button {
-      background-color: #ff0000; /* Red background */
-      color: #ffffff;            /* White text */
-      border: none;              /* No border */
-      border-radius: 50%;        /* Circular button */
+      background-color: #ff0000;
+      color: #ffffff;
+      border: none;
+      border-radius: 50%;
       width: 50px;
       height: 50px;
       font-size: 1.2rem;
       cursor: pointer;
       position: relative;
-      outline: none;
       transition: background-color 0.3s ease;
-    }
 
-    /* Change background color on hover */
-    .remove-step-button:hover {
-      background-color: #cc0000; /* Darker red */
-    }
-
-    /* Outer glow effect using box-shadow */
-    .remove-step-button::before {
-      content: "";
-      position: absolute;
-      top: -5px;
-      left: -5px;
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      box-shadow: 0 0 10px 5px rgba(255, 0, 0, 0.5); /* Initial glow */
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
-
-    /* Show glow on hover */
-    .remove-step-button:hover::before {
-      opacity: 1;
-      animation: glow-animation 1s infinite alternate;
-    }
-
-    /* Keyframes for pulsating glow */
-    @keyframes glow-animation {
-      from {
-        box-shadow: 0 0 10px 5px rgba(255, 0, 0, 0.5);
+      &:hover {
+        background-color: #cc0000;
       }
-      to {
-        box-shadow: 0 0 20px 10px rgba(255, 0, 0, 0.8);
+
+      &::before {
+        content: "";
+        position: absolute;
+        top: -5px;
+        left: -5px;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        box-shadow: 0 0 10px 5px rgba(255, 0, 0, 0.5);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+
+      &:hover::before {
+        opacity: 1;
+        animation: glow-animation 1s infinite alternate;
       }
     }
   }
 
-  /* Description Styles */
+  .info-border-container {
+    border: 2px solid rgba(0, 123, 255, 0.77);
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    transition: border-color 0.3s ease;
+    overflow: hidden;
+
+    &:hover {
+      border-color: #0056b3;
+    }
+  }
+
+  .description-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px;
+    border-bottom: 1px solid white;
+    background-color: #ebf3ff;
+  }
+
   .description {
     font-size: 1rem;
     color: #666;
-    margin-bottom: 1rem;
-    transition: opacity 0.9s; /* Smooth opacity transition */
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: color 0.3s ease;
+
+    .arrow {
+      font-size: 0.8rem;
+      color: #007bff;
+    }
+
+    &.hovered {
+      color: #007bff;
+    }
   }
 
-  /* Static Parameters Styles */
+  .info-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: #007bff;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: none;
+    font-size: 0.9rem;
+    transition: transform 0.3s ease;
+
+    &:hover {
+      transform: scale(1.1);
+    }
+
+    &:hover::after {
+      content: "More information";
+      position: absolute;
+      top: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      white-space: nowrap;
+    }
+  }
+
+  .information-box {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+    background-color: #f0f8ff;
+    border-radius: 0 0 6px 6px;
+    padding: 0 12px;
+
+    &.expanded {
+      max-height: 1000px;
+      padding: 12px;
+    }
+
+    p {
+      margin: 0.5rem 0;
+      line-height: 1.5;
+      color: #004085;
+    }
+  }
+
   .static-parameters {
-    /* Add your styles here */
-    transition: opacity 0.9s; /* Smooth opacity transition */
+    transition: opacity 0.9s;
+  }
+
+  @keyframes glow-animation {
+    from {
+      box-shadow: 0 0 10px 5px rgba(255, 0, 0, 0.5);
+    }
+    to {
+      box-shadow: 0 0 20px 10px rgba(255, 0, 0, 0.8);
+    }
   }
 }

@@ -218,6 +218,7 @@ class ParallelizableOperation(StepOperation, ABC):
         start_time = time.time()
         data: pd.DataFrame = payload.data
         counter = Counter({"success": 0, "failed": 0})
+        notifier.log(str(data), LogLevels.DEBUG)
         num_cells = len(data[self.input_column])
         output_columns = self.getColumnNames()
 
@@ -334,11 +335,13 @@ class StepValues:
 
 class StepBlueprint:
     def __init__(self, stepId, name, operation: type[StepOperation], description, inOutDef: InputOutputDefinition,
+                 information: str = None,
                  tags: List[str] = None):
         self.stepId = stepId
         self.name = name
         self.operation = operation
         self.description = description
+        self.information = information,
         self.inOutDef = inOutDef
         self.tags = tags if tags else []
 
@@ -369,10 +372,11 @@ class StepBlueprint:
 
 
 class Pipeline:
-    def __init__(self, id, name, description="", steps: List[StepValues] = None, tags: List[str] = None):
+    def __init__(self, id, name, description="", information=None, steps: List[StepValues] = None, tags: List[str] = None):
         self.id = id
         self.name = name
         self.description = description
+        self.information = information
         if steps is None:
             steps = []
         self.steps = steps

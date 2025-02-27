@@ -8,11 +8,12 @@ T = TypeVar('T')
 
 class ParamType(Generic[T]):
 
-    def __init__(self, name, realType: Type = None, parse: Callable[[object], T] = None):
+    def __init__(self, name, realType: Type = None, parse: Callable[[object], T] = None, defaultValue=None):
         from .register import Register
 
         self.name = name
         self.type = realType
+        self.defaultValue = defaultValue
 
         if parse is not None:
             self.parse = parse
@@ -100,9 +101,10 @@ class ComplexPicker(ParameterPicker):
 
 # A picker class that encapsulates an expandable list of a picker (which can be complex)
 class ComplexListPicker(ParameterPicker):
-    def __init__(self, innerParams: List["Parameter"], max_length=50):
+    def __init__(self, innerParams: List["Parameter"], max_length=50, entry_format="<value>"):
         self.inner = innerParams
         self.max_length = max_length  # Maximum number of elements in the list
+        self.entry_format = entry_format  # The format of the entries in the list <#> will be replaced by the index, <value> by first inner param value
         if len(innerParams) == 1:
             innerType = innerParams[0].type
         else:
@@ -117,6 +119,10 @@ class Parameter:
         self.name = name
         self.type = paraType
         self.description = description
+
+        if defaultValue is None:
+            defaultValue = paraType.defaultValue
+
         self.defaultValue = defaultValue
 
 

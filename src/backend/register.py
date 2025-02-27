@@ -4,6 +4,7 @@ from typing import Dict, List, Tuple
 from backend import utils
 from backend.generaltypes import StepOperation, Payload, StepOperationMapper
 from backend.operations.TextSimilarityOperation import TextSimilarityAnalysisOperation
+from backend.operations.WordListScanOperation import WordListScanOperation
 from backend.parameterTypes import ParamType, ParameterPicker, Parameter, ListType
 from backend.run.LogManager import LogManager
 from backend.storage.parsing import ParameterTypeParser, ParameterPickerParser
@@ -36,8 +37,8 @@ class Register:
 class BaseTypes:
     INT = ParamType("int", int)
     FLOAT = ParamType("float", float)
-    STRING = ParamType("string", str)
-    BOOL = ParamType("bool", bool)
+    STRING = ParamType("string", str, defaultValue="")
+    BOOL = ParamType("bool", bool, defaultValue=False)
     INT_LIST = ListType(INT)
     FLOAT_LIST = ListType(FLOAT)
     STRING_LIST = ListType(STRING)
@@ -131,6 +132,7 @@ def registerClasses():
     Register.OperationMapper.registerOperation("SentimentAnalysis", SentimentAnalysisOperation)
     Register.OperationMapper.registerOperation("KeywordExtraction", KeywordExtractionOperation)
     Register.OperationMapper.registerOperation("TextSimilarityAnalysis", TextSimilarityAnalysisOperation)
+    Register.OperationMapper.registerOperation("WordListScan", WordListScanOperation)
 
     '''
         Register types

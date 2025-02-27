@@ -98,7 +98,7 @@ class RunApi:
         # Convert to csv as default
         input_data = input_handle["data"]
         if input_handle["type"] == "text":
-            input_data = "text \n" + input_data
+            input_data = "text\n" + input_data
 
         run_id = f"{pipelineId}-{str(uuid.uuid4())[:18]}"
 

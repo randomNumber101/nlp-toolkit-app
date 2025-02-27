@@ -14,6 +14,8 @@ interface StepConfigProps {
 
 const StepConfigClass: React.FC<StepConfigProps> = ({ blueprint, values, onUpdate , onDeleteStep}) => {
   const [updatedValues, setUpdatedValues] = useState(values.values || {});
+  const [isInfoExpanded, setIsInfoExpanded] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
   useEffect(() => {
     setUpdatedValues(values.values || {});
@@ -36,10 +38,40 @@ const StepConfigClass: React.FC<StepConfigProps> = ({ blueprint, values, onUpdat
             <FaTrash/>
         </button>
       </div>
-      <div className="description">{blueprint.description}</div>
+
+      {blueprint.information && (
+        <div className="info-border-container">
+          <div className="description-container"
+              onMouseEnter={() => setIsHovered(true)}
+              onMouseLeave={() => setIsHovered(false)}
+              onClick={() => setIsInfoExpanded(!isInfoExpanded)}
+              aria-label="More information"
+          >
+            <div className={`description ${isHovered ? 'hovered' : ''}`}>
+              <span className="arrow">{isInfoExpanded ? '▼' : '▶'}</span>
+              {blueprint.description}
+            </div>
+            <button
+              className="info-icon"
+            >
+              i
+            </button>
+          </div>
+
+          <div className={`information-box ${isInfoExpanded ? 'expanded' : ''}`}
+              dangerouslySetInnerHTML={{ __html: blueprint.information }} />
+        </div>
+      )}
+
+      {!blueprint.information && blueprint.description && (
+        <div className="description-container">
+          <div className="description">
+            {blueprint.description}
+          </div>
+        </div>
+      )}
 
       <div className="static-parameters">
-        {/* Render DynamicPicker with updatedValues */}
         {blueprint.inOutDef.staticParameters.map((parameter) => (
           <DynamicPicker
             key={parameter.name}
@@ -49,7 +81,6 @@ const StepConfigClass: React.FC<StepConfigProps> = ({ blueprint, values, onUpdat
           />
         ))}
       </div>
-
     </div>
   );
 };

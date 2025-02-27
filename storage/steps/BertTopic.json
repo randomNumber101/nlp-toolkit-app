@@ -2,6 +2,7 @@
   "id": "BertTopic",
   "name": "BERT Topic Modeling",
   "description": "Finds and assigns topics in a batch of texts using BERT embeddings.",
+  "information": "<div style='background-color: #f0f0f0; padding: 10px; border-radius: 5px;'><h2>Welcome to the Application</h2><p>This is a <strong>large information text</strong> with <em>HTML formatting</em>.</p><ul><li>Feature 1</li><li>Feature 2</li></ul></div>",
   "tags": ["multiple texts only", "advanced"],
   "parameters": {
     "input column": {

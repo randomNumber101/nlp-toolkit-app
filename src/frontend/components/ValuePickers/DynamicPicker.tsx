@@ -18,6 +18,12 @@ interface DynamicPickerProps {
 const DynamicPicker: React.FC<DynamicPickerProps> = ({ parameter, value, onChange }) => {
   const defaultValue = value ?? parameter.defaultValue;
 
+  React.useEffect(() => {
+    if (value == null) {
+      onChange(parameter.defaultValue);
+    }
+  })
+
   const handleInnerParamChange = (innerName: string, newValue: any) => {
     onChange({ ...value, [innerName]: newValue });
   };
@@ -105,7 +111,7 @@ const DynamicPicker: React.FC<DynamicPickerProps> = ({ parameter, value, onChang
     case 'checkbox':
       pickerElement = (
         <CheckboxPicker
-          value={!!defaultValue}
+          value={defaultValue ?? false}
           onChange={onChange}
           label={parameter.name}
         />

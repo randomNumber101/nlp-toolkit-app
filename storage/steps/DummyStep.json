@@ -10,13 +10,19 @@
       "description" : "Sets the classification threshold."
     },
     "should return": "bool",
-    "list of classes" : {
+    "Word lists" : {
       "type" : "complex_list",
-      "description" : "List of classes to be used for classification",
+      "description" : "Add word lists here. Each list will yield a separate column in the output.",
+      "entry format": "<#>. word list: <value:0>",
       "inner_parameters": {
-        "word list": {
+        "name" : {
+          "type" : "string",
+          "description" : "Name of this word list"
+        },
+        "list of words": {
           "type": "complex_list",
-          "description": "List of words to be scaned for",
+          "description": "The words to be scanned for. Regular expressions (regex) are supported.",
+          "entry format": "<value:0>",
           "inner_parameters": {
             "word": {
               "type": "string"
