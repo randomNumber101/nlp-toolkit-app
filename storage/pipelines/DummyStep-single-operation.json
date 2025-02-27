@@ -1,0 +1,80 @@
+{
+    "id": "DummyStep-single-operation",
+    "name": "Dummy Operation",
+    "description": "Empty operation for testing.",
+    "steps": [
+        {
+            "stepId": "DummyStep",
+            "values": {
+                "Word lists": [
+                    {
+                        "name": "strong words",
+                        "list of words": [
+                            {
+                                "word": "big",
+                                "is regex": false,
+                                "extended": false
+                            },
+                            {
+                                "word": "strong",
+                                "is regex": false,
+                                "extended": false
+                            },
+                            {
+                                "word": "high",
+                                "is regex": false,
+                                "extended": false
+                            }
+                        ],
+                        "active": false,
+                        "extended": true
+                    },
+                    {
+                        "name": "weak words",
+                        "list of words": [
+                            {
+                                "word": "small",
+                                "is regex": false,
+                                "extended": false
+                            },
+                            {
+                                "word": "weak",
+                                "is regex": false,
+                                "extended": false
+                            },
+                            {
+                                "word": "tiny",
+                                "is regex": false,
+                                "extended": false
+                            },
+                            {
+                                "word": "cute",
+                                "is regex": false,
+                                "extended": false
+                            }
+                        ],
+                        "active": false,
+                        "extended": false
+                    },
+                    {
+                        "name": "hr",
+                        "list of words": [],
+                        "active": false,
+                        "extended": false
+                    }
+                ],
+                "dimensions": true,
+                "LLM config": {
+                    "model": "BertForNounClassification",
+                    "num heads": 8,
+                    "tokenization": false
+                },
+                "should return": false,
+                "threshold": 0.1
+            }
+        }
+    ],
+    "tags": [
+        "operations"
+    ]
+}

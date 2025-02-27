@@ -1,0 +1,93 @@
+<div style="background: #f8f9fa; border: 2px solid #007bff; border-radius: 8px; padding: 20px; margin: 10px 0; font-family: Arial, sans-serif; color: #333;">
+  <style>
+    .info-section { margin-bottom: 20px; }
+    .info-title {
+      color: #0056b3;
+      font-weight: 600;
+      margin-bottom: 10px;
+      border-bottom: 2px solid #007bff;
+      padding-bottom: 5px;
+    }
+    .info-list {
+      margin: 10px 0;
+      padding-left: 20px;
+    }
+    .info-list li { margin: 8px 0; }
+    .warning { color: #856404; }
+    .reference { font-size: 0.9em; color: #666; margin-top: 20px; }
+    .reference a { color: #007bff; text-decoration: none; }
+    .reference a:hover { text-decoration: underline; }
+  </style>
+
+  <div class="info-section">
+    <h3 class="info-title">🛠 How the Sentiment Analysis Operation Works</h3>
+    <ul class="info-list">
+      <li><strong>Text Input Processing:</strong> The operation processes text data from a specified input column (default: "text").</li>
+      <li><strong>Model Selection:</strong>
+        <ul>
+          <li>For English (`"en"`): Uses `distilbert-base-uncased-finetuned-sst-2-english`.</li>
+          <li>For German (`"de"`): Uses `oliverguhr/german-sentiment-bert`.</li>
+        </ul>
+      </li>
+      <li><strong>Prediction:</strong> The model classifies the sentiment of each input text as either <span style="color:#52c41a; font-weight:bold;">POSITIVE</span> or <span style="color:#f5222d; font-weight:bold;">NEGATIVE</span>, along with a confidence score.</li>
+      <li><strong>Truncation and Padding:</strong> The model ensures text fits within input limits using truncation and padding.</li>
+      <li><strong>Output:</strong> Two new columns are added:
+        <ul>
+          <li>`[prefix]_label` - Predicted sentiment label.</li>
+          <li>`[prefix]_score` - Confidence score (0 to 1).</li>
+        </ul>
+      </li>
+      <li><strong>Visualization:</strong> Displays a sample of the processed text along with its predicted sentiment and confidence score.</li>
+    </ul>
+  </div>
+
+  <div class="info-section">
+    <h3 class="info-title">⚙️ Key Configuration Notes</h3>
+    <ul class="info-list">
+      <li><strong>Input Column Selection:</strong>
+        <ul>
+          <li>Specify the text column to analyze. Default is `"text"`.</li>
+        </ul>
+      </li>
+      <li><strong>Output Column Prefix:</strong>
+        <ul>
+          <li>Customize output column names using a prefix. Default is `"sentiment_"`.</li>
+        </ul>
+      </li>
+      <li><strong>Language Selection:</strong>
+        <ul>
+          <li>English (`"en"`) and German (`"de"`) are supported.</li>
+          <li>Using an unsupported language raises an error.</li>
+        </ul>
+      </li>
+      <li><strong>Initial Model Download:</strong>
+        <ul>
+          <li>First-time usage requires downloading the model (can take some time).</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+
+  <div class="info-section">
+    <h3 class="info-title">🔧 Technical Implementation Details</h3>
+    <ul class="info-list">
+      <li><strong>Uses Hugging Face Transformers:</strong> Implements `transformers.pipeline("sentiment-analysis")`.</li>
+      <li><strong>Batch Processing:</strong> Processes input texts efficiently with automatic batching.</li>
+      <li><strong>Score Calculation:</strong> The confidence score is rounded to 4 decimal places.</li>
+      <li><strong>Text Sample Handling:</strong> Displays up to 400 characters in the visualization, appending `"..."` if truncated.</li>
+    </ul>
+  </div>
+
+  <div class="info-section">
+    <h3 class="info-title warning">⚠️ Important Notes</h3>
+    <ul class="info-list">
+      <li>Processing long texts may lead to truncation.</li>
+      <li>Models are pre-trained on general sentiment datasets; domain-specific accuracy may vary.</li>
+      <li>First-time execution might take longer due to model downloads.</li>
+    </ul>
+  </div>
+
+  <div class="reference">
+    <p>For more details, visit the <a href="https://huggingface.co/docs/transformers/main_classes/pipelines" target="_blank">Hugging Face documentation</a>.</p>
+  </div>
+</div>

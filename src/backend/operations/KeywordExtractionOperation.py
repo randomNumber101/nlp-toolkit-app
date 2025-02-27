@@ -19,6 +19,7 @@ class KeywordExtractionOperation(ParallelizableTextOperation):
 
         # Load the spaCy language model (e.g. "en_core_web_sm" or "de_core_news_sm")
         notifier.log(f"Loading spaCy model '{self.language_model}' for keyword extraction...", LogLevels.INFO)
+        notifier.log(f"On first use, this may take some time, as the model needs to be downloaded...", LogLevels.WARN)
         self.nlp = spacy.load(self.language_model)
         notifier.log("Keyword Extraction Operation initialized successfully.", LogLevels.INFO)
 

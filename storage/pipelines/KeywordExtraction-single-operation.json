@@ -1,0 +1,21 @@
+{
+    "id": "KeywordExtraction-single-operation",
+    "name": "Keyword Extraction",
+    "description": "Extracts the most common keywords from texts using spaCy.",
+    "steps": [
+        {
+            "stepId": "KeywordExtraction",
+            "values": {
+                "keyword extraction": {
+                    "num_keywords": 1,
+                    "language_model": "en_core_web_md"
+                },
+                "output column": "keywords",
+                "input column": "text"
+            }
+        }
+    ],
+    "tags": [
+        "operations"
+    ]
+}

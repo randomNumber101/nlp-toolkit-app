@@ -1,0 +1,130 @@
+<div style="background: #f0f8ff; border: 2px solid #007bff; border-radius: 8px; padding: 20px; margin: 10px 0; font-family: Arial, sans-serif; color: #333;">
+  <style>
+    .info-section { margin-bottom: 20px; }
+    .info-title {
+      color: #004085;
+      font-weight: 600;
+      margin-bottom: 10px;
+      border-bottom: 2px solid #007bff;
+      padding-bottom: 5px;
+    }
+    .info-list {
+      margin: 10px 0;
+      padding-left: 20px;
+    }
+    .info-list li { margin: 8px 0; }
+    .warning { color: #856404; }
+    .reference { font-size: 0.9em; color: #666; margin-top: 20px; }
+    .reference a { color: #007bff; text-decoration: none; }
+    .reference a:hover { text-decoration: underline; }
+  </style>
+
+  <div class="info-section">
+    <h3 class="info-title">🛠 How BERTopic Modeling Works</h3>
+    <ol class="info-list" style="list-style-type: circle;">
+      <li><strong>Embedding Generation:</strong> Uses DistilBERT to create contextual embeddings
+        <ul>
+          <li>Multilingual model handles 100+ languages</li>
+          <li>Batch processing with mixed precision (FP16) when available</li>
+        </ul>
+      </li>
+      <li><strong>Clustering:</strong> HDBSCAN algorithm groups similar embeddings
+        <ul>
+          <li>Density-based clustering preserves outlier detection (-1 topics)</li>
+        </ul>
+      </li>
+      <li><strong>Topic Representation:</strong> c-TF-IDF creates topic keywords
+        <ul>
+          <li>Adjusts for class imbalances in clusters</li>
+          <li>Custom vectorizer settings affect final keywords</li>
+        </ul>
+      </li>
+    </ol>
+  </div>
+
+  <div class="info-section">
+    <h3 class="info-title">⚙️ Key Configuration Notes</h3>
+    <ul class="info-list">
+      <li><strong>Combination with other operations:</strong>
+        <ul>
+          <li><strong>Do not</strong> use any text preprocessing steps before BERTopic❗</li>
+        </ul>
+      </li>
+      <li><strong>Language Selection:</strong>
+        <ul>
+          <li>"multilingual" uses DistilBERT-base-multilingual-cased</li>
+          <li>"english" uses a specialized English-optimized model</li>
+        </ul>
+      </li>
+      <li><strong>Cluster Size Tradeoffs:</strong>
+        <ul>
+          <li>Small values (＜10) → More specific topics, more outliers</li>
+          <li>Large values (＞50) → Broad topics, may miss nuances</li>
+        </ul>
+      </li>
+      <li><strong>Vectorizer Settings:</strong>
+        <ul>
+          <li>max_df=0.95: Excludes terms appearing in >95% documents</li>
+          <li>min_df=2: Only includes terms appearing in ≥2 documents</li>
+        </ul>
+      </li>
+      <li><strong>Verbose Mode Impact:</strong>
+        <ul>
+          <li>+ Enables progress tracking</li>
+          <li>- 3-5x slower due to manual embedding generation</li>
+          <li>- Requires ≥8GB VRAM for GPU acceleration</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+
+  <div class="info-section">
+    <h3 class="info-title">🔧 Technical Implementation Details</h3>
+    <ul class="info-list">
+      <li><strong>Embedding Generation:</strong>
+        <ul>
+          <li>Batch processing with DataLoader (multi-core support)</li>
+          <li>Mean pooling of final hidden states</li>
+          <li>Automatic mixed precision (AMP) for GPU efficiency</li>
+        </ul>
+      </li>
+      <li><strong>Cluster Optimization:</strong>
+        <ul>
+          <li>Automatically merges similar topics</li>
+          <li>Dimensionality reduction with UMAP</li>
+        </ul>
+      </li>
+      <li><strong>Output Handling:</strong>
+        <ul>
+          <li>Creates two columns: [prefix]_id and [prefix]_words</li>
+          <li>-1 indicates outlier documents</li>
+        </ul>
+      </li>
+      <li><strong>Visualization:</strong>
+        <ul>
+          <li>Interactive Plotly charts for topic exploration</li>
+          <li>Hierarchy view shows topic relationships</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+
+  <div class="info-section">
+    <h3 class="info-title warning">⚠️ Important Performance Notes</h3>
+    <ul class="info-list">
+      <li>10k documents ≈ 2-5 mins on GPU (verbose off)</li>
+      <li>100k documents ≈ 30-60 mins on CPU cluster</li>
+      <li>Memory usage scales linearly with batch size</li>
+    </ul>
+  </div>
+
+  <div class="reference">
+    <p>For more details, visit the <a href="https://maartengr.github.io/BERTopic/index.html" target="_blank">BERTopic documentation</a>.</p>
+    <p>Reference: @article{grootendorst2022bertopic,
+      title={BERTopic: Neural topic modeling with a class-based TF-IDF procedure},
+      author={Grootendorst, Maarten},
+      journal={arXiv preprint arXiv:2203.05794},
+      year={2022}
+    }</p>
+  </div>
+</div>

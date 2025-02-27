@@ -1,0 +1,14 @@
+{
+    "id": "BertTopic-single-operation",
+    "name": "BERT Topic Modeling",
+    "description": "Finds and assigns topics in a batch of texts using BERT embeddings.",
+    "steps": [
+        {
+            "stepId": "BertTopic",
+            "values": {}
+        }
+    ],
+    "tags": [
+        "operations"
+    ]
+}

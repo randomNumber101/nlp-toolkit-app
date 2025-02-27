@@ -4,8 +4,7 @@
   text-align: left;
   padding: 20px 10px;
   border-radius: 20px;
-  overflow: hidden;
-  transition: opacity 0.9s;
+  transition: opacity 0.9s; /* Removed overflow: hidden */
 
   &::before {
     content: "";
@@ -86,7 +85,7 @@
     border-radius: 8px;
     margin-bottom: 1rem;
     transition: border-color 0.3s ease;
-    overflow: hidden;
+    overflow: hidden; /* Keep overflow: hidden for the border container */
 
     &:hover {
       border-color: #0056b3;
@@ -162,7 +161,7 @@
     padding: 0 12px;
 
     &.expanded {
-      max-height: 1000px;
+      max-height: none; /* Allow the box to grow dynamically */
       padding: 12px;
     }
 

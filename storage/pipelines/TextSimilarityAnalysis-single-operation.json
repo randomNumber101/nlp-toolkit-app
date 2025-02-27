@@ -1,0 +1,19 @@
+{
+    "id": "TextSimilarityAnalysis-single-operation",
+    "name": "Text Similarity Analysis",
+    "description": "Computes the similarity between two texts based on BERT embeddings.",
+    "steps": [
+        {
+            "stepId": "TextSimilarityAnalysis",
+            "values": {
+                "transformer model": "distilbert-base-uncased",
+                "output column": "similarity",
+                "second text column": "text2",
+                "first text column": "text"
+            }
+        }
+    ],
+    "tags": [
+        "operations"
+    ]
+}

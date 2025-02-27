@@ -341,7 +341,7 @@ class StepBlueprint:
         self.name = name
         self.operation = operation
         self.description = description
-        self.information = information,
+        self.information = information
         self.inOutDef = inOutDef
         self.tags = tags if tags else []
 

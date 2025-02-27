@@ -9,6 +9,9 @@ from backend.generaltypes import ParallelizableTextOperation, Config, FrontendNo
 from backend.transferObjects.eventTransferObjects import StepState, LogLevels
 from backend.transferObjects.visualization import HTMLViz
 
+import en_core_web_md
+import de_core_news_md
+
 
 class SentimentAnalysisOperation(ParallelizableOperation, ABC):
 

@@ -1,0 +1,84 @@
+<div style="background: #f0f8ff; border: 2px solid #007bff; border-radius: 8px; padding: 20px; margin: 10px 0; font-family: Arial, sans-serif; color: #333;">
+  <style>
+    .info-section { margin-bottom: 20px; }
+    .info-title {
+      color: #004085;
+      font-weight: 600;
+      margin-bottom: 10px;
+      border-bottom: 2px solid #007bff;
+      padding-bottom: 5px;
+    }
+    .info-list {
+      margin: 10px 0;
+      padding-left: 20px;
+    }
+    .info-list li { margin: 8px 0; }
+    .warning { color: #856404; }
+    .reference { font-size: 0.9em; color: #666; margin-top: 20px; }
+    .reference a { color: #007bff; text-decoration: none; }
+    .reference a:hover { text-decoration: underline; }
+  </style>
+
+  <div class="info-section">
+    <h3 class="info-title">🛠 How DummyStep Works</h3>
+    <ul class="info-list">
+      <li><strong>Initialization:</strong> Logs a simple message and pauses briefly.</li>
+      <li><strong>Execution:</strong> Simulates an operation by updating progress in 10% increments.</li>
+      <li><strong>Randomized Failure:</strong> Has a 10% chance to fail, either logging an error or raising an exception.</li>
+      <li><strong>Visualization:</strong> Adds an HTML-based bar chart visualization to the output.</li>
+    </ul>
+  </div>
+
+  <div class="info-section">
+    <h3 class="info-title">⚙️ Key Configuration Notes</h3>
+    <ul class="info-list">
+      <li><strong>Testing Purposes:</strong>
+        <ul>
+          <li>This step does not process data—it is purely for debugging workflows.</li>
+        </ul>
+      </li>
+      <li><strong>Random Failure Behavior:</strong>
+        <ul>
+          <li>90% of the time, the step succeeds normally.</li>
+          <li>10% of the time, it fails, either by logging an error or raising an exception.</li>
+        </ul>
+      </li>
+      <li><strong>Progress Simulation:</strong>
+        <ul>
+          <li>Updates progress from 0% to 100% in steps of 10%, with 0.5s delays.</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+
+  <div class="info-section">
+    <h3 class="info-title">🔧 Technical Implementation Details</h3>
+    <ul class="info-list">
+      <li><strong>Logging:</strong>
+        <ul>
+          <li>Logs a message at the start and updates progress iteratively.</li>
+          <li>Warnings and errors are logged based on randomized failure cases.</li>
+        </ul>
+      </li>
+      <li><strong>Execution Timing:</strong>
+        <ul>
+          <li>Each progress update introduces a 0.5s delay, making total runtime ~5s.</li>
+          <li>Finalization step introduces an additional 1s delay.</li>
+        </ul>
+      </li>
+      <li><strong>Visualization Output:</strong>
+        <ul>
+          <li>Generates an embedded HTML bar chart as a visualization output.</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+
+  <div class="info-section">
+    <h3 class="info-title warning">⚠️ Important Notes</h3>
+    <ul class="info-list">
+      <li>This operation does <strong>not</strong> transform or process data in any way.</li>
+      <li>Use this operation only for testing and debugging pipeline execution flows.</li>
+    </ul>
+  </div>
+</div>

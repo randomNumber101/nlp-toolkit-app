@@ -1,7 +1,7 @@
 {
   "id": "TextSimilarityAnalysis",
   "name": "Text Similarity Analysis",
-  "description": "Compx utes the similarity between two text columns for each row using a transformer-based semantic similarity measure (cosine similarity on embeddings).",
+  "description": "Computes the similarity between two texts based on BERT embeddings.",
   "tags": ["advanced", "batch processing"],
   "parameters": {
     "first text column": {

@@ -1,0 +1,120 @@
+<div style="background: #f8f9fa; border: 2px solid #007bff; border-radius: 8px; padding: 20px; margin: 10px 0; font-family: Arial, sans-serif; color: #333;">
+  <style>
+    .info-section { margin-bottom: 20px; }
+    .info-title {
+      color: #0056b3;
+      font-weight: 600;
+      margin-bottom: 10px;
+      border-bottom: 2px solid #007bff;
+      padding-bottom: 5px;
+    }
+    .info-list {
+      margin: 10px 0;
+      padding-left: 20px;
+    }
+    .info-list li { margin: 8px 0; }
+    .warning { color: #856404; }
+    .reference { font-size: 0.9em; color: #666; margin-top: 20px; }
+    .reference a { color: #007bff; text-decoration: none; }
+    .reference a:hover { text-decoration: underline; }
+  </style>
+
+  <div class="info-section">
+    <h3 class="info-title">🛠 How the Text Similarity Analysis Operation Works</h3>
+    <ul class="info-list">
+      <li><strong>Input:</strong> The operation compares two text columns, computing a similarity score for each row.</li>
+      <li><strong>Transformer Model:</strong> Uses a pre-trained transformer model to generate text embeddings.
+        <ul>
+          <li>Default model: <code>distilbert-base-uncased</code></li>
+          <li>Alternative models: <code>bert-base-uncased</code>, <code>roberta-base</code></li>
+        </ul>
+      </li>
+      <li><strong>Embedding Calculation:</strong>
+        <ul>
+          <li>Tokenizes input text and applies transformer encoding.</li>
+          <li>Mean pooling over token embeddings generates a fixed-length vector representation.</li>
+        </ul>
+      </li>
+      <li><strong>Cosine Similarity:</strong> Computes similarity between two embeddings (values range from -1 to 1).</li>
+      <li><strong>Output:</strong> Stores similarity scores in a new column (default: <code>similarity</code>).</li>
+      <li><strong>Visualization:</strong> Displays a table previewing text pairs and their similarity scores.</li>
+    </ul>
+  </div>
+
+  <div class="info-section">
+    <h3 class="info-title">⚙️ Key Configuration Notes</h3>
+    <ul class="info-list">
+      <li><strong>Text Columns:</strong>
+        <ul>
+          <li>Select the two columns containing the texts to compare.</li>
+          <li>Defaults: <code>text1</code> and <code>text2</code>.</li>
+        </ul>
+      </li>
+      <li><strong>Output Column:</strong>
+        <ul>
+          <li>Defines where the similarity score is stored.</li>
+          <li>Default: <code>similarity</code>.</li>
+        </ul>
+      </li>
+      <li><strong>Model Selection:</strong>
+        <ul>
+          <li>Different models affect speed and accuracy.</li>
+          <li><code>distilbert-base-uncased</code>: Faster but slightly less accurate.</li>
+          <li><code>bert-base-uncased</code>: More accurate, higher resource usage.</li>
+          <li><code>roberta-base</code>: Robust for contextual meaning but slower.</li>
+        </ul>
+      </li>
+      <li><strong>Device Utilization:</strong>
+        <ul>
+          <li>Runs on GPU if available, otherwise on CPU.</li>
+          <li>GPU significantly speeds up processing for large datasets.</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+
+  <div class="info-section">
+    <h3 class="info-title">🔧 Technical Implementation Details</h3>
+    <ul class="info-list">
+      <li><strong>Tokenization:</strong> Uses Hugging Face's `AutoTokenizer` to preprocess input texts.</li>
+      <li><strong>Embedding Extraction:</strong>
+        <ul>
+          <li>Passes tokenized text through the transformer model.</li>
+          <li>Computes embeddings using mean pooling of hidden states.</li>
+        </ul>
+      </li>
+      <li><strong>Similarity Computation:</strong>
+        <ul>
+          <li>Uses PyTorch's `cosine_similarity()` function.</li>
+          <li>Handles missing or non-text inputs by returning a similarity score of `0.0`.</li>
+        </ul>
+      </li>
+      <li><strong>Batch Processing:</strong>
+        <ul>
+          <li>Processes rows iteratively with progress updates.</li>
+          <li>Simulates minimal delay to prevent system overload.</li>
+        </ul>
+      </li>
+      <li><strong>Output Format:</strong>
+        <ul>
+          <li>Stores similarity scores as floating-point values (rounded to 3 decimal places).</li>
+          <li>Displays an HTML table summarizing the first 5 processed rows.</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+
+  <div class="info-section">
+    <h3 class="info-title warning">⚠️ Important Notes</h3>
+    <ul class="info-list">
+      <li>Similarity scores range from -1 (opposite meaning) to 1 (identical meaning), but typically range between 0 and 1 for natural text.</li>
+      <li>Long texts may be truncated before processing due to model input length limits.</li>
+      <li>First execution might take longer due to model downloading.</li>
+      <li>Performance scales with dataset size; consider using GPU acceleration for large inputs.</li>
+    </ul>
+  </div>
+
+  <div class="reference">
+    <p>For more details, visit the <a href="https://huggingface.co/docs/transformers" target="_blank">Hugging Face documentation</a>.</p>
+  </div>
+</div>

@@ -1,0 +1,14 @@
+{
+    "id": "SentimentAnalysis-single-operation",
+    "name": "Sentiment Analysis",
+    "description": "Predicts text sentiments (positive/negative) and outputs prediction certainty.",
+    "steps": [
+        {
+            "stepId": "SentimentAnalysis",
+            "values": {}
+        }
+    ],
+    "tags": [
+        "operations"
+    ]
+}

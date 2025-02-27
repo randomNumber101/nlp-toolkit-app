@@ -1,0 +1,57 @@
+{
+    "id": "WordListScan-single-operation",
+    "name": "Word List Scan",
+    "description": "Scans the texts for possible matches with a list of words. The words can be regular expressions.",
+    "steps": [
+        {
+            "stepId": "WordListScan",
+            "values": {
+                "Word lists": [
+                    {
+                        "name": "List one",
+                        "list of words": [
+                            {
+                                "word": ".*q.*",
+                                "is regex": true,
+                                "extended": false
+                            },
+                            {
+                                "word": ".*w.*",
+                                "is regex": true,
+                                "extended": false
+                            },
+                            {
+                                "word": ".*e.*",
+                                "is regex": true,
+                                "extended": false
+                            }
+                        ],
+                        "active": "true",
+                        "extended": false
+                    },
+                    {
+                        "name": "list2",
+                        "list of words": [
+                            {
+                                "word": "it",
+                                "is regex": false,
+                                "extended": false
+                            },
+                            {
+                                "word": ".*ger",
+                                "is regex": true,
+                                "extended": false
+                            }
+                        ],
+                        "active": "true",
+                        "extended": false
+                    }
+                ],
+                "input column": "text"
+            }
+        }
+    ],
+    "tags": [
+        "operations"
+    ]
+}

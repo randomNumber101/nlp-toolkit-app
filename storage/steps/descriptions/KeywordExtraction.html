@@ -1,0 +1,106 @@
+<div style="background: #f8f9fa; border: 2px solid #ff9800; border-radius: 8px; padding: 20px; margin: 10px 0; font-family: Arial, sans-serif; color: #333;">
+  <style>
+    .info-section { margin-bottom: 20px; }
+    .info-title {
+      color: #e65100;
+      font-weight: 600;
+      margin-bottom: 10px;
+      border-bottom: 2px solid #ff9800;
+      padding-bottom: 5px;
+    }
+    .info-list {
+      margin: 10px 0;
+      padding-left: 20px;
+    }
+    .info-list li { margin: 8px 0; }
+    .warning { color: #856404; }
+    .reference { font-size: 0.9em; color: #666; margin-top: 20px; }
+    .reference a { color: #ff9800; text-decoration: none; }
+    .reference a:hover { text-decoration: underline; }
+  </style>
+
+  <div class="info-section">
+    <h3 class="info-title">🛠 How the Keyword Extraction Operation Works</h3>
+    <ul class="info-list">
+      <li><strong>Text Processing:</strong> The operation extracts the most relevant keywords from a selected text column.</li>
+      <li><strong>spaCy NLP Model:</strong> Uses a pre-trained spaCy language model to tokenize text and identify important words.</li>
+      <li><strong>Filtering:</strong>
+        <ul>
+          <li>Only <strong>alphabetic words</strong> are considered (numbers, punctuation, and symbols are ignored).</li>
+          <li><strong>Stopwords</strong> (common words like "the", "is", "and") are automatically removed.</li>
+        </ul>
+      </li>
+      <li><strong>Keyword Selection:</strong>
+        <ul>
+          <li>Counts occurrences of words in the text.</li>
+          <li>Selects the <strong>top N most frequent words</strong> (default: 5 keywords).</li>
+        </ul>
+      </li>
+      <li><strong>Output:</strong> Extracted keywords are stored in a new column (default: <code>keywords</code>).</li>
+      <li><strong>Visualization:</strong> Displays the input text and extracted keywords for review.</li>
+    </ul>
+  </div>
+
+  <div class="info-section">
+    <h3 class="info-title">⚙️ Key Configuration Notes</h3>
+    <ul class="info-list">
+      <li><strong>Input Column:</strong>
+        <ul>
+          <li>Selects the column containing text for keyword extraction.</li>
+          <li>Default: <code>text</code>.</li>
+        </ul>
+      </li>
+      <li><strong>Output Column:</strong>
+        <ul>
+          <li>Defines where extracted keywords are stored.</li>
+          <li>Default: <code>keywords</code>.</li>
+        </ul>
+      </li>
+      <li><strong>Number of Keywords:</strong>
+        <ul>
+          <li>Controls how many keywords are extracted per text.</li>
+          <li>Default: 5, adjustable between 1 and 20.</li>
+        </ul>
+      </li>
+      <li><strong>Language Model:</strong>
+        <ul>
+          <li>Specifies the spaCy language model used for tokenization.</li>
+          <li>Options: <code>en_core_web_md</code> (English) or <code>de_core_news_md</code> (German).</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+
+  <div class="info-section">
+    <h3 class="info-title">🔧 Technical Implementation Details</h3>
+    <ul class="info-list">
+      <li><strong>Tokenization:</strong> Text is split into individual words using the spaCy NLP pipeline.</li>
+      <li><strong>Stopword Filtering:</strong>
+        <ul>
+          <li>Common function words (e.g., "the", "and") are ignored.</li>
+          <li>Ensures extracted keywords are meaningful.</li>
+        </ul>
+      </li>
+      <li><strong>Frequency Counting:</strong>
+        <ul>
+          <li>Words are counted, and the most frequent ones are selected.</li>
+          <li>Case-insensitive (e.g., "Apple" and "apple" are treated as the same word).</li>
+        </ul>
+      </li>
+      <li><strong>Visualization:</strong> Generates an HTML preview showing extracted keywords for a given text.</li>
+    </ul>
+  </div>
+
+  <div class="info-section">
+    <h3 class="info-title warning">⚠️ Important Notes</h3>
+    <ul class="info-list">
+      <li>The operation does not understand context, so frequently occurring words may not always be meaningful.</li>
+      <li>Longer texts may produce better keyword results than very short ones.</li>
+      <li>First execution may take longer due to model downloading.</li>
+    </ul>
+  </div>
+
+  <div class="reference">
+    <p>For more details, visit the <a href="https://spacy.io/models" target="_blank">spaCy Language Models Documentation</a>.</p>
+  </div>
+</div>

@@ -1,7 +1,7 @@
 import os
 import json
 
-from typing import List
+from typing import List, Optional
 
 from backend.storage.parsing import StepBlueprintParser, PipelineParser
 from ..generaltypes import Pipeline, StepBlueprint
@@ -124,10 +124,28 @@ class StepsApi:
             print("Loading step", step_id)
             data = json.load(file)
         step = self.step_parser(data)
+        if step.information is None or step.information == "<html>":
+            step.information = self.load_description_html(step_id)
+
         self._cache[step_id] = step
         return step
 
-    def load_all(self, use_cache=True) -> list[StepBlueprint]:
+    def load_description_html(self, step_id: str) -> Optional[str]:
+        file_path = os.path.join(self.STEPS, "descriptions", f"{step_id}.html")
+        if not os.path.exists(file_path):
+            print(f"Description file not found: {file_path}")  # Debug log
+            return None
+
+        try:
+            with open(file_path, 'r', encoding='utf-8') as file:
+                content = file.read()
+                print(f"Loaded HTML content for {step_id}: {content[:100]}...")  # Debug log
+                return content
+        except UnicodeDecodeError as e:
+            print(f"Failed to read {file_path} with UTF-8 encoding: {e}")
+            return None
+
+    def load_all(self, use_cache=False) -> list[StepBlueprint]:
         return [self.load_step(sId, use_cache) for sId in self.list_ids()]
 
 

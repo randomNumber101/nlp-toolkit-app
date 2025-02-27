@@ -30,6 +30,7 @@ const StepConfigClass: React.FC<StepConfigProps> = ({ blueprint, values, onUpdat
     onUpdate({ ...values, values: newUpdatedValues });
   };
 
+  console.log(blueprint)
   return (
     <div className="step-config">
       <div className="header">

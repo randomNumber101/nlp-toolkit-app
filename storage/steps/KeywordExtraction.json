@@ -1,0 +1,57 @@
+{
+  "id": "KeywordExtraction",
+  "name": "Keyword Extraction",
+  "description": "Extracts the most common keywords from texts using spaCy.",
+  "tags": ["text processing", "nlp"],
+  "parameters": {
+    "input column": {
+      "type": "string",
+      "description": "When using CSV, defines the column to use this operation on. Defaults to 'text'",
+      "input": {
+        "type": "column_select"
+      },
+      "default": "text"
+    },
+    "output column": {
+      "type": "string",
+      "description": "The column where extracted keywords will be stored. Defaults to 'keywords'",
+      "input": {
+        "type": "text_field"
+      },
+      "default": "keywords"
+    },
+    "keyword extraction": {
+      "type": "complex",
+      "description": "Configuration for keyword extraction using spaCy.",
+      "inner_parameters": {
+        "num_keywords": {
+          "type": "int",
+          "default": 5,
+          "input": {
+            "type": "slider",
+            "min": 1,
+            "max": 20,
+            "step": 1
+          },
+          "description": "Number of keywords to extract from each text."
+        },
+        "language_model": {
+          "type": "string",
+          "description": "spaCy language model to use for text processing.",
+          "input": {
+            "type": "list",
+            "possibilities": ["en_core_web_md", "de_core_news_md"]
+          },
+          "default": "en_core_web_md"
+        }
+      }
+    }
+  },
+  "inputs": {
+    "data": "CSV[]"
+  },
+  "outputs": {
+    "data": "CSV[]",
+    "visualization": "html"
+  }
+}

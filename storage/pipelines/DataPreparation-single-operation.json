@@ -1,0 +1,14 @@
+{
+    "id": "DataPreparation-single-operation",
+    "name": "Data Preparation",
+    "description": "Removes stop words, lower-cases words and removes non-ascii characters.",
+    "steps": [
+        {
+            "stepId": "DataPreparation",
+            "values": {}
+        }
+    ],
+    "tags": [
+        "operations"
+    ]
+}
