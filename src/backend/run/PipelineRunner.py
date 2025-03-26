@@ -40,6 +40,7 @@ class RunNotifier(FrontendNotifier):
         super(RunNotifier, self).__init__()
         self.events = events
         self.logger = LogManager()
+        self.logger.set_channel("console", LoggerChannel()) # Always also log to console
         self.status_manager = StatusManager()
         self.domain = None
 

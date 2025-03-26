@@ -5,7 +5,16 @@
     "steps": [
         {
             "stepId": "DataPreparation",
-            "values": {}
+            "values": {
+                "remove non-ascii": true,
+                "lowercase": false,
+                "remove stopwords": {
+                    "activate": true,
+                    "language": "en_core_web_sm"
+                },
+                "output column": "text",
+                "input column": "text"
+            }
         }
     ],
     "tags": [

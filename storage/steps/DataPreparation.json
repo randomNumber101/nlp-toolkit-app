@@ -33,9 +33,9 @@
           "type": "string",
           "input": {
             "type": "list",
-            "possibilities": ["en_core_web_md", "de_core_news_md"]
+            "possibilities": ["en_core_web_sm", "de_core_news_sm"]
           },
-          "default": "en_core_web_md"
+          "default": "en_core_web_sm"
         }
       }
     },

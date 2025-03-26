@@ -3,7 +3,7 @@
 .landing-page {
   padding: 20px;
   text-align: center;
-  background-color: #f0f2f5;
+  background-color: rgba(255, 255, 255, 0.09);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -80,7 +80,7 @@
     border-radius: 10px;
     width: 300px;
     height: 200px;
-    background-color: #e7e7e7;
+    background-color: #ffffff;
     border: 2px solid transparent;
     display: flex;
     flex-direction: column;
@@ -182,10 +182,7 @@
   }
 
   .pipeline-card {
-
-
-
-    outline: 2px solid #52c41a;
+    outline: 5px solid #52c41a;
     .card-content {
       .pipeline-title {
         color: #52c41a; /* Blue title */
@@ -225,7 +222,7 @@
   }
 
   .operation-card {
-    outline: 2px solid #4682b4;
+    outline: 5px solid #4682b4;
     .card-content {
       .pipeline-title {
         color: #4682b4; /* Blue title */

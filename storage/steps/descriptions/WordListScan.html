@@ -1,10 +1,70 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+<div style="background: #f8f9fa; border: 2px solid #4caf50; border-radius: 8px; padding: 20px; margin: 10px 0; font-family: Arial, sans-serif; color: #333;">
+  <style>
+    .info-section { margin-bottom: 20px; }
+    .info-title {
+      color: #4caf50;
+      font-weight: 600;
+      margin-bottom: 10px;
+      border-bottom: 2px solid #4caf50;
+      padding-bottom: 5px;
+    }
+    .info-list { margin: 10px 0; padding-left: 20px; }
+    .info-list li { margin: 8px 0; }
+    .warning { color: #856404; }
+  </style>
 
-</body>
-</html>
+  <div class="info-section">
+    <h3 class="info-title">🛠 How the Word List Scan Operation Works</h3>
+    <ul class="info-list">
+      <li><strong>Text Input Processing:</strong> Reads text data from a designated column (default: "text") and prepares it for scanning.</li>
+      <li><strong>Word Lists Configuration:</strong> Processes multiple word lists defined in the configuration. Only word lists marked as active are used.</li>
+      <li><strong>Pattern Compilation:</strong>
+        <ul>
+          <li>For plain words, compiles regex patterns with word boundaries for whole-word matching.</li>
+          <li>For regex entries, compiles the provided pattern directly with case-insensitive matching.</li>
+        </ul>
+      </li>
+      <li><strong>Scanning and Counting:</strong> Iterates over each active word list, applying all its patterns to the input text and counting the total matches.</li>
+      <li><strong>Visualization:</strong> Generates an HTML preview that displays a (possibly truncated) version of the input text alongside the match counts for each word list.</li>
+    </ul>
+  </div>
+
+  <div class="info-section">
+    <h3 class="info-title">⚙️ Key Configuration Notes</h3>
+    <ul class="info-list">
+      <li><strong>Input Column:</strong>
+        <ul>
+          <li>Specifies the column to scan for text data. Default is <code>text</code>.</li>
+        </ul>
+      </li>
+      <li><strong>Word Lists:</strong>
+        <ul>
+          <li>Define one or more word lists; each list will produce a separate output column named after the list.</li>
+          <li><strong>List of Words:</strong> Each word list consists of multiple entries where each entry is a word or regex pattern. Enable regex matching by setting "is regex" to true.</li>
+          <li><strong>Active Flag:</strong> Toggle to include or exclude a word list from processing.</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+
+  <div class="info-section">
+    <h3 class="info-title">🔧 Technical Implementation Details</h3>
+    <ul class="info-list">
+      <li><strong>Parallelizable Processing:</strong> Designed as a parallelizable operation, it efficiently processes each text cell in batch mode with progress updates.</li>
+      <li><strong>Regex Matching:</strong> Utilizes Python’s <code>re</code> module to compile and apply regex patterns with case-insensitive matching.</li>
+      <li><strong>Error Handling:</strong> Logs any errors encountered during regex compilation for troubleshooting.</li>
+      <li><strong>Output Columns:</strong> For each active word list, a separate output column is generated containing the count of matches.</li>
+      <li><strong>Visualization:</strong> Returns an HTML visualization that displays a sample of the input text (truncated to 300 characters if necessary) and the respective match counts.</li>
+    </ul>
+  </div>
+
+  <div class="info-section">
+    <h3 class="info-title warning">⚠️ Important Notes</h3>
+    <ul class="info-list">
+      <li>Non-string or empty text cells result in zero matches for all word lists.</li>
+      <li>Ensure regex patterns are valid; any errors during pattern compilation are logged.</li>
+      <li>The operation is case-insensitive for both plain words and regex patterns.</li>
+      <li>Long texts are truncated in the visualization to improve readability.</li>
+    </ul>
+  </div>
+</div>

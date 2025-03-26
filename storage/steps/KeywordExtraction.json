@@ -2,7 +2,7 @@
   "id": "KeywordExtraction",
   "name": "Keyword Extraction",
   "description": "Extracts the most common keywords from texts using spaCy.",
-  "tags": ["text processing", "nlp"],
+  "tags": ["simple", "batch processing"],
   "parameters": {
     "input column": {
       "type": "string",

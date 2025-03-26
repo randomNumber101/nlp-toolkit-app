@@ -9,22 +9,29 @@ from ..generaltypes import Pipeline, StepBlueprint
 from ..register import Register
 from ..transferObjects.pipelineTransferObjects import convert_pipeline_to_transfer, convert_step_blueprint_to_transfer
 
+import os
+import sys
+import shutil
 
 import os
 import sys
 import shutil
 
+
 class Paths:
     def __init__(self):
         # Determine the target writable location
-        if getattr(sys, 'frozen', True):
+        if getattr(sys, 'frozen', False):  # Fixed: Default is now False
+            # Packaged app: Use a writable location
+            if sys.platform == "darwin":  # macOS
+                self.storage = os.path.expanduser("~/Library/Application Support/NLP Toolkit/storage")
+            elif sys.platform == "win32":  # Windows
+                self.storage = os.path.join(os.getenv("APPDATA"), "NLP Toolkit", "storage")
+            else:  # Linux
+                self.storage = os.path.expanduser("~/.local/share/NLP Toolkit/storage")
+        else:
+            # Development mode: Use a relative path
             self.storage = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../storage"))
-        elif sys.platform == "darwin":  # macOS
-            self.storage = os.path.expanduser("~/Library/Application Support/NLP Toolkit/storage")
-        elif sys.platform == "win32":  # Windows
-            self.storage = os.path.join(os.getenv("APPDATA"), "NLP Toolkit", "storage")
-        else:  # Linux
-            self.storage = os.path.expanduser("~/.local/share/NLP Toolkit/storage")
 
         # Ensure storage exists, otherwise extract it
         self.ensure_storage()
@@ -33,10 +40,12 @@ class Paths:
         self.pipelines = os.path.join(self.storage, "pipelines")
         self.steps = os.path.join(self.storage, "steps")
         self.runs = os.path.join(self.storage, "runs")
+        self.cache = os.path.join(self.storage, "cache")
 
         os.makedirs(self.pipelines, exist_ok=True)
         os.makedirs(self.steps, exist_ok=True)
         os.makedirs(self.runs, exist_ok=True)
+        os.makedirs(self.cache, exist_ok=True)
 
     def ensure_storage(self):
         """Extracts storage from the packaged app if it doesn't exist."""
@@ -45,11 +54,19 @@ class Paths:
             if getattr(sys, 'frozen', False):
                 embedded_storage = os.path.join(os.path.dirname(sys.executable), "storage")
             else:
-                return
+                # Development mode: Use the relative storage folder
+                embedded_storage = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../storage"))
 
             if os.path.exists(embedded_storage):
-                shutil.copytree(embedded_storage, self.storage, dirs_exist_ok=True)
-
+                try:
+                    shutil.copytree(embedded_storage, self.storage, dirs_exist_ok=True)
+                except AttributeError:
+                    # Fallback for Python < 3.8
+                    if os.path.exists(self.storage):
+                        shutil.rmtree(self.storage)
+                    shutil.copytree(embedded_storage, self.storage)
+            else:
+                raise FileNotFoundError(f"Storage folder not found at: {embedded_storage}")
 
 
 def list_jsons(path):
@@ -63,7 +80,6 @@ class PipelineApi:
         self.PATHS = paths
         self.PIPELINES = paths.pipelines
 
-
     def delete_pipeline(self, pipeline_id):
         file_path = os.path.join(self.PIPELINES, f"{pipeline_id}.json")
         if not os.path.exists(file_path):
@@ -76,7 +92,6 @@ class PipelineApi:
         file_path = os.path.join(self.PIPELINES, f"{pipeline.id}.json")
         with open(file_path, 'w') as file:
             json.dump(jsonObj, file, indent=4)
-
 
     def load_pipeline(self, pipeline_id) -> Pipeline:
         """Load a pipeline configuration from a JSON file in the storage/pipelines directory."""
@@ -145,7 +160,7 @@ class StepsApi:
             print(f"Failed to read {file_path} with UTF-8 encoding: {e}")
             return None
 
-    def load_all(self, use_cache=False) -> list[StepBlueprint]:
+    def load_all(self, use_cache=True) -> list[StepBlueprint]:
         return [self.load_step(sId, use_cache) for sId in self.list_ids()]
 
 
@@ -180,8 +195,3 @@ class StorageApi:
     def load_all_steps(self):
         stepBPs = self.STEPS.load_all()
         return [convert_step_blueprint_to_transfer(stepBP).to_dict() for stepBP in stepBPs]
-
-
-
-
-

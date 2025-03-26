@@ -1,8 +1,7 @@
+import sys
 from abc import ABC, abstractmethod
 from typing import List, Dict, TypeVar, Generic, Optional, Union
 from backend.transferObjects.eventTransferObjects import StepStatus, LogLevels
-
-
 
 # Define a generic type variable
 T = TypeVar("T")
@@ -45,7 +44,8 @@ class LoggerChannel(Channel[Dict[str, Union[str, LogLevels]]]):
 
 
 class LogManager(Multiplexer[Dict[str, Union[str, LogLevels]]]):
-    def __init__(self, channels: Optional[Dict[str, Channel[Dict[str, Union[str, LogLevels]]]]] = None, log_level: LogLevels = LogLevels.DEBUG):
+    def __init__(self, channels: Optional[Dict[str, Channel[Dict[str, Union[str, LogLevels]]]]] = None,
+                 log_level: LogLevels = LogLevels.DEBUG):
         super().__init__(channels if channels is not None else {"console": LoggerChannel()})
         self.log_level = log_level
 
@@ -76,10 +76,12 @@ class StatusManager(Multiplexer[StepStatus]):
     def __init__(self, channels: Optional[Dict[str, Channel[StepStatus]]] = None):
         super().__init__(channels if channels is not None else {"default": StatusChannel()})
 
-
     def send_status(self, status: StepStatus):
         self.multiplex(status)
 
     # Allow StatusManager to be called directly
     def __call__(self, status: StepStatus):
         self.send_status(status)
+
+
+

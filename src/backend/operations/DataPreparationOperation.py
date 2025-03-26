@@ -1,7 +1,8 @@
-import spacy
+
 from collections import Counter
 
 from backend.generaltypes import ParallelizableTextOperation, Config, FrontendNotifier, Payload
+from backend.operations.operation_utils import load_spacy_model_on_demand
 from backend.transferObjects.eventTransferObjects import StepState, LogLevels
 from backend.transferObjects.visualization import HTMLViz
 
@@ -10,11 +11,11 @@ class DataPreparationOperation(ParallelizableTextOperation):
 
     def initialize(self, config: Config, notifier: FrontendNotifier):
         super().initialize(config, notifier)
-        self.nlp = spacy.load(self.config["remove stopwords"]["language"])
+        language = self.config["remove stopwords"]["language"]
+        self.nlp = load_spacy_model_on_demand(language, notifier)
         self.do_stopwords = config["remove stopwords"]["activate"]
         self.do_lowercase = config["lowercase"]
         self.do_no_ascii = config["remove non-ascii"]
-
         notifier.log("Data Preparation Operation initialized!")
 
 

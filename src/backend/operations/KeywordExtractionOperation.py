@@ -1,11 +1,13 @@
-import spacy
 from collections import Counter
 
 from backend.generaltypes import ParallelizableTextOperation, Config, FrontendNotifier, Payload
+from backend.operations.operation_utils import load_spacy_model_on_demand
 from backend.transferObjects.eventTransferObjects import StepState, LogLevels
 from backend.transferObjects.visualization import HTMLViz
 
+
 class KeywordExtractionOperation(ParallelizableTextOperation):
+
     def initialize(self, config: Config, notifier: FrontendNotifier):
         self.config = config
         # Get input and output column names from the configuration
@@ -17,10 +19,8 @@ class KeywordExtractionOperation(ParallelizableTextOperation):
         self.num_keywords = extraction_config.get("num_keywords", 5)
         self.language_model = extraction_config.get("language_model", "en_core_web_sm")
 
-        # Load the spaCy language model (e.g. "en_core_web_sm" or "de_core_news_sm")
-        notifier.log(f"Loading spaCy model '{self.language_model}' for keyword extraction...", LogLevels.INFO)
-        notifier.log(f"On first use, this may take some time, as the model needs to be downloaded...", LogLevels.WARN)
-        self.nlp = spacy.load(self.language_model)
+        # Load the spaCy language model (download if necessary)
+        self.nlp = load_spacy_model_on_demand(self.language_model, notifier)
         notifier.log("Keyword Extraction Operation initialized successfully.", LogLevels.INFO)
 
     def single_cell_operation(self, notifier: FrontendNotifier, payload: Payload, text: str) -> str:

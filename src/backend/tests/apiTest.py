@@ -13,6 +13,7 @@ def test_get_blueprints():
     steps = api.STORAGE.load_all_steps()
     assert len(steps) > 0
 
+
 def test_get_pipelines():
     api = Api()
     pipes = api.STORAGE.load_all_pipelines()
@@ -46,6 +47,24 @@ def test_run_word_lists_op():
 
     api.RUNS.startRun(operation_pipe.id, input)
     time.sleep(3)  # Wait for run to end. Could also dynamically check via the progress status.
+    num_steps = len(operation_pipe.steps)
+    assert stateCounter[StepState.SUCCESS] >= num_steps, "Pipeline did not complete successfully!"
+    assert stateCounter[StepState.FAILED] == 0, "Pipeline encountered a failure!"
+
+
+def test_run_data_prep_op():
+    api, stateCounter = get_mock_backend_event_api()
+    pipes = api.STORAGE.PIPELINES.load_all()
+    operation_pipe = None
+    for pipe in pipes:
+        if "DataPreparation" in pipe.id:
+            operation_pipe = pipe
+            break
+
+    input = build_input_handle("Lorem ipsum dolomit lorem quantum sit. No kunor sic honem dores isef.")
+
+    api.RUNS.startRun(operation_pipe.id, input)
+    time.sleep(30)  # Wait for run to end. Could also dynamically check via the progress status.
     num_steps = len(operation_pipe.steps)
     assert stateCounter[StepState.SUCCESS] >= num_steps, "Pipeline did not complete successfully!"
     assert stateCounter[StepState.FAILED] == 0, "Pipeline encountered a failure!"

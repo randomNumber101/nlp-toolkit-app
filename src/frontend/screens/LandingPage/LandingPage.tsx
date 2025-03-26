@@ -213,7 +213,6 @@ const LandingPage: React.FC<LandingPageProps> = ({
 
   return (
     <div className="landing-page">
-      <h1>Configured Pipelines</h1>
 
       {/* Tag Filter Panel */}
       <div className="tag-filter-panel">

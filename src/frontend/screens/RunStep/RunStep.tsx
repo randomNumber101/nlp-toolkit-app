@@ -162,7 +162,7 @@ const RunStep: React.FC<RunStepProps> = ({ step, status, isActive, runId, stepNu
                         </button>
                         {stepNumber === totalSteps && (
                             <button className="action-button" onClick={openCsvViewer} title="View CSV">
-                                📄 View CSV
+                                📄 View And Save Result
                             </button>
                         )}
                     </div>

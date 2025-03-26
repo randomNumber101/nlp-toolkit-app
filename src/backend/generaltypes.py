@@ -147,6 +147,8 @@ class FrontendNotifier(ABC):
         pass
 
 
+
+
 class StepOperation(ABC):
     def __init__(self, config: Config, frontendNotifier: FrontendNotifier = None):
         self.initialize(config, frontendNotifier)
@@ -218,13 +220,8 @@ class ParallelizableOperation(StepOperation, ABC):
         start_time = time.time()
         data: pd.DataFrame = payload.data
         counter = Counter({"success": 0, "failed": 0})
-        notifier.log(str(data), LogLevels.DEBUG)
         num_cells = len(data[self.input_column])
         output_columns = self.getColumnNames()
-
-        # Create/initialize output columns.
-        for col in output_columns:
-            data[col] = None
 
         cell_index = 0
 

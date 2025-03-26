@@ -1,16 +1,9 @@
 # backend/operations/sentiment_analysis_operation.py
-from abc import ABC
-
-import spacy
-from collections import Counter
-from transformers import pipeline
-
 from backend.generaltypes import ParallelizableTextOperation, Config, FrontendNotifier, Payload, ParallelizableOperation
 from backend.transferObjects.eventTransferObjects import StepState, LogLevels
 from backend.transferObjects.visualization import HTMLViz
 
-import en_core_web_md
-import de_core_news_md
+from abc import ABC
 
 
 class SentimentAnalysisOperation(ParallelizableOperation, ABC):
@@ -23,7 +16,7 @@ class SentimentAnalysisOperation(ParallelizableOperation, ABC):
         self.output_prefix = config["sentiment analysis"].get("output columns prefix", "sentiment_")
 
         notifier.log("Initializing Sentiment Analysis Operation for language " + self.language, LogLevels.INFO)
-        notifier.log("When using this operation the first time, it might take a while downloading the according model...", LogLevels.WARN)
+        from transformers import pipeline
         if self.language == "en":
             self.sentiment_pipeline = pipeline("sentiment-analysis",
                                                model="distilbert-base-uncased-finetuned-sst-2-english")

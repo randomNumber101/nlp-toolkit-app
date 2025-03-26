@@ -8,20 +8,25 @@
             "values": {
                 "Word lists": [
                     {
-                        "name": "List one",
+                        "name": "Strong words",
                         "list of words": [
                             {
-                                "word": ".*q.*",
+                                "word": "strong",
                                 "is regex": true,
                                 "extended": false
                             },
                             {
-                                "word": ".*w.*",
+                                "word": "heavy",
                                 "is regex": true,
                                 "extended": false
                             },
                             {
-                                "word": ".*e.*",
+                                "word": "big",
+                                "is regex": true,
+                                "extended": false
+                            },
+                            {
+                                "word": ".*leader.*",
                                 "is regex": true,
                                 "extended": false
                             }
@@ -30,21 +35,31 @@
                         "extended": false
                     },
                     {
-                        "name": "list2",
+                        "name": "Weak words",
                         "list of words": [
                             {
-                                "word": "it",
+                                "word": "weak",
                                 "is regex": false,
                                 "extended": false
                             },
                             {
-                                "word": ".*ger",
+                                "word": "little",
                                 "is regex": true,
+                                "extended": false
+                            },
+                            {
+                                "word": "small",
+                                "is regex": false,
+                                "extended": false
+                            },
+                            {
+                                "word": "petite",
+                                "is regex": false,
                                 "extended": false
                             }
                         ],
                         "active": "true",
-                        "extended": false
+                        "extended": true
                     }
                 ],
                 "input column": "text"

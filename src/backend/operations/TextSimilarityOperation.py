@@ -1,16 +1,18 @@
-import time
-import torch
-import torch.nn.functional as F
-import pandas as pd
-from transformers import AutoTokenizer, AutoModel
-
 from backend.generaltypes import StepOperation, Config, FrontendNotifier, Payload
 from backend.transferObjects.eventTransferObjects import StepState, LogLevels
 from backend.transferObjects.visualization import MultiVisualization, HTMLViz, SimpleTextViz
 
+import time
+
 
 class TextSimilarityAnalysisOperation(StepOperation):
     def initialize(self, config: Config, notifier: FrontendNotifier):
+
+        print("Importing TextSimilarity deps")
+        import torch
+        from transformers import AutoTokenizer, AutoModel
+        print("Done.")
+
         self.config = config
         # Read two input column names from the configuration.
         self.first_column = config.get("first text column", "text1")
@@ -29,19 +31,22 @@ class TextSimilarityAnalysisOperation(StepOperation):
         self.model.to(self.device)
         notifier.log("Text Similarity Analysis Operation initialized using transformer model.", LogLevels.INFO)
 
-    def compute_embedding(self, text: str) -> torch.Tensor:
+    def compute_embedding(self, text: str):
         """
         Computes an embedding for the given text using mean pooling over the transformer outputs.
         """
+
+        from torch import no_grad, sum, clamp
+
         inputs = self.tokenizer(text, return_tensors="pt", padding=True, truncation=True)
         # Move inputs to the correct device.
         inputs = {key: value.to(self.device) for key, value in inputs.items()}
-        with torch.no_grad():
+        with no_grad():
             outputs = self.model(**inputs)
         # Mean pooling over the token embeddings
         attention_mask = inputs["attention_mask"].unsqueeze(-1).expand(outputs.last_hidden_state.size()).float()
-        sum_embeddings = torch.sum(outputs.last_hidden_state * attention_mask, dim=1)
-        sum_mask = torch.clamp(attention_mask.sum(dim=1), min=1e-9)
+        sum_embeddings = sum(outputs.last_hidden_state * attention_mask, dim=1)
+        sum_mask = clamp(attention_mask.sum(dim=1), min=1e-9)
         embedding = sum_embeddings / sum_mask
         return embedding[0]
 
@@ -52,14 +57,16 @@ class TextSimilarityAnalysisOperation(StepOperation):
         if not (isinstance(text1, str) and isinstance(text2, str)):
             return 0.0
 
+        from torch import cosine_similarity
+
         emb1 = self.compute_embedding(text1)
         emb2 = self.compute_embedding(text2)
-        similarity = F.cosine_similarity(emb1.unsqueeze(0), emb2.unsqueeze(0)).item()
+        similarity = cosine_similarity(emb1.unsqueeze(0), emb2.unsqueeze(0)).item()
         return similarity
 
     def run(self, payload: Payload, notifier: FrontendNotifier) -> StepState:
         try:
-            data: pd.DataFrame = payload.data
+            data = payload.data
             total_rows = len(data)
             if total_rows == 0:
                 notifier.log("Input data is empty.", LogLevels.ERROR)

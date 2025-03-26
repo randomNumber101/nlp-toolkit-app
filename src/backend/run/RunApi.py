@@ -10,6 +10,7 @@ import pandas
 from backend.run.backendEventApi import BackendEventApi
 from backend.generaltypes import Pipeline
 from backend.run.PipelineRunner import PipelineRunner
+from backend.storage.parsing import PipelineParser
 from backend.storage.storageApi import StorageApi
 from backend.transferObjects.pipelineTransferObjects import convert_pipeline_to_transfer
 from backend.transferObjects.visualization import Visualization
@@ -20,11 +21,13 @@ from backend.transferObjects.visualization import Visualization
 class RunStorageApi:
 
     PREVIEW_ROWS_NUM = 150
+    MAX_RUNS = 10
 
     def __init__(self, run_directory):
         self.directory = run_directory
 
     def initializeRun(self, run_id, pipeline : Pipeline):
+        self.recycleRuns()
         base_path = os.path.join(self.directory, run_id)
         viz_path = os.path.join(base_path, "visualizations")
         os.makedirs(viz_path)
@@ -36,6 +39,15 @@ class RunStorageApi:
             json.dump(original_pipeline, f, indent=4)
 
         return True
+
+
+    def getRunIds(self):
+        """
+            Returns a list of all run ids in the storage directory sorted by modification date. (newest first)
+        """
+        run_ids = [f for f in os.listdir(self.directory) if os.path.isdir(os.path.join(self.directory, f))]
+        run_ids = sorted(run_ids, key=lambda x: self.getModificationDate(x), reverse=True)
+        return run_ids
 
     def getRunPipeline(self, run_id):
         base_path = os.path.join(self.directory, run_id)
@@ -63,6 +75,8 @@ class RunStorageApi:
     def saveResult(self, run_id, data: pandas.DataFrame):
         base_path = os.path.join(self.directory, run_id)
         save_path = os.path.join(base_path, "result.csv")
+
+        # Delete oldest runs if there are too many
         return data.to_csv(save_path)
 
     def getResultPath(self, run_id):
@@ -75,6 +89,23 @@ class RunStorageApi:
     def getResult(self, run_id) -> pandas.DataFrame:
         save_path = self.getResultPath(run_id)
         return pandas.read_csv(save_path, nrows=RunStorageApi.PREVIEW_ROWS_NUM)
+
+    def getModificationDate(self, run_id):
+        base_path = os.path.join(self.directory, run_id)
+        return os.path.getmtime(base_path)
+
+    def delete_run(self, run_id):
+        base_path = os.path.join(self.directory, run_id)
+        if os.path.isdir(base_path):
+            shutil.rmtree(base_path)
+            return True
+
+    def recycleRuns(self):
+        run_ids = self.getRunIds()
+        if len(run_ids) > RunStorageApi.MAX_RUNS:
+            for run_id in run_ids[RunStorageApi.MAX_RUNS:]:
+                self.delete_run(run_id)
+
 
 
 class RunApi:
@@ -120,6 +151,9 @@ class RunApi:
     def getResult(self, run_id):
         dataframe = self._runStorageApi.getResult(run_id)
         return dataframe.to_json(orient='records')
+
+    def getOriginalPipeline(self, run_id):
+        return self._runStorageApi.getRunPipeline(run_id)
 
 
 

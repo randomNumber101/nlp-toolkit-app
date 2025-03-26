@@ -1,3 +1,5 @@
+import sys
+
 import pandas as pd
 import os
 from typing import Union, Any
@@ -38,4 +40,46 @@ def parseWildcardToDataframe(X: Any) -> pd.DataFrame:
     else:
         raise TypeError(
             "Unsupported type for parsing. Supported types are: pandas.DataFrame, str (filepath or text), and stream objects.")
+
+
+class CustomStdout:
+    def __init__(self, custom_log_func):
+        self.custom_log_func = custom_log_func  # Your logging function
+        self.buffer = []  # Buffer to handle partial lines
+
+    def write(self, text: str):
+        # Split text into lines and send completed lines to the custom function
+        if text == '\n':  # Handle standalone newlines
+            self.buffer.append('')
+        parts = text.split('\n')
+        for i, part in enumerate(parts):
+            if i < len(parts) - 1:
+                # Complete line found
+                self.buffer.append(part)
+                full_line = '\n'.join(self.buffer)
+                self.custom_log_func(full_line)
+                self.buffer = []
+            else:
+                # Partial line remains
+                self.buffer.append(part)
+
+    def flush(self):
+        # Optional: Send remaining buffer content if needed
+        if self.buffer:
+            self.custom_log_func('\n'.join(self.buffer))
+            self.buffer = []
+        sys.__stdout__.flush()  # Preserve default flush behavior
+
+
+from contextlib import contextmanager
+
+
+@contextmanager
+def redirect_stdout_to_logger(custom_log_func):
+    original_stdout = sys.stdout
+    sys.stdout = CustomStdout(custom_log_func)
+    try:
+        yield
+    finally:
+        sys.stdout = original_stdout  # Restore original stdout
 

@@ -94,8 +94,8 @@ export async function listStepBlueprints(): Promise<StepBlueprint[]> {
 
   const response = await window.pywebview.api.STORAGE.load_all_steps();
   console.log(response)
-  const result = unpackResponse(response);
-  return result as StepBlueprint[]; // Cast response to StepBlueprint array
+  const result = unpackResponse(response) as StepBlueprint[];
+  return result.filter((step) => !step.id.includes("Dummy")); // Filter out null values
 }
 
 // Load a specific step blueprint by its ID

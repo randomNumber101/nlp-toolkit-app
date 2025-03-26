@@ -1,40 +1,11 @@
-import webview
-from bertopic import BERTopic
-from bertopic.vectorizers import ClassTfidfTransformer
-from sklearn.feature_extraction.text import CountVectorizer
-import pandas as pd
-import numpy as np
-from transformers import DistilBertModel, DistilBertTokenizer
-import torch
-from torch.utils.data import DataLoader, Dataset
-from torch.cuda.amp import autocast
-
 from backend.transferObjects.eventTransferObjects import StepState, LogLevels
 from backend.generaltypes import StepOperation, Payload, FrontendNotifier, Config
 from backend.transferObjects.visualization import HTMLViz, SimpleTextViz, PlotlyViz, MultiVisualization
 
 
-class TextDataset(Dataset):
-    """
-    Dataset class for handling text data during embedding creation.
-    Only used in verbose mode.
-    """
-    def __init__(self, texts, tokenizer, max_length=512):
-        self.texts = texts
-        self.tokenizer = tokenizer
-        self.max_length = max_length
-
-    def __len__(self):
-        return len(self.texts)
-
-    def __getitem__(self, idx):
-        return self.tokenizer(
-            self.texts[idx],
-            padding='max_length',
-            truncation=True,
-            max_length=self.max_length,
-            return_tensors='pt'
-        )
+class TextDataset:
+    """Empty shell - real implementation moved to compute_embeddings()"""
+    pass
 
 
 class BertTopicOperation(StepOperation):
@@ -43,16 +14,19 @@ class BertTopicOperation(StepOperation):
     """
 
     def initialize(self, config: Config, notifier: FrontendNotifier):
-        """
-        Initializes the BertTopicOperation with configurations.
+        """Delayed imports for BERTopic core functionality"""
+        super().initialize(config, notifier)
 
-        Args:
-            config (Config): Configuration object containing parameters.
-            notifier (FrontendNotifier): Notifier for logging and progress updates.
-        """
-        super(BertTopicOperation, self).initialize(config, notifier)
+        # Lazy-load heavy dependencies
+        notifier.log("Importing BERTopic dependencies...", LogLevels.INFO)
+        notifier.log("This may take a while...", LogLevels.WARN)
+        from bertopic import BERTopic
+        from bertopic.vectorizers import ClassTfidfTransformer
+        notifier.log("Done.", LogLevels.INFO)
+
 
         # Common configurations
+        self.config = config
         self.input_column = config.get("input column", "text")
         self.output_column = config.get("output columns prefix", "topic_")
         self.language = config["topic modeling"]["language"]
@@ -60,7 +34,8 @@ class BertTopicOperation(StepOperation):
         self.vectorizer_config = config["topic modeling"]["vectorizer"]
         self.use_verbose = config["topic modeling"].get("Use verbose progress reporting", False)
 
-        # Initialize BERTopic (common to both modes)
+        notifier.log("Initializing models...", LogLevels.INFO)
+        # Initialize BERTopic core
         ctfidf_model = ClassTfidfTransformer(reduce_frequent_words=True)
         self.topic_model = BERTopic(
             language=self.language,
@@ -68,62 +43,65 @@ class BertTopicOperation(StepOperation):
             ctfidf_model=ctfidf_model)
 
         if self.vectorizer_config:
+            from sklearn.feature_extraction.text import CountVectorizer
             self.topic_model.vectorizer_model = CountVectorizer(**self.vectorizer_config)
 
         if self.use_verbose:
-            # Verbose Mode Initializations
-            notifier.log("Verbose progress reporting is enabled.", LogLevels.INFO)
-            notifier.log("BERTopic will use manual embedding creation with DistilBERT.", LogLevels.INFO)
-            notifier.log("This mode will provide more progress updates during the operation but will be much slower.", LogLevels.WARN)
-            notifier.log("For faster operation, disable verbose mode in the configuration.", LogLevels.INFO)
+            self._init_verbose_mode(notifier)
 
-            # Initialize device
-            self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-            notifier.log(f"Using device: {self.device}", LogLevels.INFO)
+    def _init_verbose_mode(self, notifier):
+        """Delayed imports for verbose mode components"""
+        from transformers import DistilBertModel, DistilBertTokenizer
+        import torch
 
-            # Initialize DistilBERT tokenizer and model for embeddings
-            notifier.log(f"Initializing DistilBERT model and tokenizer for {self.language}...", LogLevels.INFO)
-            self.tokenizer = DistilBertTokenizer.from_pretrained('distilbert-base-multilingual-cased')
-            self.embedding_model = DistilBertModel.from_pretrained('distilbert-base-multilingual-cased')
+        notifier.log("Verbose progress reporting enabled", LogLevels.INFO)
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-            # Utilize multiple GPUs if available
-            if torch.cuda.device_count() > 1:
-                notifier.log(f"Multiple GPUs detected: {torch.cuda.device_count()}. Using DataParallel.", LogLevels.INFO)
-                self.embedding_model = torch.nn.DataParallel(self.embedding_model)
+        # Initialize DistilBERT tokenizer and model for embeddings
+        notifier.log(f"Initializing DistilBERT model and tokenizer for {self.language}...", LogLevels.INFO)
+        self.tokenizer = DistilBertTokenizer.from_pretrained('distilbert-base-multilingual-cased')
+        self.embedding_model = DistilBertModel.from_pretrained('distilbert-base-multilingual-cased')
 
-            self.embedding_model.to(self.device)
-            self.embedding_model.eval()
+        if torch.cuda.device_count() > 1:
+            notifier.log(f"Using {torch.cuda.device_count()} GPUs", LogLevels.INFO)
+            self.embedding_model = torch.nn.DataParallel(self.embedding_model)
 
-            # Set batch size (can be adjusted based on hardware)
-            self.batch_size = config["topic modeling"].get("batch_size", 64)
-        else:
-            # Original Mode Initializations
-            notifier.log("Verbose progress reporting is disabled. Using original BERTopic workflow.", LogLevels.INFO)
-            notifier.log("BERTopic will use the default workflow for topic modeling.", LogLevels.INFO)
-            notifier.log("This mode may be faster but will not provide detailed progress updates.", LogLevels.WARN)
-            notifier.log("This operation is quite heavy and may take a while to complete. Do not wonder.", LogLevels.WARN)
-
+        self.embedding_model.to(self.device).eval()
+        self.batch_size = self.config["topic modeling"].get("batch_size", 64)
 
     def compute_embeddings(self, texts, notifier):
-        """
-        Manually compute BERT embeddings with progress updates.
+        """Delayed imports for embedding computation"""
+        import numpy as np
+        import torch
+        from torch.utils.data import DataLoader
+        from torch.cuda.amp import autocast
 
-        Args:
-            texts (list): List of text documents.
-            notifier (FrontendNotifier): Notifier for logging and progress updates.
+        # Define dataset class here to defer torch imports
+        class TextDataset(torch.utils.data.Dataset):
+            def __init__(self, texts, tokenizer, max_length=512):
+                self.texts = texts
+                self.tokenizer = tokenizer
+                self.max_length = max_length
 
-        Returns:
-            np.ndarray: Array of embeddings.
-        """
-        notifier.log("Starting embedding creation... (This may take a while)", LogLevels.INFO)
+            def __len__(self): return len(self.texts)
+
+            def __getitem__(self, idx):
+                return self.tokenizer(
+                    self.texts[idx],
+                    padding='max_length',
+                    truncation=True,
+                    max_length=self.max_length,
+                    return_tensors='pt'
+                )
+
+        notifier.log("Starting embedding creation...", LogLevels.INFO)
         notifier.sendStatus(StepState.RUNNING, progress=10)
 
-        # Create dataset and dataloader with multi-core support
         dataset = TextDataset(texts, self.tokenizer)
         dataloader = DataLoader(
             dataset,
             batch_size=self.batch_size,
-            num_workers=8,  # Adjust based on CPU cores
+            num_workers=4,
             pin_memory=True,
             prefetch_factor=2,
             persistent_workers=True
@@ -150,7 +128,6 @@ class BertTopicOperation(StepOperation):
             # Update progress
             progress = 10 + (i / total_batches) * 30  # Embedding takes from 10% to 40%
             notifier.sendStatus(StepState.RUNNING, progress=int(progress))
-            notifier.log(f"Processed batch {i}/{total_batches} for embeddings.", LogLevels.DEBUG)
 
         embeddings = np.vstack(embeddings)
         notifier.sendStatus(StepState.RUNNING, progress=40)
@@ -158,16 +135,9 @@ class BertTopicOperation(StepOperation):
         return embeddings
 
     def run(self, payload: Payload, notifier: FrontendNotifier) -> StepState:
-        """
-        Executes the BERTopic operation based on the configuration.
+        """Delayed pandas import"""
+        import pandas as pd
 
-        Args:
-            payload (Payload): Payload containing data.
-            notifier (FrontendNotifier): Notifier for logging and progress updates.
-
-        Returns:
-            StepState: Result state of the operation.
-        """
         try:
             data: pd.DataFrame = payload.data
 
@@ -264,5 +234,5 @@ class BertTopicOperation(StepOperation):
             return StepState.SUCCESS
 
         except Exception as e:
-            notifier.log(f"Error during BERTopic modeling: {str(e)}", LogLevels.ERROR)
+            notifier.log(f"Error: {str(e)}", LogLevels.ERROR)
             return StepState.FAILED
