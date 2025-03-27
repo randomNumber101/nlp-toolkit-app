@@ -29,7 +29,6 @@ const DynamicVisualization: React.FC<DynamicVizProps> = ({ visualization }) => {
             />;
 
         case 'plotly':
-            console.log(visualization.content)
             return <PlotlyVisualization  content={visualization.content.config}/>;
 
         // Future visualization types can be handled here

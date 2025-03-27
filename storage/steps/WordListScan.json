@@ -15,7 +15,7 @@
     "Word lists" : {
       "type" : "complex_list",
       "description" : "Add word lists here. Each list will yield a separate column in the output.",
-      "entry format": "<#>. word list: <value:0>",
+      "entry_format": "<value>",
       "inner_parameters": {
         "name" : {
           "type" : "string",
@@ -23,8 +23,9 @@
         },
         "list of words": {
           "type": "complex_list",
-          "description": "The words to be scanned for. Regular expressions (regex) are supported.",
-          "entry format": "<value:0>",
+          "description": "The words to be scanned for. Regular expression (regex) evaluation can be turned on per word. You may also drag and drop your line-seperated word lists here to add them.",
+          "entry_format": "<value>",
+          "loadable_from_file": true,
           "inner_parameters": {
             "word": {
               "type": "string"

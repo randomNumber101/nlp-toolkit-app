@@ -44,10 +44,11 @@ class ComplexPicker(ParameterPicker):
 
 
 class ComplexListPicker(ParameterPicker):
-    def __init__(self, innerParams: List["Parameter"], max_length=50, entry_format="<value>"):
+    def __init__(self, innerParams: List["Parameter"], max_length=50, entry_format="<value>", loadable_from_file=False):
         self.inner = innerParams
         self.max_length = max_length  # Maximum number of elements in the list
         self.entry_format = entry_format  # The format of the entries in the list <#> will be replaced by the index, <value> by first inner param value
+        self.loadable_from_file = loadable_from_file  # Adds a drag & drop area for file input. Each line will create a new entry with the value put into the first inner parameter
         if len(innerParams) == 1:
             innerType = innerParams[0].type
         else:

@@ -6,13 +6,19 @@ import './DragAndDrop.scss';
 import { InputHandle } from '../../screens/InputScreen/InputScreen';
 
 interface DragAndDropProps {
+  validExtensions?: string[];
   onFileDataReceived: (inputHandle: InputHandle) => void;
 }
 
-const DragAndDrop: React.FC<DragAndDropProps> = ({ onFileDataReceived }) => {
+const DragAndDrop: React.FC<DragAndDropProps> = ({ onFileDataReceived, validExtensions= [".txt", ".csv"] }) => {
   const [dragActive, setDragActive] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const extensionsFormatted =
+      validExtensions.length == 1 ?
+          validExtensions[0] :
+          validExtensions.slice(0, -1).join(", ") + " or " + validExtensions[validExtensions.length - 1]
 
   const handleDrag = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -35,12 +41,9 @@ const DragAndDrop: React.FC<DragAndDropProps> = ({ onFileDataReceived }) => {
   };
 
   const handleFile = async (file: File) => {
-    const validTypes = ['text/plain', 'text/csv'];
-    const validExtensions = ['.txt', '.csv'];
-    const isValidType = validTypes.indexOf(file.type) != -1;
     const isValidExtension = validExtensions.some(ext => file.name.toLowerCase().endsWith(ext));
 
-    if (isValidType && isValidExtension) {
+    if (isValidExtension) {
       try {
         const handle = await fileToInputHandle(file);
         onFileDataReceived(handle);
@@ -50,7 +53,8 @@ const DragAndDrop: React.FC<DragAndDropProps> = ({ onFileDataReceived }) => {
         console.error(error);
       }
     } else {
-      setErrorMessage('Only .txt and .csv files are accepted.');
+
+      setErrorMessage(`Only (${extensionsFormatted}) files are accepted.`);
     }
   };
 
@@ -101,13 +105,13 @@ const DragAndDrop: React.FC<DragAndDropProps> = ({ onFileDataReceived }) => {
       >
         <input
           type="file"
-          accept=".txt,.csv"
+          accept={validExtensions.join(",")}
           ref={fileInputRef}
           onChange={handleFileSelect}
           hidden
         />
         <p>
-          Drag & Drop your .txt or .csv file here or{' '}
+          Drag & Drop your {extensionsFormatted} file here or{' '}
           <span className="browse-text" onClick={handleBrowseFiles}>
             browse
           </span>

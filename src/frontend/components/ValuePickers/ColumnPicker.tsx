@@ -20,11 +20,6 @@ const ColumnPicker: React.FC<ColumnPickerProps> = ({ value, onChange }) => {
   const [selectedOption, setSelectedOption] = useState<string>(isOther ? 'other' : (value || options[0]));
   const [otherValue, setOtherValue] = useState<string>(isOther ? value : '');
 
-  useEffect(() => {
-    console.log(value)
-    console.log("Is other: ", isOther)
-  }, [value]);
-
   // Update the component state when the parent value changes.
   useEffect(() => {
     const newIsOther = options.indexOf(value) == -1;

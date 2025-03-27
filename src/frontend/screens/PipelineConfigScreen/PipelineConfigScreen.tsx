@@ -50,7 +50,6 @@ const PipelineConfigScreen: React.FC<PipelineConfigScreenProps> = ({
     setPipelineName(pipeline?.name ?? '');
     setPipelineDescription(pipeline?.description ?? 'No description');
     setSteps(pipeline?.steps ?? []);
-    console.log("Pipeline updated");
   }, [pipeline]);
 
   const { blueprints } = useBlueprintContext();
@@ -132,6 +131,7 @@ const PipelineConfigScreen: React.FC<PipelineConfigScreenProps> = ({
 
   const csvData =
       inputHandle.type === 'csv' ? inputHandle.data : "text \n" + inputHandle.data;
+
 
   return (
     <div className="pipeline-config-screen">

@@ -145,12 +145,14 @@ class ParameterParser:
                 raise SyntaxError(f"Complex type {name} requires inner types.")
 
             inner_params = self.parseParameters(get(param_obj, "inner_parameters"))
-            max_list_length = getOptional(param_obj, "max_length", 50)
+            max_list_length = getOptional(param_obj, "max_length", None)
+            entry_format = getOptional(param_obj, "entry_format", "<value>")
+            loadable_from_file = getOptional(param_obj, "loadable_from_file", False)
 
             if self.pickerParser is None:
                 raise SyntaxError("Complex List ist not allowed as a type for Dynamic types.")
 
-            picker = ComplexListPicker(inner_params, max_length=max_list_length)
+            picker = ComplexListPicker(inner_params, max_length=max_list_length, entry_format=entry_format, loadable_from_file=loadable_from_file)
             return StaticParameter(name, picker, description, [])
 
 

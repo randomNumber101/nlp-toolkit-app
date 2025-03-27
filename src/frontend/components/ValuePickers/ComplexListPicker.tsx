@@ -1,7 +1,9 @@
 import * as React from 'react';
 import { Parameter } from '../../types';
 import DynamicPicker from './DynamicPicker';
+import DragAndDrop from '../DragAndDrop/DragAndDrop';
 import './ComplexListPicker.scss';
+import {InputHandle} from "../../screens/InputScreen/InputScreen";
 
 interface ComplexListPickerProps {
   parameter: Parameter;
@@ -11,6 +13,7 @@ interface ComplexListPickerProps {
 
 const ComplexListPicker: React.FC<ComplexListPickerProps> = ({ parameter, value = [], onChange }) => {
   const maxLength = parameter.picker?.values?.max_length || Infinity;
+  const useDragAndDrop = parameter.picker?.values?.loadable_from_file ?? false;
 
   // Add a new entry to the list
   const handleAddEntry = () => {
@@ -54,6 +57,39 @@ const ComplexListPicker: React.FC<ComplexListPickerProps> = ({ parameter, value 
     return value;
   };
 
+  // Placeholder for file handling callback.
+  // You can implement this function later as needed.
+  const handleFile = (fileData: InputHandle) => {
+    console.log("File received:", fileData);
+    const newEntries = fileData.data.split("\n").map(value => {
+      const newEntry = {};
+      // Create new entries for each word line
+      parameter.picker.parameters.forEach((innerParam) => {
+        newEntry[innerParam.name] = innerParam.defaultValue;
+      });
+
+      // Set the value of the first inner parameter (must be string type)
+      newEntry[parameter.picker.parameters[0].name] = value
+      return newEntry
+    })
+    onChange([...value, ...newEntries])
+  };
+
+  // Helper function to replace placeholders in the format string
+  const renderFormattedEntry = (format: string, entry: any, index: number) => {
+    return format
+      .replace(/<#>/g, () => (index + 1).toString())
+      .replace(/<value(:\d+)?>/g, (match) => {
+        const paramIndex = match.match(/\d+/)?.[0] || '1';
+        const paramValue = entry[parameter.picker.parameters[parseInt(paramIndex) - 1]?.name];
+        if (paramValue) {
+          return renderFirstParamValue(paramValue);
+        } else {
+          return `<span class="empty-value">empty</span>`;
+        }
+      });
+  };
+
   return (
     <div className="complex-list-picker">
       <h4>{parameter.name}</h4>
@@ -62,33 +98,17 @@ const ComplexListPicker: React.FC<ComplexListPickerProps> = ({ parameter, value 
           {parameter.description}
         </div>
       )}
+      {useDragAndDrop && (
+        <div className="drag-and-drop-area">
+          <DragAndDrop onFileDataReceived={handleFile} validExtensions={[".txt"]} />
+        </div>
+      )}
       <div className="list-body">
         {value.map((entry, index) => {
           const firstParam = parameter.picker.parameters[0];
           const firstParamValue = entry[firstParam.name];
           const isComplex = firstParam.type === 'complex' || firstParam.picker?.name === 'complex_list';
           const format = parameter.picker.values['entry_format'];
-
-          // Helper function to replace placeholders in the format string
-          const renderFormattedEntry = (format: string, entry: any, index: number) => {
-            return format
-              .replace(/<#>/g, (match) => {
-                // Replace <#> with the entry index (starting from 1)
-                return (index + 1).toString();
-              })
-              .replace(/<value(:\d+)?>/g, (match) => {
-                // Extract the parameter index if specified (e.g., <value:2>)
-                const paramIndex = match.match(/\d+/)?.[0] || '1'; // Default to 1 if no index is provided
-                const paramValue = entry[parameter.picker.parameters[parseInt(paramIndex) - 1]?.name];
-
-                // Render the value or "empty" if it's missing
-                if (paramValue) {
-                  return renderFirstParamValue(paramValue);
-                } else {
-                  return `<span class="empty-value">empty</span>`;
-                }
-              });
-          };
 
           return (
             <div
@@ -123,7 +143,7 @@ const ComplexListPicker: React.FC<ComplexListPickerProps> = ({ parameter, value 
                   <button
                     className="extend-button"
                     onClick={(e) => {
-                      e.stopPropagation(); // Prevent retracting other entries
+                      e.stopPropagation();
                       toggleExtended(index);
                     }}
                   >
@@ -132,7 +152,7 @@ const ComplexListPicker: React.FC<ComplexListPickerProps> = ({ parameter, value 
                   <button
                     className="remove-button"
                     onClick={(e) => {
-                      e.stopPropagation(); // Prevent retracting other entries
+                      e.stopPropagation();
                       handleRemoveEntry(index);
                     }}
                   >
