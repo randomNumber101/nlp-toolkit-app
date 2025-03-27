@@ -16,6 +16,7 @@ import CsvViewer from "../../components/CsvViewer/CsvViewer";
 import OverlayWindow from "../../components/OverlayWindow/OverlayWindow";
 import {InputHandle} from "../InputScreen/InputScreen";
 import {useInputHandleContext} from "../../utils/InputHandleContext";
+import {FaClockRotateLeft} from "react-icons/fa6";
 
 interface PipelineConfigScreenProps {
   initialPipe: Pipeline | null;
@@ -39,12 +40,26 @@ const PipelineConfigScreen: React.FC<PipelineConfigScreenProps> = ({
   const [selectedStepIndex, setSelectedStepIndex] = useState<number | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [showSaved, setShowSaved] = useState(false);
+  const [showReverted, setShowReverted] = useState(false)
   const [showOperationToolbox, setShowOperationToolbox] = useState(false);
   const [showInputCsv, setShowInputCsv] = useState(false);
   const inputHandle = useInputHandleContext();
 
   const toolboxRef = useRef<HTMLDivElement>(null);
   const addOperationRef = useRef<HTMLDivElement>(null);
+
+
+    // Sync local state when initialPipe prop changes
+    useEffect(() => {
+      setPipeline(pipeline);
+    }, [initialPipe]);
+
+    // Existing useEffect to update derived state
+    useEffect(() => {
+      setPipelineName(pipeline?.name ?? '');
+      setPipelineDescription(pipeline?.description ?? 'No description');
+      setSteps(pipeline?.steps ?? []);
+    }, [pipeline]);
 
   useEffect(() => {
     setPipelineName(pipeline?.name ?? '');
@@ -57,6 +72,11 @@ const PipelineConfigScreen: React.FC<PipelineConfigScreenProps> = ({
 
   const isSingleOperation = steps.length === 1 && pipeline.id.includes("single-operation");
 
+  useEffect(() => {
+    if (selectedStepIndex == null && steps.length > 0) {
+      setSelectedStepIndex(0)
+    }
+  }, steps)
 
   const onDragStart = () => setIsDragging(true);
 
@@ -80,6 +100,23 @@ const PipelineConfigScreen: React.FC<PipelineConfigScreenProps> = ({
     setShowSaved(true);
     setTimeout(() => setShowSaved(false), 2000);
   };
+
+  const handleRevertChanges = () => {
+    const freshPipeline = { ...initialPipe };
+    setPipeline(freshPipeline);
+    setShowReverted(true);
+    setTimeout(() => setShowReverted(false), 2000);
+  }
+
+  const handleGoBack = () => {
+    handleRevertChanges()
+    onPrevious()
+  }
+
+  const handleRunPipeline = () => {
+    handleSavePipeline()
+    onNext()
+  }
 
   const handleDeleteStep = (index: number) => () => {
     const updatedSteps = [...steps];
@@ -257,13 +294,16 @@ const PipelineConfigScreen: React.FC<PipelineConfigScreenProps> = ({
 
       {/* Buttons */}
       <div className="button-container">
-        <button className="back-button" onClick={onPrevious}>
+        <button className="back-button" onClick={handleGoBack}>
           <FaArrowLeft /> Back
         </button>
         <button className={`save-button ${showSaved ? 'show-saved' : ''}`} onClick={handleSavePipeline}>
           <FaSave /> Save
         </button>
-        <button className="run-button" onClick={onNext}>
+        <button className={`revert-button ${showReverted ? 'show-reverted' : ''}`} onClick={handleRevertChanges}>
+          <FaClockRotateLeft /> Revert Changes
+        </button>
+        <button className="run-button" onClick={handleRunPipeline}>
           <FaPlay /> Run Pipeline
         </button>
       </div>

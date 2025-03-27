@@ -7,10 +7,10 @@
             "stepId": "DataPreparation",
             "values": {
                 "remove non-ascii": true,
-                "lowercase": false,
+                "lowercase": true,
                 "remove stopwords": {
                     "activate": true,
-                    "language": "en_core_web_sm"
+                    "language": "de_core_news_sm"
                 },
                 "output column": "text",
                 "input column": "text"

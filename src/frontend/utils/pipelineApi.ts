@@ -41,7 +41,7 @@ export async function loadPipeline(pipelineId: string): Promise<Pipeline | null>
   try {
     const response = await window.pywebview.api.load_pipeline(pipelineId);
     const result = unpackResponse(response);
-    return result as Pipeline; // Cast to Pipeline interface
+    return fixPipelineVersion(result as Pipeline); // Cast to Pipeline interface
   } catch (error) {
     console.error("Failed to load pipeline:", error);
     return null;
@@ -73,13 +73,19 @@ export async function deletePipeline(pipelineId: string): Promise<boolean> {
   }
 }
 
+function fixPipelineVersion (pipe: Pipeline) {
+  if (pipe.version)
+    return pipe
+  return {...pipe, version: Date.now()}
+}
+
 // List all pipelines
 export async function listPipelines(): Promise<Pipeline[]> {
   await waitForPywebview();
   try {
     const response = await window.pywebview.api.STORAGE.load_all_pipelines();
     const result = unpackResponse(response);
-    return result as Pipeline[]; // Cast response to Pipeline array
+    return (result as Pipeline[]).map(fixPipelineVersion); // Cast response to Pipeline array
   } catch (error) {
     console.error("Failed to list pipelines:", error);
     return [];

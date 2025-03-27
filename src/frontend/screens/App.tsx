@@ -98,17 +98,20 @@ function App() {
   };
 
   const onSavePipeline = (pipeline: Pipeline) => {
-    savePipeline(pipeline).catch(console.log);
-    const index = pipelines.findIndex(p => p.id === pipeline.id);
+    const updatedPipeline = { ...pipeline, version: Date.now() };
+    setSelectedPipeline(updatedPipeline);
+    // Update your local pipelines with the new version
+    const index = pipelines.findIndex(p => p.id === updatedPipeline.id);
     const newPipelines = [...pipelines];
     if (index !== -1) {
-      newPipelines[index] = { ...pipeline };
+      newPipelines[index] = updatedPipeline;
     } else {
-      newPipelines.push(pipeline);
+      newPipelines.push(updatedPipeline);
     }
-    setSelectedPipeline(pipeline);
     setPipelines(newPipelines);
+    savePipeline(updatedPipeline).catch(console.log);
   };
+
 
   const onAddPipeline = () => {
     const newPipeline = {

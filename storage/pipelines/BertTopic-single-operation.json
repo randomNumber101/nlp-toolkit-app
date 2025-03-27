@@ -5,7 +5,19 @@
     "steps": [
         {
             "stepId": "BertTopic",
-            "values": {}
+            "values": {
+                "topic modeling": {
+                    "language": "english",
+                    "min_cluster_size": 10,
+                    "vectorizer": {
+                        "max_df": 0.95,
+                        "min_df": 2
+                    },
+                    "Use verbose progress reporting": false
+                },
+                "output columns prefix": "text",
+                "input column": "text"
+            }
         }
     ],
     "tags": [

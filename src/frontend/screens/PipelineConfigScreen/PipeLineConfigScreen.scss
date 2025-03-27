@@ -296,6 +296,37 @@
         }
       }
 
+      .revert-button {
+        background-color: #ff9800; // Base color for revert button
+        color: white;
+        position: relative;
+
+        &:hover {
+          background-color: #fb8c00; // Slightly darker on hover
+          box-shadow: 0 0 5px #e67e00;
+        }
+
+        &:after {
+          content: "↩ Reverted!";
+          position: absolute;
+          top: -30px;
+          right: 10px;
+          background: #ff9800;
+          color: white;
+          padding: 5px 10px;
+          border-radius: 3px;
+          font-size: 0.9rem;
+          display: none;
+          opacity: 0;
+          transition: opacity 0.3s;
+        }
+
+        &.show-reverted:after {
+          display: block;
+          opacity: 1;
+        }
+      }
+
       .run-button {
         background-color: #2196f3;
         color: white;

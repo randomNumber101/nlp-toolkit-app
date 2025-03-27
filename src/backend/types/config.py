@@ -31,6 +31,7 @@ class Config(dict[str, Any]):
             else:
                 self.values[vName] = self.fields[vName].type.parse(vValue)
 
+
     def getMissingValues(self) -> Iterable[str]:
         for key in self.fields:
             if key in self.complexFields:
@@ -60,3 +61,15 @@ class Config(dict[str, Any]):
     def __iter__(self):
         complexVals = filter(lambda x: x in self.complexFields, self.fields)
         return itertools.chain(self.values, complexVals)
+
+    def get_values(self):
+        result = self.values
+        for k, inner_config in self.fields.items():
+            if inner_config not in self.complexFields:
+                continue
+            inner_config_dict = inner_config.get_values()
+            result[k] = inner_config_dict
+        return result
+
+
+

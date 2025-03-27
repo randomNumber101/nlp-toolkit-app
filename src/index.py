@@ -48,7 +48,7 @@ if __name__ == '__main__':
     print("Creating window...")
     # Create the window immediately
     window = webview.create_window(
-        'NLP Toolkit',
+        'NLP4Edu',
         get_entrypoint(),
         js_api=None,  # Start with no API
         width=1000,

@@ -26,6 +26,7 @@ class BertTopicOperation(StepOperation):
         notifier.log("This may take a while...", LogLevels.WARN)
         from bertopic import BERTopic
         from bertopic.vectorizers import ClassTfidfTransformer
+
         notifier.log("Done.", LogLevels.INFO)
 
 
@@ -34,9 +35,18 @@ class BertTopicOperation(StepOperation):
         self.input_column = config.get("input column", "text")
         self.output_column = config.get("output columns prefix", "topic_")
         self.language = config["topic modeling"]["language"]
+
+        if self.language == "german":
+            from spacy.lang.de.stop_words import STOP_WORDS
+        else:
+            from spacy.lang.en.stop_words import STOP_WORDS
+
+
+
         self.cluster_size = config["topic modeling"]["min_cluster_size"]
-        self.vectorizer_config = config["topic modeling"]["vectorizer"]
+        self.vectorizer_config = config["topic modeling"]["vectorizer"].get_values()
         self.use_verbose = config["topic modeling"].get("Use verbose progress reporting", False)
+
 
         notifier.log("Initializing models...", LogLevels.INFO)
         # Initialize BERTopic core
@@ -46,9 +56,11 @@ class BertTopicOperation(StepOperation):
             min_topic_size=self.cluster_size,
             ctfidf_model=ctfidf_model)
 
+        from sklearn.feature_extraction.text import CountVectorizer
         if self.vectorizer_config:
-            from sklearn.feature_extraction.text import CountVectorizer
-            self.topic_model.vectorizer_model = CountVectorizer(**self.vectorizer_config)
+            self.topic_model.vectorizer_model = CountVectorizer(stop_words=list(STOP_WORDS), **self.vectorizer_config)
+        else:
+            self.topic_model.vectorizer_model = CountVectorizer(stop_words=list(STOP_WORDS))
 
         if self.use_verbose:
             self._init_verbose_mode(notifier)
