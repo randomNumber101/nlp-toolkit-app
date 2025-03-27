@@ -1,21 +1,18 @@
-import os
+
 import json
 
-from typing import List, Optional
+from typing import Optional
 
 from backend.storage.parsing import StepBlueprintParser, PipelineParser
-from ..generaltypes import Pipeline, StepBlueprint
-
-from ..register import Register
-from ..transferObjects.pipelineTransferObjects import convert_pipeline_to_transfer, convert_step_blueprint_to_transfer
+from backend.register import Register
+from backend.transferObjects.pipelineTransferObjects import convert_pipeline_to_transfer, convert_step_blueprint_to_transfer
 
 import os
 import sys
 import shutil
 
-import os
-import sys
-import shutil
+from backend.types.blueprint import StepBlueprint
+from backend.types.pipeline import Pipeline
 
 
 class Paths:

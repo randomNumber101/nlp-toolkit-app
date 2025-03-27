@@ -2,8 +2,6 @@ import time
 from collections import Counter
 
 from backend.Api import Api
-from backend.generaltypes import Pipeline
-from backend.run.backendEventApi import BackendEventApi
 from backend.tests.utils import get_mock_backend_event_api, build_input_handle
 from backend.transferObjects.eventTransferObjects import StepStatus, StepState, StepLogUpdate
 
@@ -64,7 +62,7 @@ def test_run_data_prep_op():
     input = build_input_handle("Lorem ipsum dolomit lorem quantum sit. No kunor sic honem dores isef.")
 
     api.RUNS.startRun(operation_pipe.id, input)
-    time.sleep(30)  # Wait for run to end. Could also dynamically check via the progress status.
+    time.sleep(3)  # Wait for run to end. Could also dynamically check via the progress status.
     num_steps = len(operation_pipe.steps)
     assert stateCounter[StepState.SUCCESS] >= num_steps, "Pipeline did not complete successfully!"
     assert stateCounter[StepState.FAILED] == 0, "Pipeline encountered a failure!"

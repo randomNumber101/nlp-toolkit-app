@@ -37,10 +37,8 @@ const RunStep: React.FC<RunStepProps> = ({ step, status, isActive, runId, stepNu
 
     const fetchVisualization = async () => {
         try {
-            console.log("Fetching visualization data...");
             const vizData = await getRunVisualization(runId, status.domain.stepIndex);
             if (vizData) {
-                console.log("Visualization data fetched successfully.", vizData);
                 setVisualization(vizData);
             } else {
                 console.error('Visualization data is null.');
@@ -67,14 +65,12 @@ const RunStep: React.FC<RunStepProps> = ({ step, status, isActive, runId, stepNu
     };
 
     const handleLogUpdate = (event: CustomEvent) => {
-        console.log("Log update event received:", event);
         const logUpdate = event.detail as StepLogUpdate;
         if (
             logUpdate.domain.runId === status.domain.runId &&
             logUpdate.domain.pipelineId === status.domain.pipelineId &&
             logUpdate.domain.stepIndex === status.domain.stepIndex
         ) {
-            console.log("Updating logs for step index:", status.domain.stepIndex);
             setLogs(prevLogs => [...prevLogs, ...logUpdate.logs]);
         }
     };
@@ -105,12 +101,10 @@ const RunStep: React.FC<RunStepProps> = ({ step, status, isActive, runId, stepNu
     };
 
     const openOverlay = () => {
-        console.log("Opening visualization overlay.");
         setIsOverlayOpen(true);
     };
 
     const closeOverlay = () => {
-        console.log("Closing visualization overlay.");
         setIsOverlayOpen(false);
     };
 

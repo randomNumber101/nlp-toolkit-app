@@ -1,7 +1,10 @@
 import re
-from backend.generaltypes import Config, FrontendNotifier, Payload, ParallelizableOperation
 from backend.transferObjects.eventTransferObjects import StepState, LogLevels
 from backend.transferObjects.visualization import HTMLViz
+from backend.types.config import Config
+from backend.types.frontendNotifier import FrontendNotifier
+from backend.types.operation import ParallelizableOperation
+from backend.types.payload import Payload
 
 
 class WordListScanOperation(ParallelizableOperation):

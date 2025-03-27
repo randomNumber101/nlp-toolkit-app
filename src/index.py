@@ -62,5 +62,5 @@ if __name__ == '__main__':
     api_thread.start()
 
     # Start the UI immediately
-    webview.settings['OPEN_DEVTOOLS_IN_DEBUG'] = False
-    webview.start(debug=False, gui='edgechromium')
+    #webview.settings['OPEN_DEVTOOLS_IN_DEBUG'] = False
+    webview.start(debug=True, gui='edgechromium')

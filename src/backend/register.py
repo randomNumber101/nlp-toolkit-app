@@ -1,12 +1,12 @@
-import typing
+
 from typing import Dict, List, Tuple
 
 from backend import utils
-from backend.generaltypes import StepOperation, Payload, StepOperationMapper
 from backend.operations.TextSimilarityOperation import TextSimilarityAnalysisOperation
 from backend.operations.WordListScanOperation import WordListScanOperation
-from backend.parameterTypes import ParamType, ParameterPicker, Parameter, ListType
-from backend.run.LogManager import LogManager
+from backend.types.operation import StepOperation, StepOperationMapper
+from backend.types.params import Parameter
+from backend.types.pickers import ParamType, ListType, ParameterPicker
 from backend.storage.parsing import ParameterTypeParser, ParameterPickerParser
 import pandas as pd
 
@@ -15,6 +15,9 @@ from backend.operations.DataPreparationOperation import DataPreparationOperation
 from backend.operations.DummyOperation import DummyOperation
 from backend.operations.KeywordExtractionOperation import KeywordExtractionOperation
 from backend.operations.SentimentAnalysisOperation import SentimentAnalysisOperation
+
+
+
 
 
 class Register:
@@ -59,6 +62,8 @@ class BaseTypes:
 """
 Parameter Type for DataFrames (csv)
 """
+
+
 class DataType(ParamType):
     Instances: Dict[Tuple[str], "DataType"] = {}
 

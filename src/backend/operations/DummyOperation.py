@@ -2,9 +2,11 @@ import random
 import time
 
 from backend.transferObjects.eventTransferObjects import StepState, LogLevels
-from backend.generaltypes import StepOperation, Payload, FrontendNotifier, Config
 from backend.transferObjects.visualization import SimpleTextViz, HTMLViz
-
+from backend.types.config import Config
+from backend.types.frontendNotifier import FrontendNotifier
+from backend.types.operation import StepOperation
+from backend.types.payload import Payload
 
 ## Needs to be registered in register.py
 

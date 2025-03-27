@@ -1,8 +1,12 @@
-from backend.generaltypes import StepOperation, Config, FrontendNotifier, Payload
 from backend.transferObjects.eventTransferObjects import StepState, LogLevels
 from backend.transferObjects.visualization import MultiVisualization, HTMLViz, SimpleTextViz
 
 import time
+
+from backend.types.config import Config
+from backend.types.frontendNotifier import FrontendNotifier
+from backend.types.operation import StepOperation
+from backend.types.payload import Payload
 
 
 class TextSimilarityAnalysisOperation(StepOperation):
@@ -20,7 +24,7 @@ class TextSimilarityAnalysisOperation(StepOperation):
         # Name of the output column to store similarity scores.
         self.output_column = config.get("output column", "similarity")
 
-        # Transformer model parameters
+        # Transformer model types
         self.model_name = config.get("transformer model", "distilbert-base-uncased")
         notifier.log(f"Loading transformer model and tokenizer '{self.model_name}' for text similarity...",
                      LogLevels.INFO)

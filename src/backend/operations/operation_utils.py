@@ -1,10 +1,8 @@
 import os
 import sys
 
-from backend.generaltypes import FrontendNotifier
 from backend.transferObjects.eventTransferObjects import LogLevels
-
-
+from backend.types.frontendNotifier import FrontendNotifier
 
 
 def load_spacy_model_on_demand(model_name: str, notifier: FrontendNotifier):

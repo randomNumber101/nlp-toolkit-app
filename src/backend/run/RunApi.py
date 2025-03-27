@@ -8,9 +8,8 @@ from tkinter import filedialog
 import pandas
 
 from backend.run.backendEventApi import BackendEventApi
-from backend.generaltypes import Pipeline
+from backend.types.pipeline import Pipeline
 from backend.run.PipelineRunner import PipelineRunner
-from backend.storage.parsing import PipelineParser
 from backend.storage.storageApi import StorageApi
 from backend.transferObjects.pipelineTransferObjects import convert_pipeline_to_transfer
 from backend.transferObjects.visualization import Visualization

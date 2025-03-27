@@ -1,9 +1,13 @@
 # backend/operations/sentiment_analysis_operation.py
-from backend.generaltypes import ParallelizableTextOperation, Config, FrontendNotifier, Payload, ParallelizableOperation
 from backend.transferObjects.eventTransferObjects import StepState, LogLevels
 from backend.transferObjects.visualization import HTMLViz
 
 from abc import ABC
+
+from backend.types.config import Config
+from backend.types.frontendNotifier import FrontendNotifier
+from backend.types.operation import ParallelizableOperation
+from backend.types.payload import Payload
 
 
 class SentimentAnalysisOperation(ParallelizableOperation, ABC):

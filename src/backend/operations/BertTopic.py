@@ -1,6 +1,10 @@
 from backend.transferObjects.eventTransferObjects import StepState, LogLevels
-from backend.generaltypes import StepOperation, Payload, FrontendNotifier, Config
-from backend.transferObjects.visualization import HTMLViz, SimpleTextViz, PlotlyViz, MultiVisualization
+
+from backend.transferObjects.visualization import PlotlyViz, MultiVisualization
+from backend.types.config import Config
+from backend.types.frontendNotifier import FrontendNotifier
+from backend.types.operation import StepOperation
+from backend.types.payload import Payload
 
 
 class TextDataset:
@@ -199,7 +203,7 @@ class BertTopicOperation(StepOperation):
 
             # Check if any topics were generated
             if num_topics == 0:
-                notifier.log("No topics were generated. Adjust parameters or check input data.", LogLevels.ERROR)
+                notifier.log("No topics were generated. Adjust types or check input data.", LogLevels.ERROR)
                 return StepState.FAILED
 
             # Add results to the DataFrame

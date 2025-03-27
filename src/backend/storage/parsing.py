@@ -1,10 +1,15 @@
 import re
 import typing
 from typing import Callable, Dict, Any, List
-from backend.parameterTypes import ParameterPicker, Parameter, ParamType, InputOutputDefinition, \
-    StaticParameter, ComplexType, ComplexPicker, ComplexListPicker
-from backend.generaltypes import StepBlueprint, StepOperationMapper, Pipeline, StepValues
+
+from backend.types.blueprint import StepBlueprint, InputOutputDefinition, StepValues
+from backend.types.operation import StepOperationMapper
+from backend.types.params import StaticParameter, Parameter
+from backend.types.pickers import ParamType, ComplexType, ParameterPicker, ComplexPicker, ComplexListPicker
 import uuid
+
+from backend.types.pipeline import Pipeline
+
 
 # Utility functions to extract fields with optional default values
 def get(obj: Dict[str, Any], field: str) -> Any:
@@ -102,7 +107,7 @@ class ParameterPickerParser:
             raise NotImplementedError(f"No default picker installed for type {paramType}")
 
 
-# Class to parse parameters, including complex types
+# Class to parse types, including complex types
 class ParameterParser:
     def __init__(self, parameterTypeParser: ParameterTypeParser, pickerParser: ParameterPickerParser,
                  enforceStatic=False, strictTyping=True):
@@ -117,11 +122,11 @@ class ParameterParser:
         default_value = getOptional(param_obj, "default")
 
         if param_type_str == "complex":
-            # For Complex (composite) types, parse residual key-values as parameters.
+            # For Complex (composite) types, parse residual key-values as types.
 
             if "inner_parameters" not in param_obj:
                 print(param_obj)
-                raise SyntaxError(f"Complex type {name} requires inner parameters.")
+                raise SyntaxError(f"Complex type {name} requires inner types.")
 
             parameters = self.parseParameters(param_obj["inner_parameters"])
             if self.pickerParser is not None:
@@ -137,13 +142,13 @@ class ParameterParser:
 
             if "inner_parameters" not in param_obj:
                 print(param_obj)
-                raise SyntaxError(f"Complex type {name} requires inner parameters.")
+                raise SyntaxError(f"Complex type {name} requires inner types.")
 
             inner_params = self.parseParameters(get(param_obj, "inner_parameters"))
             max_list_length = getOptional(param_obj, "max_length", 50)
 
             if self.pickerParser is None:
-                raise SyntaxError("Complex List ist not allowed as a type for Dynamic parameters.")
+                raise SyntaxError("Complex List ist not allowed as a type for Dynamic types.")
 
             picker = ComplexListPicker(inner_params, max_length=max_list_length)
             return StaticParameter(name, picker, description, [])
@@ -181,7 +186,7 @@ class ParameterParser:
             if isinstance(param_def, dict):
                 parameters.append(self.parseParameterObject(name, param_def))
             elif isinstance(param_def, str):
-                # Simple parameters without detailed definitions (e.g., "bool")
+                # Simple types without detailed definitions (e.g., "bool")
                 param_type = self.typeParser(param_def, strict=self.strictTyping)
                 try:
                     picker = self.pickerParser.useDefault(param_type)
@@ -210,7 +215,7 @@ class StepBlueprintParser:
         information = getOptional(stepObject, "information", None)
         tags = getOptional(stepObject, "tags", [])
 
-        # Parse parameters, inputs, and outputs
+        # Parse types, inputs, and outputs
         parameter_definitions = getOptional(stepObject, "parameters", {})
         parameters = self.staticParser.parseParameters(parameter_definitions)
 

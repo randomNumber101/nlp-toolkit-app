@@ -64,10 +64,6 @@ const InputScreen: React.FC<InputScreenProps> = ({ preloaded = null, onGoToPipel
   );
   const [isOverlayOpen, setIsOverlayOpen] = useState<boolean>(false);
 
-  useEffect(() => {
-    console.log('New input:', inputHandle);
-  }, [inputHandle]);
-
   const handleFileDataReceived = (handle: InputHandle) => {
     setInput('');
     setInputHandle(handle);
@@ -116,7 +112,7 @@ const InputScreen: React.FC<InputScreenProps> = ({ preloaded = null, onGoToPipel
         </div>
 
         {inputType === 'file' ? (
-          <DragAndDrop onFileDataReceived={handleFileDataReceived} />
+          <DragAndDrop onFileDataReceived={handleFileDataReceived} validExtensions={[".txt", ".csv"]}/>
         ) : (
           <TextArea
             value={input}

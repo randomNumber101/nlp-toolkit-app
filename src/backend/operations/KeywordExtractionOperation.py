@@ -1,9 +1,12 @@
 from collections import Counter
 
-from backend.generaltypes import ParallelizableTextOperation, Config, FrontendNotifier, Payload
 from backend.operations.operation_utils import load_spacy_model_on_demand
 from backend.transferObjects.eventTransferObjects import StepState, LogLevels
 from backend.transferObjects.visualization import HTMLViz
+from backend.types.config import Config
+from backend.types.frontendNotifier import FrontendNotifier
+from backend.types.operation import ParallelizableTextOperation
+from backend.types.payload import Payload
 
 
 class KeywordExtractionOperation(ParallelizableTextOperation):

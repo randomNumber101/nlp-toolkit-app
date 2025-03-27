@@ -4,10 +4,13 @@ from typing import Dict, List, Union
 from backend.run.backendEventApi import BackendEventApi
 from backend.transferObjects.eventTransferObjects import StepState, StepLogUpdate, NotificationDomain, StepStatus, Log, \
     LogLevels
-from backend.generaltypes import Pipeline, StepBlueprint, FrontendNotifier, Payload
 from backend.register import Register
 from backend.run.LogManager import LogManager, LoggerChannel, StatusManager, StatusChannel
 from backend.transferObjects.visualization import MultiVisualization
+from backend.types.blueprint import StepBlueprint
+from backend.types.frontendNotifier import FrontendNotifier
+from backend.types.payload import Payload
+from backend.types.pipeline import Pipeline
 
 
 class FrontendLogChannel(LoggerChannel):

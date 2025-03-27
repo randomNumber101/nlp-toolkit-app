@@ -1,9 +1,8 @@
 from typing import List, Dict, Optional
 import uuid
 
-from backend.generaltypes import Pipeline, StepValues, StepBlueprint
-from backend.parameterTypes import ComplexPicker, Parameter, ParameterPicker, StaticParameter, InputOutputDefinition, \
-    ComplexListPicker
+
+from backend.types.pickers import ParameterPicker, ComplexPicker, ComplexListPicker
 
 
 class ParameterTransferObject:

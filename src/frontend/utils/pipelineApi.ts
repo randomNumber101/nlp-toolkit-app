@@ -64,7 +64,6 @@ export async function savePipeline(config: Pipeline): Promise<boolean> {
 export async function deletePipeline(pipelineId: string): Promise<boolean> {
   await waitForPywebview();
   try {
-    console.log("Deleting pipeline", pipelineId)
     const response = await window.pywebview.api.STORAGE.delete_pipeline(pipelineId);
     const result = unpackResponse(response);
     return result as boolean; // Cast result to boolean
@@ -79,7 +78,6 @@ export async function listPipelines(): Promise<Pipeline[]> {
   await waitForPywebview();
   try {
     const response = await window.pywebview.api.STORAGE.load_all_pipelines();
-    console.log(response)
     const result = unpackResponse(response);
     return result as Pipeline[]; // Cast response to Pipeline array
   } catch (error) {
@@ -93,7 +91,6 @@ export async function listStepBlueprints(): Promise<StepBlueprint[]> {
   await waitForPywebview();
 
   const response = await window.pywebview.api.STORAGE.load_all_steps();
-  console.log(response)
   const result = unpackResponse(response) as StepBlueprint[];
   return result.filter((step) => !step.id.includes("Dummy")); // Filter out null values
 }
@@ -156,7 +153,6 @@ export async function getRunResult(run_id: string): Promise<any> {
     // Ensure response is parsed as JSON
     const result = unpackResponse(response);
     if (typeof result === "string") {
-      console.log("Parsing JSON string:", result);
       return JSON.parse(result);
     }
     return result; // Already an object
@@ -169,7 +165,6 @@ export async function getRunResult(run_id: string): Promise<any> {
 export async function saveRunResult(run_id: string): Promise<boolean> {
   await waitForPywebview();
   try {
-    console.log("Saving run result for", run_id)
     const response = await window.pywebview.api.RUNS.saveResult(run_id);
     // Ensure response is parsed as JSON
     unpackResponse(response); // Already an object
