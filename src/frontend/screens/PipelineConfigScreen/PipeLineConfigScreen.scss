@@ -251,6 +251,17 @@
         transition: background-color 0.3s, box-shadow 0.3s;
         position: relative;
 
+        &:disabled {
+          opacity: 0.3;
+          background-color: gray;
+          color: darkgrey;
+          cursor: default;
+          &:hover {
+            background-color: gray;
+            box-shadow: 0 0 0;
+          }
+        }
+
         svg {
           margin-right: 5px;
         }
@@ -262,6 +273,9 @@
         &:hover {
           background-color: #e0e0e0;
           box-shadow: 0 0 5px #ccc;
+        }
+        &:disabled {
+
         }
       }
 
@@ -294,6 +308,8 @@
           display: block;
           opacity: 1;
         }
+
+
       }
 
       .revert-button {

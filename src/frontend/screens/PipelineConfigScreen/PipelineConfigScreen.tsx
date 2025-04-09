@@ -37,35 +37,34 @@ const PipelineConfigScreen: React.FC<PipelineConfigScreenProps> = ({
   const [pipelineName, setPipelineName] = useState(pipeline?.name ?? '');
   const [pipelineDescription, setPipelineDescription] = useState(pipeline?.description ?? 'No description');
   const [steps, setSteps] = useState<StepValues[]>(pipeline?.steps ?? []);
+  const [isModified, setIsModified] = useState<boolean>(false)
+
   const [selectedStepIndex, setSelectedStepIndex] = useState<number | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+
   const [showSaved, setShowSaved] = useState(false);
   const [showReverted, setShowReverted] = useState(false)
   const [showOperationToolbox, setShowOperationToolbox] = useState(false);
   const [showInputCsv, setShowInputCsv] = useState(false);
+
   const inputHandle = useInputHandleContext();
 
   const toolboxRef = useRef<HTMLDivElement>(null);
   const addOperationRef = useRef<HTMLDivElement>(null);
 
 
-    // Sync local state when initialPipe prop changes
-    useEffect(() => {
-      setPipeline(pipeline);
-    }, [initialPipe]);
+  useEffect(() => {
+    console.log("IsModified", isModified)
+  })
 
-    // Existing useEffect to update derived state
-    useEffect(() => {
-      setPipelineName(pipeline?.name ?? '');
-      setPipelineDescription(pipeline?.description ?? 'No description');
-      setSteps(pipeline?.steps ?? []);
-    }, [pipeline]);
-
+  // Existing useEffect to update derived state
   useEffect(() => {
     setPipelineName(pipeline?.name ?? '');
     setPipelineDescription(pipeline?.description ?? 'No description');
     setSteps(pipeline?.steps ?? []);
   }, [pipeline]);
+
+
 
   const { blueprints } = useBlueprintContext();
   const blueprintMap = useMemo(() => listToMap(blueprints, (bp: StepBlueprint) => bp.id), [blueprints]);
@@ -97,6 +96,8 @@ const PipelineConfigScreen: React.FC<PipelineConfigScreenProps> = ({
       description: pipelineDescription,
       steps,
     });
+    setIsModified(false);
+
     setShowSaved(true);
     setTimeout(() => setShowSaved(false), 2000);
   };
@@ -104,6 +105,8 @@ const PipelineConfigScreen: React.FC<PipelineConfigScreenProps> = ({
   const handleRevertChanges = () => {
     const freshPipeline = { ...initialPipe };
     setPipeline(freshPipeline);
+    setIsModified(false)
+
     setShowReverted(true);
     setTimeout(() => setShowReverted(false), 2000);
   }
@@ -136,6 +139,7 @@ const PipelineConfigScreen: React.FC<PipelineConfigScreenProps> = ({
       uniqueId: `unique-${Date.now()}`,
     };
     setSteps([...steps, newStep]);
+
     setShowOperationToolbox(false);
   };
 
@@ -176,9 +180,17 @@ const PipelineConfigScreen: React.FC<PipelineConfigScreenProps> = ({
       <div className="pipeline-header">
         <h2>General Settings</h2>
         <label>Name:</label>
-        <TextFieldPicker value={pipelineName} onChange={(name) => setPipelineName(name)} />
+        <TextFieldPicker value={pipelineName} onChange={(name) => {
+          setPipelineName(name)
+          setIsModified(true)
+          }}
+        />
         <label>Description:</label>
-        <TextFieldPicker value={pipelineDescription} onChange={(desc) => setPipelineDescription(desc)} />
+        <TextFieldPicker value={pipelineDescription} onChange={(desc) =>  {
+          setPipelineDescription(desc)
+          setIsModified(true)
+        }}
+        />
       </div>
 
       {/* Operations */}
@@ -284,6 +296,7 @@ const PipelineConfigScreen: React.FC<PipelineConfigScreenProps> = ({
                 const updatedSteps = [...steps];
                 updatedSteps[selectedStepIndex] = { ...updatedSteps[selectedStepIndex], ...updatedValues };
                 setSteps(updatedSteps);
+                setIsModified(true)
               }}
               onDeleteStep={handleDeleteStep(selectedStepIndex)}
               isSingleOperation={isSingleOperation}
@@ -294,16 +307,16 @@ const PipelineConfigScreen: React.FC<PipelineConfigScreenProps> = ({
 
       {/* Buttons */}
       <div className="button-container">
-        <button className="back-button" onClick={handleGoBack}>
+        <button className="back-button" onClick={handleGoBack} disabled={isModified}>
           <FaArrowLeft /> Back
         </button>
-        <button className={`save-button ${showSaved ? 'show-saved' : ''}`} onClick={handleSavePipeline}>
+        <button className={`save-button ${showSaved ? 'show-saved' : ''}`} onClick={handleSavePipeline} disabled={!isModified}>
           <FaSave /> Save
         </button>
-        <button className={`revert-button ${showReverted ? 'show-reverted' : ''}`} onClick={handleRevertChanges}>
+        <button className={`revert-button ${showReverted ? 'show-reverted' : ''}`} onClick={handleRevertChanges} disabled={!isModified}>
           <FaClockRotateLeft /> Revert Changes
         </button>
-        <button className="run-button" onClick={handleRunPipeline}>
+        <button className="run-button" onClick={handleRunPipeline} disabled={isModified}>
           <FaPlay /> Run Pipeline
         </button>
       </div>

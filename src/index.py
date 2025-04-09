@@ -43,7 +43,7 @@ def loading_window():
 
 if __name__ == '__main__':
     # loading_window()
-    do_debug = getattr(sys, 'frozen', True)  # Debug mode if not frozen (i.e., not packaged)
+    do_debug = not getattr(sys, 'frozen', False)  # Debug mode if not frozen (i.e., not packaged)
 
     print("Creating window...")
     # Create the window immediately
@@ -63,4 +63,4 @@ if __name__ == '__main__':
 
     # Start the UI immediately
     #webview.settings['OPEN_DEVTOOLS_IN_DEBUG'] = False
-    webview.start(debug=True, gui='edgechromium')
+    webview.start(debug=do_debug, gui='edgechromium')

@@ -75,6 +75,11 @@ function App() {
     }
   }, []);
 
+  const goToInputScreen = () => {
+    setCurrentScreen('input');
+    setCurrentStep(0);
+  };
+
   const goToLandingPage = () => {
     setCurrentScreen('landing');
     setCurrentStep(1);
@@ -84,11 +89,6 @@ function App() {
     setSelectedPipeline(pipeline);
     setCurrentScreen('pipelineConfig');
     setCurrentStep(2);
-  };
-
-  const goToInputScreen = () => {
-    setCurrentScreen('input');
-    setCurrentStep(0);
   };
 
   const goToResultsScreen = (pipeline: Pipeline) => {
@@ -144,6 +144,9 @@ function App() {
           break;
         case 2:
           if (selectedPipeline) {
+            if (currentScreen == "results") {
+              // TODO: Reload pipeline
+            }
             goToConfigScreen(selectedPipeline);
           } else {
             goToLandingPage();

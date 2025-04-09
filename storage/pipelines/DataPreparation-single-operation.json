@@ -9,7 +9,7 @@
                 "remove non-ascii": true,
                 "lowercase": true,
                 "remove stopwords": {
-                    "activate": true,
+                    "activate": false,
                     "language": "de_core_news_sm"
                 },
                 "output column": "text",
