@@ -35,28 +35,28 @@ class TextSimilarityAnalysisOperation(StepOperation):
         notifier.log("Text Similarity Analysis Operation initialized using transformer model.", LogLevels.INFO)
 
     def compute_embedding(self, text: str):
-        """
-        Computes an embedding for the given text using mean pooling over the transformer outputs.
-        """
+        """Handle varying hidden sizes automatically"""
+        from torch import no_grad, clamp
 
-        from torch import no_grad, sum, clamp
+        inputs = self.tokenizer(text, return_tensors="pt", padding=True, truncation=True, max_length=512)
+        inputs = {k: v.to(self.device) for k, v in inputs.items()}
 
-        inputs = self.tokenizer(text, return_tensors="pt", padding=True, truncation=True)
-        # Move inputs to the correct device.
-        inputs = {key: value.to(self.device) for key, value in inputs.items()}
         with no_grad():
             outputs = self.model(**inputs)
-        # Mean pooling over the token embeddings
-        attention_mask = inputs["attention_mask"].unsqueeze(-1).expand(outputs.last_hidden_state.size()).float()
-        sum_embeddings = sum(outputs.last_hidden_state * attention_mask, dim=1)
-        sum_mask = clamp(attention_mask.sum(dim=1), min=1e-9)
-        embedding = sum_embeddings / sum_mask
-        return embedding[0]
+
+        # Unified pooling logic
+        if hasattr(outputs, "last_hidden_state"):
+            embeddings = outputs.last_hidden_state
+        else:
+            embeddings = outputs[0]  # Handle models without explicit last_hidden_state
+
+        attention_mask = inputs["attention_mask"]
+        input_mask_expanded = attention_mask.unsqueeze(-1).expand(embeddings.size()).float()
+        sum_embeddings = (embeddings * input_mask_expanded).sum(dim=1)
+        sum_mask = clamp(input_mask_expanded.sum(dim=1), min=1e-9)
+        return sum_embeddings / sum_mask
 
     def compute_similarity(self, text1: str, text2: str) -> float:
-        """
-        Computes a cosine similarity between two texts using transformer-based embeddings.
-        """
         if not (isinstance(text1, str) and isinstance(text2, str)):
             return 0.0
 
@@ -64,9 +64,10 @@ class TextSimilarityAnalysisOperation(StepOperation):
 
         emb1 = self.compute_embedding(text1)
         emb2 = self.compute_embedding(text2)
-        similarity = cosine_similarity(emb1.unsqueeze(0), emb2.unsqueeze(0)).item()
-        return similarity
 
+        # Remove unsqueeze(0) - embeddings already have batch dimension
+        similarity = cosine_similarity(emb1, emb2, dim=1).item()  # <-- Fix here
+        return similarity
     def run(self, payload: Payload, notifier: FrontendNotifier) -> StepState:
         try:
             data = payload.data

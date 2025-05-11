@@ -50,65 +50,91 @@ def load_spacy_model_on_demand(model_name: str, notifier: FrontendNotifier):
 
 def _get_or_create_internal():
     path = os.path.join(PATHS.cache, "models")
-    if not os.path.exists(path):
-        os.mkdir(path)
+    os.makedirs(path, exist_ok=True)
     return path
 
 
 def _set_hf_cache():
-    """Point all HF downloads to internal_storage."""
-    internal_storage = str(_get_or_create_internal)
-    os.environ.setdefault("TRANSFORMERS_CACHE", internal_storage)
-    os.environ.setdefault("HF_HOME", internal_storage)
-
+    cache_root = _get_or_create_internal()
+    os.environ["HF_HOME"] = cache_root
+    os.environ["HF_DATASETS_CACHE"] = os.path.join(cache_root, "datasets")
+    os.environ["TRANSFORMERS_CACHE"] = os.path.join(cache_root, "transformers")
 
 
 def ensure_transformer(model_name: str):
     from transformers import AutoTokenizer, AutoModel
-    internal_storage = _get_or_create_internal()
+    from huggingface_hub import snapshot_download
 
-    """Download tokenizer + model if missing, then return local paths."""
     _set_hf_cache()
+    cache_dir = _get_or_create_internal()
 
-    # tokenizer
     try:
-        AutoTokenizer.from_pretrained(model_name, local_files_only=True)
-    except OSError:
-        AutoTokenizer.from_pretrained(model_name, cache_dir=internal_storage)
-    # model
-    try:
-        AutoModel.from_pretrained(model_name, local_files_only=True)
-    except OSError:
-        AutoModel.from_pretrained(model_name, cache_dir=internal_storage)
+        # Check if model exists locally
+        snapshot_download(
+            model_name,
+            cache_dir=cache_dir,
+            local_files_only=True
+        )
+    except FileNotFoundError:
+        # Download with proper structure
+        snapshot_download(
+            model_name,
+            cache_dir=cache_dir,
+            allow_patterns=["*.json", "*.model", "*.bin", "*.safetensors"]
+        )
+
+    # Now load normally
+    AutoTokenizer.from_pretrained(model_name, cache_dir=cache_dir)
+    AutoModel.from_pretrained(model_name, cache_dir=cache_dir)
 
 
 def load_transformer(model_name: str):
+    """
+    Ensure the model is cached, then load and return (tokenizer, model)
+    strictly from disk (no network).
+    """
     from transformers import AutoTokenizer, AutoModel
-    internal_storage = _get_or_create_internal()
 
-    """Ensure download and return (tokenizer, model) loaded from internal_storage."""
+    _set_hf_cache()
+    cache_dir = _get_or_create_internal()
+
+    # First, ensure the files are present
     ensure_transformer(model_name)
-    tok = AutoTokenizer.from_pretrained(model_name,
-                                        cache_dir=internal_storage,
-                                        local_files_only=True)
-    mdl = AutoModel.from_pretrained(model_name,
-                                    cache_dir=internal_storage,
-                                    local_files_only=True)
-    return tok, mdl
+
+    # Then load offline
+    tokenizer = AutoTokenizer.from_pretrained(
+        model_name,
+        cache_dir=cache_dir,
+        local_files_only=True
+    )
+    model = AutoModel.from_pretrained(
+        model_name,
+        cache_dir=cache_dir,
+        local_files_only=True
+    )
+    return tokenizer, model
 
 
 def load_pipeline(task: str, model_name: str):
-    from transformers import pipeline
-    internal_storage = _get_or_create_internal()
+    from transformers import AutoTokenizer, AutoModelForSequenceClassification, pipeline
 
-    """Ensure pipeline model is cached, then load it offline."""
     _set_hf_cache()
+    cache_dir = _get_or_create_internal()
+
+    # 1) Make sure the files are on disk (this will fetch if missing)
     try:
-        # fast path if already cached
-        return pipeline(task, model=model_name, local_files_only=True)
+        AutoTokenizer.from_pretrained(model_name, local_files_only=True, cache_dir=cache_dir)
+        AutoModelForSequenceClassification.from_pretrained(model_name, local_files_only=True, cache_dir=cache_dir)
     except OSError:
-        # initial download
-        return pipeline(task, model=model_name, cache_dir=internal_storage)
+        AutoTokenizer.from_pretrained(model_name, cache_dir=cache_dir)
+        AutoModelForSequenceClassification.from_pretrained(model_name, cache_dir=cache_dir)
+
+    # 2) Load strictly offline
+    tok = AutoTokenizer.from_pretrained(model_name, local_files_only=True, cache_dir=cache_dir)
+    mdl = AutoModelForSequenceClassification.from_pretrained(model_name, local_files_only=True, cache_dir=cache_dir)
+
+    # 3) Build a pipeline with preloaded objects
+    return pipeline(task, model=mdl, tokenizer=tok)
 
 
 def load_sentence_transformer(model_name: str):

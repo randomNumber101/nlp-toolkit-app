@@ -33,7 +33,7 @@
       "description": "The transformer model name to use for computing text embeddings.",
       "input": {
         "type": "list",
-        "possibilities": ["distilbert-base-uncased", "bert-base-uncased", "roberta-base"]
+        "possibilities": ["sentence-transformers/all-MiniLM-L6-v2", "T-Systems-onsite/cross-en-de-roberta-sentence-transformer"]
       },
       "default": "distilbert-base-uncased"
     }
