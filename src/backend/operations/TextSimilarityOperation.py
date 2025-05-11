@@ -8,13 +8,13 @@ from backend.types.frontendNotifier import FrontendNotifier
 from backend.types.operation import StepOperation
 from backend.types.payload import Payload
 
+from backend.operations.operation_utils import load_transformer
 
 class TextSimilarityAnalysisOperation(StepOperation):
     def initialize(self, config: Config, notifier: FrontendNotifier):
 
         print("Importing TextSimilarity deps")
         import torch
-        from transformers import AutoTokenizer, AutoModel
         print("Done.")
 
         self.config = config
@@ -28,8 +28,7 @@ class TextSimilarityAnalysisOperation(StepOperation):
         self.model_name = config.get("transformer model", "distilbert-base-uncased")
         notifier.log(f"Loading transformer model and tokenizer '{self.model_name}' for text similarity...",
                      LogLevels.INFO)
-        self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
-        self.model = AutoModel.from_pretrained(self.model_name)
+        self.tokenizer, self.model = load_transformer(model_name=self.model_name)
         self.model.eval()
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.model.to(self.device)

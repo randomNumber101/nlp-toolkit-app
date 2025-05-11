@@ -56,6 +56,7 @@ if __name__ == '__main__':
     )
     print("Window created")
 
+
     # Start the API initialization in a separate thread
     api_thread = threading.Thread(target=initialize_api, args=(window,))
     api_thread.daemon = True  # Daemonize thread to exit when the main program exits

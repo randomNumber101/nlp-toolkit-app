@@ -1,3 +1,4 @@
+from backend.operations.operation_utils import load_sentence_transformer, load_transformer
 from backend.transferObjects.eventTransferObjects import StepState, LogLevels
 
 from backend.transferObjects.visualization import PlotlyViz, MultiVisualization
@@ -47,14 +48,20 @@ class BertTopicOperation(StepOperation):
         self.vectorizer_config = config["topic modeling"]["vectorizer"].get_values()
         self.use_verbose = config["topic modeling"].get("Use verbose progress reporting", False)
 
-
         notifier.log("Initializing models...", LogLevels.INFO)
-        # Initialize BERTopic core
         ctfidf_model = ClassTfidfTransformer(reduce_frequent_words=True)
+
+        notifier.log("Loading BERTopic embedding model from internal storage...", LogLevels.INFO)
+
+        # Load from local cache, inject into pipeline
+        emb_model = load_sentence_transformer("all-MiniLM-L6-v2")
+
         self.topic_model = BERTopic(
+            embedding_model=emb_model,
             language=self.language,
             min_topic_size=self.cluster_size,
-            ctfidf_model=ctfidf_model)
+            ctfidf_model=ctfidf_model
+        )
 
         from sklearn.feature_extraction.text import CountVectorizer
         if self.vectorizer_config:
@@ -73,10 +80,11 @@ class BertTopicOperation(StepOperation):
         notifier.log("Verbose progress reporting enabled", LogLevels.INFO)
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-        # Initialize DistilBERT tokenizer and model for embeddings
         notifier.log(f"Initializing DistilBERT model and tokenizer for {self.language}...", LogLevels.INFO)
-        self.tokenizer = DistilBertTokenizer.from_pretrained('distilbert-base-multilingual-cased')
-        self.embedding_model = DistilBertModel.from_pretrained('distilbert-base-multilingual-cased')
+
+        self.tokenizer, self.embedding_model = load_transformer(
+            "distilbert-base-multilingual-cased"
+        )
 
         if torch.cuda.device_count() > 1:
             notifier.log(f"Using {torch.cuda.device_count()} GPUs", LogLevels.INFO)

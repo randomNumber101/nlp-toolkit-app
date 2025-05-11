@@ -8,7 +8,7 @@ from backend.types.config import Config
 from backend.types.frontendNotifier import FrontendNotifier
 from backend.types.operation import ParallelizableOperation
 from backend.types.payload import Payload
-
+from backend.operations.operation_utils import load_pipeline
 
 class SentimentAnalysisOperation(ParallelizableOperation, ABC):
 
@@ -20,12 +20,12 @@ class SentimentAnalysisOperation(ParallelizableOperation, ABC):
         self.output_prefix = config["sentiment analysis"].get("output columns prefix", "sentiment_")
 
         notifier.log("Initializing Sentiment Analysis Operation for language " + self.language, LogLevels.INFO)
-        from transformers import pipeline
+
         if self.language == "en":
-            self.sentiment_pipeline = pipeline("sentiment-analysis",
-                                               model="distilbert-base-uncased-finetuned-sst-2-english")
+            self.sentiment_pipeline = load_pipeline("sentiment-analysis",
+                                               model_name="distilbert-base-uncased-finetuned-sst-2-english")
         elif self.language == "de":
-            self.sentiment_pipeline = pipeline("sentiment-analysis", model="oliverguhr/german-sentiment-bert")
+            self.sentiment_pipeline = load_pipeline("sentiment-analysis", model_name="oliverguhr/german-sentiment-bert")
         else:
             raise ValueError("Unsupported language for sentiment analysis.")
         notifier.log("Sentiment Analysis Operation initialized successfully. ", LogLevels.INFO)

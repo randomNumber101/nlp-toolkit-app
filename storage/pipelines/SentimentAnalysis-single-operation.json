@@ -5,7 +5,13 @@
     "steps": [
         {
             "stepId": "SentimentAnalysis",
-            "values": {}
+            "values": {
+                "sentiment analysis": {
+                    "language": "en"
+                },
+                "output columns prefix": "text",
+                "input column": "text"
+            }
         }
     ],
     "tags": [

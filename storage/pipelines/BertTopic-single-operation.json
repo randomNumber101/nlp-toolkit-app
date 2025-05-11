@@ -7,7 +7,7 @@
             "stepId": "BertTopic",
             "values": {
                 "topic modeling": {
-                    "language": "english",
+                    "language": "multilingual",
                     "min_cluster_size": 10,
                     "vectorizer": {
                         "max_df": 0.95,
