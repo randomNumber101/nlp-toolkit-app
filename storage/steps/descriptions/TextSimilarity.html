@@ -47,21 +47,26 @@
       <li><strong>Text Columns:</strong>
         <ul>
           <li>Select the two columns containing the texts to compare.</li>
-          <li>Defaults: <code>text1</code> and <code>text2</code>.</li>
+          <li>Defaults: <code>text1</code> and <code>txt2</code>.</li>
+        </ul>
+      </li>
+      <li><strong>Do cross comparison</strong>
+        <ul>
+          <li><strong>If not selected,</strong> each row of the both text columns will result in one pair on which similarity analysis will be conducted. Both columns need to have the same length.</li>
+          <li><strong>If selected,</strong> each entry of column 1 will be compared with each entry of column 2. This takes considerably longer for large columns. Column lengths may differ.</li>
         </ul>
       </li>
       <li><strong>Output Column:</strong>
         <ul>
-          <li>Defines where the similarity score is stored.</li>
+          <li>Defines where the similarity score is stored. Will be ignored if cross comparison is enabled.</li>
           <li>Default: <code>similarity</code>.</li>
         </ul>
       </li>
       <li><strong>Model Selection:</strong>
         <ul>
-          <li>Different models affect speed and accuracy.</li>
-          <li><code>distilbert-base-uncased</code>: Faster but slightly less accurate.</li>
-          <li><code>bert-base-uncased</code>: More accurate, higher resource usage.</li>
-          <li><code>roberta-base</code>: Robust for contextual meaning but slower.</li>
+          <li>Different models depending on language.</li>
+          <li><code>sentence-transformers/all-MiniLM-L6-v2</code> Small, powerful English model</li>
+          <li><code>T-Systems-onsite/cross-en-de-roberta-sentence-transformer</code> English & German model.</li>
         </ul>
       </li>
       <li><strong>Device Utilization:</strong>

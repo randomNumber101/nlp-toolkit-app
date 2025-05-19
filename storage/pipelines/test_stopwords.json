@@ -11,7 +11,8 @@
                 },
                 "lowercase": true,
                 "input column": "text",
-                "output column": "cleaned"
+                "output column": "cleaned",
+                "remove non-ascii": true
             }
         },
         {
@@ -21,6 +22,27 @@
                     "language": "en"
                 },
                 "input column": "cleaned"
+            }
+        },
+        {
+            "stepId": "KeywordExtraction",
+            "values": {
+                "keyword extraction": {
+                    "num_keywords": 5,
+                    "language_model": "en_core_web_md"
+                },
+                "output column": "keywords",
+                "input column": "text"
+            }
+        },
+        {
+            "stepId": "TextSimilarityAnalysis",
+            "values": {
+                "transformer model": "sentence-transformers/all-MiniLM-L6-v2",
+                "output column": "similarity",
+                "Do cross comparison": false,
+                "second text column": "text2",
+                "first text column": "text1"
             }
         }
     ],

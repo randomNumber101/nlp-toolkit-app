@@ -9,7 +9,8 @@
                 "transformer model": "T-Systems-onsite/cross-en-de-roberta-sentence-transformer",
                 "output column": "similarity",
                 "second text column": "text2",
-                "first text column": "text1"
+                "first text column": "text1",
+                "Do cross comparison": true
             }
         }
     ],

@@ -10,6 +10,7 @@ from backend.types.operation import ParallelizableOperation
 from backend.types.payload import Payload
 from backend.operations.operation_utils import load_pipeline
 
+
 class SentimentAnalysisOperation(ParallelizableOperation, ABC):
 
     def initialize(self, config: Config, notifier: FrontendNotifier):
@@ -23,7 +24,7 @@ class SentimentAnalysisOperation(ParallelizableOperation, ABC):
 
         if self.language == "en":
             self.sentiment_pipeline = load_pipeline("sentiment-analysis",
-                                               model_name="distilbert-base-uncased-finetuned-sst-2-english")
+                                                    model_name="distilbert-base-uncased-finetuned-sst-2-english")
         elif self.language == "de":
             self.sentiment_pipeline = load_pipeline("sentiment-analysis", model_name="oliverguhr/german-sentiment-bert")
         else:

@@ -1,3 +1,5 @@
+import pandas
+
 from backend.transferObjects.eventTransferObjects import StepState, LogLevels
 from backend.transferObjects.visualization import MultiVisualization, HTMLViz, SimpleTextViz
 
@@ -9,6 +11,7 @@ from backend.types.operation import StepOperation
 from backend.types.payload import Payload
 
 from backend.operations.operation_utils import load_transformer
+
 
 class TextSimilarityAnalysisOperation(StepOperation):
     def initialize(self, config: Config, notifier: FrontendNotifier):
@@ -23,6 +26,8 @@ class TextSimilarityAnalysisOperation(StepOperation):
         self.second_column = config.get("second text column", "text2")
         # Name of the output column to store similarity scores.
         self.output_column = config.get("output column", "similarity")
+
+        self.cross_compare = config.get("Do cross comparison", False)
 
         # Transformer model types
         self.model_name = config.get("transformer model", "distilbert-base-uncased")
@@ -66,74 +71,144 @@ class TextSimilarityAnalysisOperation(StepOperation):
         emb2 = self.compute_embedding(text2)
 
         # Remove unsqueeze(0) - embeddings already have batch dimension
-        similarity = cosine_similarity(emb1, emb2, dim=1).item()  # <-- Fix here
+        similarity = cosine_similarity(emb1, emb2, dim=1).item()
         return similarity
+
     def run(self, payload: Payload, notifier: FrontendNotifier) -> StepState:
         try:
-            data = payload.data
-            total_rows = len(data)
-            if total_rows == 0:
-                notifier.log("Input data is empty.", LogLevels.ERROR)
-                return StepState.FAILED
-
-            # Ensure that both input columns exist.
-            if self.first_column not in data.columns or self.second_column not in data.columns:
-                notifier.log("One or both specified text columns do not exist in the data.", LogLevels.ERROR)
-                return StepState.FAILED
-
-            similarity_scores = []
-            viz_rows_html = ""  # accumulate table rows for visualization
-
-            for idx, row in data.iterrows():
-                text1 = row[self.first_column]
-                text2 = row[self.second_column]
-                sim = self.compute_similarity(text1, text2)
-                similarity_scores.append(sim)
-
-                # Report progress and logging.
-                progress = ((idx + 1) / total_rows) * 100
-                notifier.sendStatus(StepState.RUNNING, progress=progress)
-                notifier.log(f"Processed row {idx + 1}/{total_rows}: similarity = {sim:.3f}", LogLevels.DEBUG)
-
-                # Build a snippet for the visualization.
-                viz_rows_html += f"<tr><td>{text1}</td><td>{text2}</td><td>{sim:.3f}</td></tr>"
-                time.sleep(0.01)  # simulate delay if needed
-
-            # Store the computed similarity scores into the dataframe.
-            data[self.output_column] = similarity_scores
-            payload.data = data
-
-            # Build a final HTML table as visualization (previewing first 5 rows).
-            table_html = """
-            <div style="font-family: Arial, sans-serif; padding: 20px;">
-              <h3 style="text-align: center;">Text Similarity Analysis Results</h3>
-              <table style="width: 100%; border-collapse: collapse;">
-                <thead>
-                  <tr>
-                    <th style="border: 1px solid #ddd; padding: 8px;">First Text</th>
-                    <th style="border: 1px solid #ddd; padding: 8px;">Second Text</th>
-                    <th style="border: 1px solid #ddd; padding: 8px;">Similarity Score</th>
-                  </tr>
-                </thead>
-                <tbody>
-            """
-
-            # Only use the first 5 rows for visualization.
-            viz_rows = viz_rows_html.split("</tr>")[:5]
-            for row_html in viz_rows:
-                if row_html.strip():
-                    table_html += row_html + "</tr>"
-            table_html += """
-                </tbody>
-              </table>
-            </div>
-            """
-
-            payload.addVisualization(HTMLViz(table_html))
-            notifier.log("Text similarity analysis completed successfully.", LogLevels.INFO)
-            notifier.sendStatus(StepState.SUCCESS, progress=100)
-            return StepState.SUCCESS
+            if self.cross_compare:
+                return self.cross_comparison(payload, notifier)
+            else:
+                return self.pairwise_comparison(payload, notifier)
 
         except Exception as e:
             notifier.log(f"Error during text similarity analysis: {str(e)}", LogLevels.ERROR)
             return StepState.FAILED
+
+
+    def pairwise_comparison(self, payload: Payload, notifier: FrontendNotifier) -> StepState:
+        data: pandas.DataFrame = payload.data
+        total_rows = len(data)
+
+        # Ensure that both input columns exist.
+        if self.first_column not in data.columns or self.second_column not in data.columns:
+            notifier.log("One or both specified text columns do not exist in the data.", LogLevels.ERROR)
+            return StepState.FAILED
+
+        if total_rows == 0:
+            notifier.log("Input data is empty.", LogLevels.ERROR)
+            return StepState.FAILED
+
+        similarity_scores = []
+        viz_rows_html = ""  # accumulate table rows for visualization
+
+        for idx, row in data.iterrows():
+            text1 = row[self.first_column]
+            text2 = row[self.second_column]
+            sim = self.compute_similarity(text1, text2)
+            similarity_scores.append(sim)
+
+            # Report progress and logging.
+            progress = ((idx + 1) / total_rows) * 100
+            notifier.sendStatus(StepState.RUNNING, progress=progress)
+            notifier.log(f"Processed row {idx + 1}/{total_rows}: similarity = {sim:.3f}", LogLevels.DEBUG)
+
+            # Build a snippet for the visualization.
+            viz_rows_html += f"<tr><td>{text1}</td><td>{text2}</td><td>{sim:.3f}</td></tr>"
+            time.sleep(0.01)  # simulate delay if needed
+
+        # Store the computed similarity scores into the dataframe.
+        data[self.output_column] = similarity_scores
+        payload.data = data
+
+        # Build a final HTML table as visualization (previewing first 5 rows).
+        table_html = """
+                   <div style="font-family: Arial, sans-serif; padding: 20px;">
+                     <h3 style="text-align: center;">Text Similarity Analysis Results</h3>
+                     <table style="width: 100%; border-collapse: collapse;">
+                       <thead>
+                         <tr>
+                           <th style="border: 1px solid #ddd; padding: 8px;">First Text</th>
+                           <th style="border: 1px solid #ddd; padding: 8px;">Second Text</th>
+                           <th style="border: 1px solid #ddd; padding: 8px;">Similarity Score</th>
+                         </tr>
+                       </thead>
+                       <tbody>
+                   """
+
+        # Only use the first 5 rows for visualization.
+        viz_rows = viz_rows_html.split("</tr>")[:5]
+        for row_html in viz_rows:
+            if row_html.strip():
+                table_html += row_html + "</tr>"
+        table_html += """
+                       </tbody>
+                     </table>
+                   </div>
+                   """
+
+        payload.addVisualization(HTMLViz(table_html))
+        notifier.log("Text similarity analysis completed successfully.", LogLevels.INFO)
+        notifier.sendStatus(StepState.SUCCESS, progress=100)
+        return StepState.SUCCESS
+
+
+    def _delete_empty_cells(self, column):
+        i = len(column) - 1
+        while column[i] == None or column[i] == "":
+            i -= 1
+        return column[0:i+1]
+
+    def cross_comparison(self, payload: Payload, notifier: FrontendNotifier) -> StepState:
+        import pandas as pd
+        from backend.transferObjects.visualization import PlotlyViz
+        import plotly.graph_objects as go
+
+        data: pandas.DataFrame = payload.data
+        total_rows = len(data)
+
+        # Ensure input columns exist and data is not empty
+        if self.first_column not in data.columns or self.second_column not in data.columns:
+            notifier.log("One or both specified text columns do not exist in the data.", LogLevels.ERROR)
+            return StepState.FAILED
+        if total_rows == 0:
+            notifier.log("Input data is empty.", LogLevels.ERROR)
+            return StepState.FAILED
+
+        # Clean empty cells
+        col1 = self._delete_empty_cells(data[self.first_column])
+        col2 = self._delete_empty_cells(data[self.second_column])
+
+        texts1 = col1.tolist()
+        texts2 = col2.tolist()
+        n, m = len(texts1), len(texts2)
+
+        matrix = []
+        notifier.sendStatus(StepState.RUNNING, progress=0)
+        for i, t1 in enumerate(texts1):
+            row_sims = []
+            for j, t2 in enumerate(texts2):
+                sim = self.compute_similarity(t1, t2)
+                row_sims.append(sim)
+            matrix.append(row_sims)
+
+            # Update progress after each row
+            progress = ((i + 1) / n) * 90
+            notifier.sendStatus(StepState.RUNNING, progress=progress)
+            notifier.log(f"Processed cross row {i+1}/{n}", LogLevels.DEBUG)
+
+        # Create DataFrame of similarities
+        sim_df = pd.DataFrame(matrix, index=texts1, columns=texts2)
+        payload.data = sim_df
+
+        # Build heatmap visualization
+        fig = go.Figure(data=go.Heatmap(z=matrix, x=texts2, y=texts1))
+        payload.addVisualization(PlotlyViz(fig))
+
+        notifier.log("Cross comparison similarity matrix generated.", LogLevels.INFO)
+        notifier.sendStatus(StepState.SUCCESS, progress=100)
+        return StepState.SUCCESS
+
+
+
+
