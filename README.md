@@ -2,6 +2,21 @@
 
 ![diagram](docs/diagram.png)
 
+## Installation
+
+This app is currently only built for **Windows**. It is packaged with all necessary libraries, so no additional software installation is required (which makes the download larger).
+
+To use the app, simply download the folder from the following link:  
+- 👉[NLP4EDU V1.3](https://uni-duesseldorf.sciebo.de/s/hB4Gsw6EY051Myx)👈
+
+This bundle includes the executable (`.exe`) as well as a folder with sample input files.
+
+> **⚠️ Before installing a new version**, remove old temporary files to reset your settings:  
+> 1. Open `C:\Users\<username>\AppData\Roaming`  
+> 2. Delete the folder named `NLP Toolkit`  
+>
+> This will also clear any previous configurations you’ve made.
+
 ## Who is this App for?
 This App enables researchers to use common natural language processing (NLP) methods for data analysis. It provides an **easy-to-use interface** for configuring and running various NLP tasks, **no coding skills required**. 🎉
 
@@ -39,20 +54,7 @@ Generally, you want to provide the app with an input `csv` file resembling a tab
   In plain terms: it reads your documents, finds clusters of similar content, and tells you what each cluster is about in a few key words. Perfect for getting the big picture quickly!  
   [Check out BERTopic](https://maartengr.github.io/BERTopic/index.html)
 
-## Installation
 
-This app is currently only built for **Windows**. It is packaged with all necessary libraries, so no additional software installation is required (which makes the download larger).
-
-To use the app, simply download the folder from the following link:  
-- [NLP4EDU V1.3](https://uni-duesseldorf.sciebo.de/s/hB4Gsw6EY051Myx)
-
-This bundle includes the executable (`.exe`) as well as a folder with sample input files.
-
-> **⚠️ Before installing a new version**, remove old temporary files to reset your settings:  
-> 1. Open `C:\Users\<username>\AppData\Roaming`  
-> 2. Delete the folder named `NLP Toolkit`  
->
-> This will also clear any previous configurations you’ve made.
 
 ---
 
