@@ -1,0 +1,13 @@
+{
+  "input_data": {
+    "type": "text",
+    "data": "This is a great tool!"
+  },
+  "config_params": {
+    "sentiment analysis": {
+      "language": "en",
+      "output columns prefix": "sentiment_"
+    }
+  },
+  "expected_output": {}
+}

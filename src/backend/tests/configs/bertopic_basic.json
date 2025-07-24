@@ -1,0 +1,19 @@
+{
+  "input_data": {
+    "type": "text",
+    "data": "This is a test sentence about topic modeling."
+  },
+  "config_params": {
+    "input column": "text",
+    "output columns prefix": "topic_",
+    "topic modeling": {
+      "language": "english",
+      "min_cluster_size": 1,
+      "vectorizer": {
+        "use_default": true
+      },
+      "Use verbose progress reporting": false
+    }
+  },
+  "expected_output": {}
+}

@@ -41,6 +41,7 @@ class TextSimilarityAnalysisOperation(StepOperation):
 
     def compute_embedding(self, text: str):
         """Handle varying hidden sizes automatically"""
+        import torch
         from torch import no_grad, clamp
 
         inputs = self.tokenizer(text, return_tensors="pt", padding=True, truncation=True, max_length=512)
@@ -55,7 +56,11 @@ class TextSimilarityAnalysisOperation(StepOperation):
         else:
             embeddings = outputs[0]  # Handle models without explicit last_hidden_state
 
-        attention_mask = inputs["attention_mask"]
+        if "attention_mask" in inputs and inputs["attention_mask"].numel() > 0:
+            attention_mask = inputs["attention_mask"]
+        else:
+            # Create a mask of all ones if attention_mask is missing or empty
+            attention_mask = torch.ones(embeddings.size(0), embeddings.size(1), device=self.device)
         input_mask_expanded = attention_mask.unsqueeze(-1).expand(embeddings.size()).float()
         sum_embeddings = (embeddings * input_mask_expanded).sum(dim=1)
         sum_mask = clamp(input_mask_expanded.sum(dim=1), min=1e-9)

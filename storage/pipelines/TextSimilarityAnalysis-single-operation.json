@@ -10,7 +10,7 @@
                 "output column": "similarity",
                 "second text column": "text2",
                 "first text column": "text1",
-                "Do cross comparison": true
+                "Do cross comparison": false
             }
         }
     ],

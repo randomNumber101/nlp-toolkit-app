@@ -1,0 +1,14 @@
+{
+  "input_data": {
+    "type": "text",
+    "data": "This is a test sentence for text similarity."
+  },
+  "config_params": {
+    "first text column": "text",
+    "second text column": "text",
+    "output column": "similarity",
+    "Do cross comparison": false,
+    "transformer model": "distilbert-base-uncased"
+  },
+  "expected_output": {}
+}

@@ -1,0 +1,19 @@
+{
+    "test_name": "basic_text_similarity_pairwise_test",
+    "operation_name": "TextSimilarityOperation",
+    "input_data": [
+        {"text1": "The cat sat on the mat.", "text2": "The cat is on the mat."},
+        {"text1": "I love this movie.", "text2": "I hate this movie."}
+    ],
+    "configuration": {
+        "first text column": "text1",
+        "second text column": "text2",
+        "output column": "similarity",
+        "Do cross comparison": false,
+        "transformer model": "distilbert-base-uncased"
+    },
+    "expected_output": [
+        {"similarity": 0.9},
+        {"similarity": 0.1}
+    ]
+}

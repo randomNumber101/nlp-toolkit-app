@@ -59,7 +59,7 @@
                             }
                         ],
                         "active": "true",
-                        "extended": true
+                        "extended": false
                     }
                 ],
                 "input column": "text"

@@ -144,3 +144,5 @@ class PipelineRunner:
 
             notifier.sendStatus(StepState.SUCCESS, 100)
             stepIndex += 1
+
+        notifier.sendStatus(StepState.SUCCESS, 100)

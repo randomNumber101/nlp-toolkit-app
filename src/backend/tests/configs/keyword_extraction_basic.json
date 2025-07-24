@@ -1,0 +1,15 @@
+{
+  "input_data": {
+    "type": "text",
+    "data": "This is a test sentence for keyword extraction."
+  },
+  "config_params": {
+    "input column": "text",
+    "output column": "keywords",
+    "keyword extraction": {
+      "num_keywords": 3,
+      "language_model": "en_core_web_sm"
+    }
+  },
+  "expected_output": {}
+}

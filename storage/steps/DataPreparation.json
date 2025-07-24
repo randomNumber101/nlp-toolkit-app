@@ -48,6 +48,16 @@
       "type": "bool",
       "default": true,
       "description": "Toggle to remove non-ASCII characters."
+    },
+    "remove punctuation": {
+      "type": "bool",
+      "default": false,
+      "description": "Toggle to remove punctuation characters."
+    },
+    "lemmatize": {
+      "type": "bool",
+      "default": false,
+      "description": "Toggle to lemmatize words to their base form."
     }
   },
   "inputs": {

@@ -40,3 +40,10 @@ class CellNotifierWrapper(FrontendNotifier):
 
         relative_progress = (100 * self.cell_index + progress) / self.total_cells
         self.cellNotifier.sendStatus(StepState.RUNNING, relative_progress)
+
+class DummyNotifier(FrontendNotifier):
+    def log(self, message: str | List[str], level: LogLevels = LogLevels.DEBUG):
+        print(f"LOG ({level.name}): {message}")
+
+    def sendStatus(self, stepState: StepState, progress: float = 0.0):
+        print(f"STATUS: {stepState.name} - {progress}%")

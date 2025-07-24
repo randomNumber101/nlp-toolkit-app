@@ -8,14 +8,14 @@
             "values": {
                 "topic modeling": {
                     "language": "multilingual",
-                    "min_cluster_size": 10,
+                    "min_cluster_size": 7,
                     "vectorizer": {
-                        "max_df": 0.95,
-                        "min_df": 2
+                        "max_df": 1,
+                        "min_df": 1
                     },
                     "Use verbose progress reporting": false
                 },
-                "output columns prefix": "text",
+                "output columns prefix": "",
                 "input column": "text"
             }
         }

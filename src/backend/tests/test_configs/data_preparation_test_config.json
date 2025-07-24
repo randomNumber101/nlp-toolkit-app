@@ -1,0 +1,23 @@
+{
+    "test_name": "basic_data_preparation_test",
+    "operation_name": "DataPreparationOperation",
+    "input_data": [
+        {"text_column": "This is a sample sentence."},
+        {"text_column": "Another sentence for testing."}
+    ],
+    "configuration": {
+        "text_column": "text_column",
+        "remove stopwords": {
+        "activate": true,
+        "language": "english"
+    },
+        "lemmatize": true,
+        "lowercase": true,
+        "remove non-ascii": false,
+        "remove punctuation": true
+    },
+    "expected_output": [
+        {"text_column": "sample sentence"},
+        {"text_column": "sentence test"}
+    ]
+}

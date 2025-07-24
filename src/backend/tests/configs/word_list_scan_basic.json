@@ -1,0 +1,26 @@
+{
+  "input_data": {
+    "type": "text",
+    "data": "This is a test sentence for word list scan."
+  },
+  "config_params": {
+    "input column": "text",
+    "Word lists": [
+      {
+        "active": true,
+        "name": "test_list",
+        "list of words": [
+          {
+            "word": "test",
+            "is regex": false
+          },
+          {
+            "word": "scan",
+            "is regex": false
+          }
+        ]
+      }
+    ]
+  },
+  "expected_output": {}
+}

@@ -1,0 +1,15 @@
+{
+    "test_name": "basic_keyword_extraction_test",
+    "operation_name": "KeywordExtractionOperation",
+    "input_data": [
+        {"text_column": "This is a sample sentence for keyword extraction testing. Sample sentence has keywords."}
+    ],
+    "configuration": {
+        "input column": "text_column",
+        "num_keywords": 3,
+        "language_model": "en_core_web_sm"
+    },
+    "expected_output": [
+        {"keywords": "sample, sentence, keyword"}
+    ]
+}

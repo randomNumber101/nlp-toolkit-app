@@ -1,5 +1,6 @@
 
 from collections import Counter
+import re
 
 from backend.operations.operation_utils import load_spacy_model_on_demand
 from backend.transferObjects.eventTransferObjects import StepState, LogLevels
@@ -19,6 +20,8 @@ class DataPreparationOperation(ParallelizableTextOperation):
         self.do_stopwords = config["remove stopwords"]["activate"]
         self.do_lowercase = config["lowercase"]
         self.do_no_ascii = config["remove non-ascii"]
+        self.do_remove_punctuation = config.get("remove punctuation", False)
+        self.do_lemmatize = config["lemmatize"]
         notifier.log("Data Preparation Operation initialized!")
 
 
@@ -26,6 +29,14 @@ class DataPreparationOperation(ParallelizableTextOperation):
     def single_cell_operation(self, notifier: FrontendNotifier, payload: Payload, text: str) -> str:
 
         stopword_counter = Counter()
+
+        # Apply operations based on config
+        if self.do_lowercase:
+            text = text.lower()
+        if self.do_no_ascii:
+            text = ''.join(char for char in text if ord(char) < 128)
+        if self.do_remove_punctuation:
+            text = re.sub(r'[^\\w\\s]', '', text)
 
         # Remove stopwords (and count those removed) if requested.
         if self.do_stopwords:
@@ -35,7 +46,7 @@ class DataPreparationOperation(ParallelizableTextOperation):
                 if token.is_stop:
                     stopword_counter[token.text.lower()] += 1
                 else:
-                    filtered_tokens.append(token.text)
+                    filtered_tokens.append(token.lemma_ if self.do_lemmatize else token.text)
             text = ' '.join(filtered_tokens)
 
         # Combine lowercasing and ASCII removal in one pass.
@@ -77,3 +88,5 @@ class DataPreparationOperation(ParallelizableTextOperation):
         payload.addVisualization(HTMLViz(stats_html))
         notifier.sendStatus(StepState.SUCCESS, progress=100.0)
         return text
+
+        

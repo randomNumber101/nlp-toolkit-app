@@ -1,0 +1,21 @@
+{
+    "test_name": "basic_sentiment_analysis_test",
+    "operation_name": "SentimentAnalysisOperation",
+    "input_data": [
+        {"text_column": "This is a great movie!"},
+        {"text_column": "I hate this product."},
+        {"text_column": "This is a neutral statement."}
+    ],
+    "configuration": {
+        "input column": "text_column",
+        "sentiment analysis": {
+            "language": "en",
+            "output columns prefix": "sentiment_"
+        }
+    },
+    "expected_output": [
+        {"sentiment_label": "POSITIVE", "sentiment_score": 0.999},
+        {"sentiment_label": "NEGATIVE", "sentiment_score": 0.998},
+        {"sentiment_label": "NEUTRAL", "sentiment_score": 0.5}
+    ]
+}

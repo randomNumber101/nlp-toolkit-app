@@ -1,0 +1,19 @@
+{
+  "input_data": {
+    "type": "text",
+    "data": "This is a test sentence."
+  },
+  "config_params": {
+    "remove stopwords": {
+      "language": "english",
+      "activate": true
+    },
+    "lowercase": true,
+    "remove non-ascii": true,
+    "remove punctuation": true,
+    "lemmatize": true
+  },
+  "expected_output": {
+    "text": ""
+  }
+}
