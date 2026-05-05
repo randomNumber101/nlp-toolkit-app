@@ -1,0 +1,41 @@
+# Use a standard Ubuntu image as the base
+FROM ubuntu:22.04
+
+# Avoid interactive prompts during package installation
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install system dependencies required for Python, Node.js, and pywebview (GTK backend)
+RUN apt-get update && apt-get install -y \
+    python3 \
+    python3-pip \
+    python3-venv \
+    git \
+    curl \
+    libgirepository1.0-dev \
+    gcc \
+    libcairo2-dev \
+    pkg-config \
+    python3-dev \
+    gir1.2-gtk-3.0 && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install Node.js 20.x
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
+    apt-get install -y nodejs
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy all your project files into the container
+COPY . .
+
+# Create and activate a virtual environment, then install Python dependencies
+RUN python3 -m venv venv
+RUN . venv/bin/activate && pip install --no-cache-dir -r requirements.txt
+
+# Install frontend dependencies and build the React app
+RUN npm install
+RUN npm run frontend:prod
+
+# Define the command to run the build. Activates the venv and calls pyinstaller.
+CMD ["/bin/bash", "-c", ". venv/bin/activate && pyinstaller --noconfirm build-linux.spec"]

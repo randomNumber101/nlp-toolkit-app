@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import './PipelineConfigScreen.scss';
+import './PipeLineConfigScreen.scss';
 import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
 import { Pipeline, StepBlueprint, StepValues } from '../../types';
 import OperationBox from '../../components/OperationBox/OperationBox';

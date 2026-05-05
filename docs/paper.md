@@ -9,11 +9,11 @@ tags:
   - React
 authors:
   - name: Michael Khal
-    orcid: 0000-0000-0000-0000 
+    orcid: 0000-0002-5020-9000 
     affiliation: 1
     corresponding: true
   - name: Boris Thome
-    orcid: 0000-0000-0000-0000 
+    orcid: 0000-0002-5020-9000 
     affiliation: 1
 affiliations:
  - name: Heinrich-Heine Universität Düsseldorf, Germany
@@ -24,7 +24,7 @@ bibliography: paper.bib
 
 ## Summary
 
-**NLP4EDU** is a standalone desktop application that provides a graphical user interface for common Natural Language Processing (NLP) operations. Packaged as a simple executable file, it allows users to import tabular data (CSV) and apply a sequence of text analysis tasks without writing any code. The results, including processed data tables and visualizations, can be directly previewed and exported. The software is built with a Python backend (using libraries such as spaCy, Hugging Face Transformers, and BERTopic) and a modern React frontend, connected via `pywebview`. This architecture ensures both powerful analytical capabilities and a responsive, user-friendly experience.
+**NLP4EDU** is a standalone desktop application that provides a graphical user interface for common Natural Language Processing (NLP) operations. Packaged as a simple executable file, it allows users to import tabular data (CSV) and apply a sequence of text analysis tasks without writing any code. The results, including processed data tables and visualizations, can be directly previewed and exported. The software is built with a Python backend (using libraries such as spaCy, Hugging Face Transformers, and BERTopic) and a modern React frontend, connected via `pywebview`. This architecture ensures both powerful analytical capabilities and a responsive, user-friendly experience. The software is released under the MIT license.
 
 ---
 
@@ -42,12 +42,12 @@ Furthermore, the software is designed for extensibility. The modular architectur
 
 The toolbox offers a range of core NLP functionalities that can be chained together into pipelines:
 
-* **Data Preparation**: Cleans text by converting to lowercase, removing stopwords and punctuation, and performing lemmatization using `spaCy` models.
+* **Data Preparation**: Cleans text by converting to lowercase, removing stopwords and punctuation, and performing lemmatization using `spaCy` models [@spacy2017].
 * **Keyword Extraction**: Identifies the most frequent and significant terms in a text corpus.
-* **Sentiment Analysis**: Assigns a sentiment score (positive/negative) to texts using pre-trained models from Hugging Face Transformers.
+* **Sentiment Analysis**: Assigns a sentiment score (positive/negative) to texts using pre-trained models from Hugging Face Transformers [@huggingface2020transformers].
 * **Text Similarity**: Calculates the cosine similarity between text entries using sentence-transformer embeddings to find semantic likeness.
 * **Word List Scan**: Scans text for the presence and frequency of user-defined keywords or regular expressions.
-* **BERTopic Modeling**: Discovers latent topics in documents using `BERTopic`, providing interactive visualizations of the topic structures.
+* **BERTopic Modeling**: Discovers latent topics in documents using `BERTopic` [@bertopic2022], providing interactive visualizations of the topic structures.
 
 Each operation is configurable, allowing users to specify parameters such as the text column to be analyzed, language models to use, or the number of keywords to extract.
 
