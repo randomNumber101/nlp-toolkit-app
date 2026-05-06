@@ -19,3 +19,6 @@ venv*
 .pytest_cache
 __pycache__
 .eggs
+# Gemini Documentation
+gemini/
+gemini.md

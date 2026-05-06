@@ -109,12 +109,13 @@ class RunStorageApi:
 
 class RunApi:
 
-    def __init__(self, storage: StorageApi, events: BackendEventApi):
+    def __init__(self, storage: StorageApi, events: BackendEventApi, registry):
         self.runs_dir = storage.PATHS.runs
         self._pipelineApi = storage.PIPELINES
         self._stepApi = storage.STEPS
         self._runStorageApi = RunStorageApi(run_directory=self.runs_dir)
         self._eventApi = events
+        self._registry = registry
 
 
     def invokeEvent(self, name, data_object):
@@ -135,7 +136,7 @@ class RunApi:
         def runStep():
             pipeline = self._pipelineApi.load_pipeline(pipelineId)
             blueprints = {bp.stepId: bp for bp in self._stepApi.load_all()}
-            runner = PipelineRunner(self._eventApi, self._runStorageApi)
+            runner = PipelineRunner(self._eventApi, self._runStorageApi, self._registry)
             runner.start(blueprints, pipeline, run_id, input_data)
 
         runThread = threading.Thread(target=runStep, name=f"StepRunner for {run_id}", daemon=True)

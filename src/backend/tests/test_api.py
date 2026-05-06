@@ -1,8 +1,9 @@
+from src.backend.core.register import GlobalRegistry
 import time
 from collections import Counter
 from unittest.mock import patch, MagicMock
 
-from backend.Api import Api
+from backend.core.Api import Api
 from src.backend.tests.test_utils_operations import get_mock_backend_event_api
 
 def build_input_handle(text):
@@ -14,13 +15,13 @@ from backend.transferObjects.eventTransferObjects import StepStatus, StepState, 
 
 
 def test_get_blueprints():
-    api = Api()
+    api = Api(GlobalRegistry)
     steps = api.STORAGE.load_all_steps()
     assert len(steps) > 0
 
 
 def test_get_pipelines():
-    api = Api()
+    api = Api(GlobalRegistry)
     pipes = api.STORAGE.load_all_pipelines()
     assert len(pipes) > 0
 

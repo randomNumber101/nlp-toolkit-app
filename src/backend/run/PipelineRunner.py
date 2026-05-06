@@ -4,7 +4,7 @@ from typing import Dict, List, Union
 from backend.run.backendEventApi import BackendEventApi
 from backend.transferObjects.eventTransferObjects import StepState, StepLogUpdate, NotificationDomain, StepStatus, Log, \
     LogLevels
-from backend.register import Register
+from backend.core.register import Register
 from backend.run.LogManager import LogManager, LoggerChannel, StatusManager, StatusChannel
 from backend.transferObjects.visualization import MultiVisualization
 from backend.types.blueprint import StepBlueprint
@@ -63,9 +63,10 @@ class RunNotifier(FrontendNotifier):
 
 class PipelineRunner:
 
-    def __init__(self, events: BackendEventApi, runStorage: "RunStorageApi"):
+    def __init__(self, events: BackendEventApi, runStorage: "RunStorageApi", registry):
         self.events = events
         self.storage = runStorage
+        self.registry = registry
 
 
     def __call__(self, *args, **kwargs):
@@ -88,7 +89,7 @@ class PipelineRunner:
 
         # Find first csv parameter in first step
         blueprint_steps = [blueprints[stepVal.stepId] for stepVal in pipeline.steps]
-        base_csv_type = Register.ParamTypeParser.parse("csv[]")
+        base_csv_type = self.registry.ParamTypeParser.parse("csv[]")
 
         first_csv_parameter = None
         for step in blueprint_steps:
@@ -115,9 +116,11 @@ class PipelineRunner:
             try:
                 result = step.run(stepVals, payload, notifier)
             except Exception as e:
+                from backend.core.errors import PipelineError
+                err = PipelineError(f"Backend exception during run: {repr(e)}", step_id=stepVals.stepId)
                 traceback_str = traceback.format_exc()
                 notifier.log(traceback_str, LogLevels.ERROR)
-                notifier.log(f"Backend exception during run: {repr(e)}", LogLevels.ERROR)
+                notifier.log(err.message, LogLevels.ERROR)
                 notifier.sendStatus(StepState.FAILED)
                 return
 

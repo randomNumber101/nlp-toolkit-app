@@ -5,7 +5,8 @@ import sys
 import threading
 import webview
 import encodings
-from backend.Api import Api
+from backend.core.Api import Api
+from backend.core.register import GlobalRegistry
 
 
 def get_entrypoint():
@@ -31,7 +32,7 @@ def initialize_api(window):
     Initialize the API in the background and attach it to the window once ready.
     """
     print("Initializing API...")
-    api = Api()
+    api = Api(GlobalRegistry)
     print("API initialized")
     window._js_api = api
 

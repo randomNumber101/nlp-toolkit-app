@@ -13,25 +13,24 @@ function unpackResponse(response: any) {
 }
 
 async function waitForPywebview(): Promise<void> {
-  console.log("Waiting for webview...")
+  console.log("Waiting for webview...");
+  if (typeof window !== "undefined" && window.pywebview && window.pywebview.api) {
+      console.log("Webview already available.");
+      return Promise.resolve();
+  }
   return new Promise((resolve, reject) => {
-    const interval = setInterval(() => {
-      if (typeof window.pywebview !== "undefined" && window.pywebview.api) {
-        clearInterval(interval);
+    const handleReady = () => {
+        console.log("Webview is available via event.");
+        window.removeEventListener('pywebviewready', handleReady);
         clearTimeout(timeout);
-        console.log("Webview is available. Exiting poll loop.");
         resolve();
-      }
-      else{
-        console.log("Webview not available, yet");
-      }
-    }, 250);
-
-    // Timeout after 3 seconds if pywebview is still unavailable
+    };
+    window.addEventListener('pywebviewready', handleReady);
+    
     const timeout = setTimeout(() => {
-      clearInterval(interval);
-      reject(new Error("pywebview API was not detected within 3 seconds"));
-    }, 3000); // 3 seconds timeout
+      window.removeEventListener('pywebviewready', handleReady);
+      reject(new Error("pywebview API was not detected within 10 seconds"));
+    }, 10000);
   });
 }
 

@@ -3,7 +3,7 @@ import json
 from typing import Optional
 
 from backend.storage.parsing import StepBlueprintParser, PipelineParser
-from backend.register import Register
+from backend.core.register import Register
 from backend.transferObjects.pipelineTransferObjects import convert_pipeline_to_transfer, \
     convert_step_blueprint_to_transfer
 
@@ -60,11 +60,11 @@ class PipelineApi:
 
 class StepsApi:
 
-    def __init__(self, paths):
+    def __init__(self, paths, registry):
         self.PATHS = paths
         self.STEPS = paths.steps
         self.step_parser = StepBlueprintParser(
-            Register.ParamTypeParser, Register.ParamPickerParser, Register.OperationMapper)
+            registry.ParamTypeParser, registry.ParamPickerParser, registry.OperationMapper)
         self._cache = {}
         self.reload_from_storage()
 
@@ -113,10 +113,10 @@ class StepsApi:
 
 class StorageApi:
 
-    def __init__(self):
+    def __init__(self, registry):
         self.PATHS = PATHS
         self.PIPELINES = PipelineApi(self.PATHS)
-        self.STEPS = StepsApi(self.PATHS)
+        self.STEPS = StepsApi(self.PATHS, registry)
 
     def load_pipeline(self, pipeline_id):
         pipeline = self.PIPELINES.load_pipeline(pipeline_id)

@@ -1,10 +1,11 @@
+from src.backend.core.register import GlobalRegistry
 import json
 import os
 from threading import Event
 from collections import Counter
 from unittest.mock import MagicMock
 import pandas as pd
-from src.backend.Api import Api
+from src.backend.core.Api import Api
 from src.backend.run.backendEventApi import BackendEventApi
 from src.backend.types.payload import Payload
 from src.backend.types.frontendNotifier import FrontendNotifier
@@ -29,7 +30,7 @@ class MockBackendEventApi(BackendEventApi):
 
 
 def get_mock_backend_event_api():
-    api = Api()
+    api = Api(GlobalRegistry)
     stateCounter = Counter()
     completion_event = Event()
     api.RUNS._eventApi = MockBackendEventApi(stateCounter, completion_event)
